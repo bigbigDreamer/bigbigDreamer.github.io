@@ -1,0 +1,149 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="BillWang"><meta name="renderer" content="webkit"><meta name="copyright" content="BillWang"><meta name="keywords" content="BillWang"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>axios的二次封装 · BillWang's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/alarm.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/alarm.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">BillWang</div><div class="profile-signature">每个人距离成功都只差一步坚持。</div><div class="friends"><div>FRIENDS</div><span><a href="https://desirefire.github.io/" target="_black">Natalia Tsunako</a></span><span><a href="//itzmn.github.io" target="_black">七夜</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-lg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">凌瑶宫</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">axios的二次封装</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2018-11-04</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="axios"> axios</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="ajax"> ajax</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Promise"> Promise</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">868</span> | Reading time: <span class="post-count">5</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h2 id="&#x524D;&#x8A00;"><a href="#&#x524D;&#x8A00;" class="headerlink" title="&#x524D;&#x8A00;"></a>&#x524D;&#x8A00;</h2><p>&#x2003;&#x2003;&#x2003;&#x4ECA;&#x5929;&#x6DF1;&#x591C;&#x63A2;&#x7A76;&#xFF0C;&#x6765;&#x8DDF;&#x5927;&#x5BB6;&#x8BA8;&#x8BBA;&#x4E00;&#x756A;axios&#x7684;&#x4E8C;&#x6B21;&#x5C01;&#x88C5;&#x3002;&#x4E3B;&#x8981;&#x7528;&#x5230;&#x7684;&#x5C31;&#x662F;Promise&#x56DE;&#x8C03;&#x5730;&#x72F1;&#x89E3;&#x51B3;&#x65B9;&#x6848;&#x3002;</p>
+<hr>
+<h2 id="Axios"><a href="#Axios" class="headerlink" title="Axios"></a>Axios</h2><h3 id="&#x6982;&#x8FF0;"><a href="#&#x6982;&#x8FF0;" class="headerlink" title="&#x6982;&#x8FF0;"></a>&#x6982;&#x8FF0;</h3><p>&#x2003;&#x2003;&#x2003;Axios &#x662F;&#x4E00;&#x4E2A;&#x57FA;&#x4E8E; promise &#x7684; HTTP &#x5E93;&#xFF0C;&#x53EF;&#x4EE5;&#x7528;&#x5728;&#x6D4F;&#x89C8;&#x5668;&#x548C; node.js &#x4E2D;&#x3002;</p>
+<h3 id="&#x5B89;&#x88C5;"><a href="#&#x5B89;&#x88C5;" class="headerlink" title="&#x5B89;&#x88C5;"></a>&#x5B89;&#x88C5;</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm i axios -S</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="CDN"><a href="#CDN" class="headerlink" title="CDN"></a>CDN</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=<span class="string">&quot;https://unpkg.com/axios/dist/axios.min.js&quot;</span>&gt;&lt;/script&gt;</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="&#x4F7F;&#x7528;"><a href="#&#x4F7F;&#x7528;" class="headerlink" title="&#x4F7F;&#x7528;"></a>&#x4F7F;&#x7528;</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">// &#x4E3A;&#x7ED9;&#x5B9A; ID &#x7684; user &#x521B;&#x5EFA;&#x8BF7;&#x6C42;</span><br><span class="line">axios.get(<span class="string">&apos;/user?ID=12345&apos;</span>)</span><br><span class="line">  .<span class="keyword">then</span>(<span class="keyword">function</span> (response) {</span><br><span class="line">    console.log(response);</span><br><span class="line">  })</span><br><span class="line">  .catch(<span class="keyword">function</span> (error) {</span><br><span class="line">    console.log(error);</span><br><span class="line">  });</span><br><span class="line"></span><br><span class="line">// &#x53EF;&#x9009;&#x5730;&#xFF0C;&#x4E0A;&#x9762;&#x7684;&#x8BF7;&#x6C42;&#x53EF;&#x4EE5;&#x8FD9;&#x6837;&#x505A;</span><br><span class="line">axios.get(<span class="string">&apos;/user&apos;</span>, {</span><br><span class="line">    params: {</span><br><span class="line">      ID: 12345</span><br><span class="line">    }</span><br><span class="line">  })</span><br><span class="line">  .<span class="keyword">then</span>(<span class="keyword">function</span> (response) {</span><br><span class="line">    console.log(response);</span><br><span class="line">  })</span><br><span class="line">  .catch(<span class="keyword">function</span> (error) {</span><br><span class="line">    console.log(error);</span><br><span class="line">  });</span><br><span class="line"></span><br><span class="line">axios.post(<span class="string">&apos;/user&apos;</span>, {</span><br><span class="line">  firstName: <span class="string">&apos;Fred&apos;</span>,</span><br><span class="line">  lastName: <span class="string">&apos;Flintstone&apos;</span></span><br><span class="line">})</span><br><span class="line">.<span class="keyword">then</span>(<span class="keyword">function</span> (response) {</span><br><span class="line">  console.log(response);</span><br><span class="line">})</span><br><span class="line">.catch(<span class="keyword">function</span> (error) {</span><br><span class="line">  console.log(error);</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure>
+<hr>
+<h2 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a><a href="https://www.jianshu.com/p/43f948051d65" target="_blank" rel="noopener">Promise</a></h2><h3 id="&#x6982;&#x8FF0;-1"><a href="#&#x6982;&#x8FF0;-1" class="headerlink" title="&#x6982;&#x8FF0;"></a>&#x6982;&#x8FF0;</h3><p>&#x2003;&#x2003;&#x2003;Promise &#x662F;&#x5F02;&#x6B65;&#x7F16;&#x7A0B;&#x7684;&#x4E00;&#x79CD;&#x89E3;&#x51B3;&#x65B9;&#x6848;&#xFF0C;&#x6BD4;&#x4F20;&#x7EDF;&#x7684;&#x89E3;&#x51B3;&#x65B9;&#x6848;&#x2014;&#x2014;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x548C;&#x4E8B;&#x4EF6;&#x2014;&#x2014;&#x66F4;&#x5408;&#x7406;&#x548C;&#x66F4;&#x5F3A;&#x5927;&#x3002;&#x5B83;&#x7531;&#x793E;&#x533A;&#x6700;&#x65E9;&#x63D0;&#x51FA;&#x548C;&#x5B9E;&#x73B0;&#xFF0C;ES6 &#x5C06;&#x5176;&#x5199;&#x8FDB;&#x4E86;&#x8BED;&#x8A00;&#x6807;&#x51C6;&#xFF0C;&#x7EDF;&#x4E00;&#x4E86;&#x7528;&#x6CD5;&#xFF0C;&#x539F;&#x751F;&#x63D0;&#x4F9B;&#x4E86;Promise&#x5BF9;&#x8C61;&#x3002;<br>&#x2003;&#x2003;&#x2003;&#x6240;&#x8C13;Promise&#xFF0C;&#x7B80;&#x5355;&#x8BF4;&#x5C31;&#x662F;&#x4E00;&#x4E2A;&#x5BB9;&#x5668;&#xFF0C;&#x91CC;&#x9762;&#x4FDD;&#x5B58;&#x7740;&#x67D0;&#x4E2A;&#x672A;&#x6765;&#x624D;&#x4F1A;&#x7ED3;&#x675F;&#x7684;&#x4E8B;&#x4EF6;&#xFF08;&#x901A;&#x5E38;&#x662F;&#x4E00;&#x4E2A;&#x5F02;&#x6B65;&#x64CD;&#x4F5C;&#xFF09;&#x7684;&#x7ED3;&#x679C;&#x3002;&#x4ECE;&#x8BED;&#x6CD5;&#x4E0A;&#x8BF4;&#xFF0C;Promise &#x662F;&#x4E00;&#x4E2A;&#x5BF9;&#x8C61;&#xFF0C;&#x4ECE;&#x5B83;&#x53EF;&#x4EE5;&#x83B7;&#x53D6;&#x5F02;&#x6B65;&#x64CD;&#x4F5C;&#x7684;&#x6D88;&#x606F;&#x3002;Promise &#x63D0;&#x4F9B;&#x7EDF;&#x4E00;&#x7684; API&#xFF0C;&#x5404;&#x79CD;&#x5F02;&#x6B65;&#x64CD;&#x4F5C;&#x90FD;&#x53EF;&#x4EE5;&#x7528;&#x540C;&#x6837;&#x7684;&#x65B9;&#x6CD5;&#x8FDB;&#x884C;&#x5904;&#x7406;&#x3002;<br>&#x2003;&#x2003;&#x2003;&#x8FD9;&#x6837;&#x7684;&#x597D;&#x5904;&#x5C31;&#x662F;&#x907F;&#x514D;&#x5F00;&#x53D1;&#x8005;&#x8C03;&#x5165;&#x56DE;&#x8C03;&#x5730;&#x72F1;&#xFF0C;&#x4F7F;&#x5F97;&#x5F02;&#x6B65;&#x5F00;&#x53D1;&#x66F4;&#x52A0;&#x4F18;&#x96C5;&#x3002;</p>
+<h3 id="&#x4F7F;&#x7528;-1"><a href="#&#x4F7F;&#x7528;-1" class="headerlink" title="&#x4F7F;&#x7528;"></a>&#x4F7F;&#x7528;</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">const promise = new Promise(<span class="keyword">function</span>(resolve, reject) {</span><br><span class="line">  // ... some code</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (success){</span><br><span class="line">    resolve(value);</span><br><span class="line">  } <span class="keyword">else</span> {</span><br><span class="line">    reject(error);</span><br><span class="line">  }</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure>
+<hr>
+<h2 id="&#x4E8C;&#x6B21;&#x5C01;&#x88C5;"><a href="#&#x4E8C;&#x6B21;&#x5C01;&#x88C5;" class="headerlink" title="&#x4E8C;&#x6B21;&#x5C01;&#x88C5;"></a>&#x4E8C;&#x6B21;&#x5C01;&#x88C5;</h2><h3 id="&#x76EE;&#x7684;"><a href="#&#x76EE;&#x7684;" class="headerlink" title="&#x76EE;&#x7684;"></a>&#x76EE;&#x7684;</h3><p>&#x2003;&#x2003;&#x2003;Axios&#x4E8C;&#x6B21;&#x5C01;&#x88C5;&#x7684;&#x76EE;&#x7684;&#x5728;&#x4E8E;&#x7B80;&#x5316;&#x64CD;&#x4F5C;&#xFF0C;&#x80FD;&#x591F;&#x5728;&#x4E0D;&#x540C;&#x5C42;&#x9762;&#x4E0A;&#x6EE1;&#x8DB3;&#x5F00;&#x53D1;&#x8005;&#x9700;&#x6C42;&#x3002;</p>
+<h3 id="&#x53C2;&#x6570;&#x8BF4;&#x660E;"><a href="#&#x53C2;&#x6570;&#x8BF4;&#x660E;" class="headerlink" title="&#x53C2;&#x6570;&#x8BF4;&#x660E;"></a>&#x53C2;&#x6570;&#x8BF4;&#x660E;</h3><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><table style="margin-top :-300px">    <tbody><tr>        <td style="width:50px;">method</td>        <td>&#x6307;&#x660E;ajax&#x53D1;&#x9001;&#x7684;&#x662F;post&#x8FD8;&#x662F;get</td>    </tr>    <tr>       <td>url</td>       <td>&#x6307;&#x660E;&#x53D1;&#x9001;ajax&#x7684;url&#x5730;&#x5740;</td>    </tr>    <tr>        <td>json</td>        <td>&#x6307;&#x660E;&#x5728;&#x53D1;&#x9001;&#x7684;&#x8FC7;&#x7A0B;&#x4E2D;&#x9644;&#x5E26;&#x7684;&#x6570;&#x636E;&#xFF08;&#x9ED8;&#x8BA4;JSON&#xFF09;</td>    </tr>    <tr>        <td>sync</td>        <td>&#x6307;&#x660E;&#x662F;&#x5426;&#x5F02;&#x6B65;&#xFF0C;&#x53EF;&#x9009;&#x503C;&#x4E3A;&#xFF1A;true/false</td>    </tr></tbody></table>
+
+<h3 id="Code-Demo"><a href="#Code-Demo" class="headerlink" title="Code Demo"></a>Code Demo</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @time  2018/11/3 21:49</span><br><span class="line"> * @author  Bill Wang &lt;1826001146@qq.com&gt;</span><br><span class="line"> * @desc &#x5BF9;axios&#x7684;&#x4E8C;&#x6B21;&#x5C01;&#x88C5;</span><br><span class="line"> * @param {string} -method &#x8868;&#x793A;&#xFF1A;post/get {string} -url &#x8868;&#x793A;&#xFF1A;&#x8BF7;&#x6C42;&#x5730;&#x5740;  {json} json &#x8868;&#x793A;&#x4F20;&#x9001;&#x6570;&#x636E;</span><br><span class="line"> * @todo  &#x5B9E;&#x73B0;axios&#x7684;Promise&#x4EE3;&#x7801;&#x63A7;&#x5236;&#x5B9E;&#x73B0;</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">const ajax = <span class="keyword">function</span> (method, url, json, sync) {</span><br><span class="line">    <span class="built_in">return</span> new Promise(<span class="keyword">function</span> (resolve, reject) {</span><br><span class="line">        <span class="keyword">if</span> (method) {</span><br><span class="line">            <span class="keyword">if</span> (method === <span class="string">&apos;post&apos;</span>) {</span><br><span class="line">                <span class="built_in">let</span> data = require(<span class="string">&apos;axios&apos;</span>).post(url, json, {async: sync});</span><br><span class="line">                <span class="keyword">if</span> (data) {</span><br><span class="line">                    resolve(data);</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (method === <span class="string">&apos;get&apos;</span>) {</span><br><span class="line">                <span class="built_in">let</span> data = require(<span class="string">&apos;axios&apos;</span>).get(url, {</span><br><span class="line">                    params: json,</span><br><span class="line">                }, {async: sync});</span><br><span class="line">                resolve(data);</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">        reject(<span class="string">&apos;some wrong with your code!!!&apos;</span>);</span><br><span class="line">    })</span><br><span class="line">        .<span class="keyword">then</span>(data =&gt; {</span><br><span class="line">            <span class="keyword">if</span> (data) {</span><br><span class="line">                <span class="built_in">return</span> data.data;</span><br><span class="line">            }</span><br><span class="line">        }, err =&gt; {</span><br><span class="line">            <span class="built_in">return</span> err;</span><br><span class="line">        });</span><br><span class="line"></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">//&#x8FD9;&#x4E2A;&#x5730;&#x65B9;&#x8FD4;&#x56DE;&#x7684;&#x662F;&#x4E00;&#x4E2A;Promise{pending}&#x72B6;&#x6001;&#xFF0C;&#x6240;&#x4EE5;&#x53EA;&#x9700;&#x8981;&#x5728;<span class="keyword">then</span>&#x4E2D;&#x7EE7;&#x7EED;&#x6267;&#x884C;&#x83B7;&#x53D6;&#x6570;&#x636E;&#x5373;&#x53EF;</span><br><span class="line">ajax(<span class="string">&apos;post&apos;</span>, <span class="string">&apos;https://www.easy-mock.com/mock/5b924623321f1076a4fc149f/example/persons&apos;</span>, <span class="string">&apos;&apos;</span>, <span class="literal">true</span>)</span><br><span class="line">    .<span class="keyword">then</span>(result =&gt; {</span><br><span class="line">        console.log(result.data);</span><br><span class="line">    });</span><br></pre></td></tr></tbody></table></figure>
+<hr>
+<h2 id="&#x603B;&#x7ED3;"><a href="#&#x603B;&#x7ED3;" class="headerlink" title="&#x603B;&#x7ED3;"></a>&#x603B;&#x7ED3;</h2><blockquote>
+<p>&#x5C31;&#x67D0;&#x79CD;&#x7A0B;&#x5EA6;&#x7A0B;&#x5EA6;&#x800C;&#x8A00;&#x6211;&#x8FD8;&#x662F;&#x6BD4;&#x8F83;&#x559C;&#x6B22;&#x4F7F;&#x7528;Promise&#x53BB;&#x5904;&#x7406;&#x4E00;&#x4E9B;&#x56DE;&#x8C03;&#x4EFB;&#x52A1;&#x7279;&#x522B;&#x591A;&#x7684;&#x5DE5;&#x4F5C;&#x7684;&#xFF0C;&#x5F53;&#x7136;&#x50CF;Generator&#x751F;&#x6210;&#x5668;&#x8FD9;&#x6837;&#x7684;&#x795E;&#x5668;&#x4E5F;&#x7528;&#x7684;&#x66F4;&#x591A;&#xFF0C;&#x81EA;&#x4ECE;&#x5728;ES8&#x4E2D;&#x63D0;&#x51FA;&#x8349;&#x6848;async&#x8BED;&#x6CD5;&#x7CD6;&#xFF0C;&#x4F7F;&#x5F97;&#x64CD;&#x4F5C;&#x66F4;&#x52A0;&#x7B80;&#x4FBF;&#xFF0C;&#x540C;&#x6837;&#x4E5F;&#x4F7F;&#x5F97;&#x5F02;&#x6B65;&#x4EE3;&#x7801;&#x66F4;&#x52A0;&#x4F18;&#x96C5;&#x3002;</p>
+</blockquote>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://bigbigdreamer.github.io">BillWang</a></p><p> <span>Link:  </span><a href="https://bigbigdreamer.github.io/2018/11/04/axios/">https://bigbigdreamer.github.io/2018/11/04/axios/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2018/11/03/hexoStart/" title="从零搭建个人博客"><span>NextPost ></span><br><span class="nextTitle">从零搭建个人博客</span></a><div class="clear"></div></div><div id="comment"><div id="lv-container" data-id="city" data-uid="MTAyMC80MDczNC8xNzI2MA"><script>(function (d, s) {
+  var j, e = d.getElementsByTagName(s)[0];
+  if (typeof LivereTower === 'function') { return; }
+  j = d.createElement(s);
+  j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+  j.async = true;
+  e.parentNode.insertBefore(j, e);
+})(document, 'script');</script></div></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + '490c72c80e7c5f485272ffc6d84c956b';
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();</script></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Axios"><span class="toc-number">2.</span> <span class="toc-text">Axios</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#概述"><span class="toc-number">2.1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装"><span class="toc-number">2.2.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CDN"><span class="toc-number">2.3.</span> <span class="toc-text">CDN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用"><span class="toc-number">2.4.</span> <span class="toc-text">使用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Promise"><span class="toc-number">3.</span> <span class="toc-text">Promise</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#概述-1"><span class="toc-number">3.1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-1"><span class="toc-number">3.2.</span> <span class="toc-text">使用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二次封装"><span class="toc-number">4.</span> <span class="toc-text">二次封装</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#目的"><span class="toc-number">4.1.</span> <span class="toc-text">目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参数说明"><span class="toc-number">4.2.</span> <span class="toc-text">参数说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Code-Demo"><span class="toc-number">4.3.</span> <span class="toc-text">Code Demo</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
