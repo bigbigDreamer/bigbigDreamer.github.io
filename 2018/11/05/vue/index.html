@@ -1,0 +1,149 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="BillWang"><meta name="renderer" content="webkit"><meta name="copyright" content="BillWang"><meta name="keywords" content="BillWang"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>vue @cli3.0的配置 · BillWang's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/alarm.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/alarm.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">BillWang</div><div class="profile-signature">每个人距离成功都只差一步坚持。</div><div class="friends"><div>FRIENDS</div><span><a href="https://desirefire.github.io/" target="_black">Natalia Tsunako</a></span><span><a href="//itzmn.github.io" target="_black">七夜</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-lg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">凌瑶宫</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">vue @cli3.0的配置</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2018-11-05</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Vue"> Vue</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="webpack"> webpack</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="vue @cli3.0"> vue @cli3.0</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">692</span> | Reading time: <span class="post-count">4</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h2 id="&#x5F00;&#x5FC3;&#x4E00;&#x523B;"><a href="#&#x5F00;&#x5FC3;&#x4E00;&#x523B;" class="headerlink" title="&#x5F00;&#x5FC3;&#x4E00;&#x523B;"></a>&#x5F00;&#x5FC3;&#x4E00;&#x523B;</h2><blockquote>
+<p>&#x2003;&#x2003;&#x201C;&#x515C;&#x515C;&#x8F6C;&#x8F6C;&#x671D;&#x82B1;&#x5915;&#x62FE;&#x5374;&#x5DF2;&#x8FDF;&#xFF0C;&#x5BFB;&#x5BFB;&#x89C5;&#x89C5;&#x9189;&#x751F;&#x68A6;&#x6B7B;&#x53C8;&#x4E00;&#x4E16;&#x2026;&#x2026;&#x201D;&#xFF0C;&#x6B63;&#x5728;&#x5199;&#x535A;&#x5BA2;&#x7684;&#x6211;&#xFF0C;&#x60C5;&#x4E0D;&#x81EA;&#x7981;&#x5730;&#x54FC;&#x8D77;&#x4E86;&#x8FD9;&#x9996;&#x6B4C;&#x3002;<span class="github-emoji" style="color: transparent;background:no-repeat url(https://assets-cdn.github.com/images/icons/emoji/unicode/1f607.png?v8) center/contain" data-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f607.png?v8">&#x1F607;</span>&#xFF0C;&#x597D;&#x5566;&#xFF0C;&#x54B1;&#x4EEC;&#x5207;&#x5165;&#x6B63;&#x9898;&#x5427;&#xFF0C;&#x4ECA;&#x5929;&#x4E3A;&#x5927;&#x5BB6;&#x8BE6;&#x7EC6;&#x89E3;&#x8FF0;Vue @cli3.0&#x81EA;&#x52A8;&#x5316;&#x76EE;&#x5F55;&#x4E2D;<code>vue.config.js</code>&#x914D;&#x7F6E;&#x3002;</p>
+</blockquote>
+<h2 id="Vue-cli-3-0"><a href="#Vue-cli-3-0" class="headerlink" title="Vue @cli 3.0"></a>Vue @cli 3.0</h2><h3 id="&#x6982;&#x8FF0;"><a href="#&#x6982;&#x8FF0;" class="headerlink" title="&#x6982;&#x8FF0;"></a>&#x6982;&#x8FF0;</h3><blockquote>
+<p>&#x2003;&#x2003;Vue CLI &#x81F4;&#x529B;&#x4E8E;&#x5C06; Vue &#x751F;&#x6001;&#x4E2D;&#x7684;&#x5DE5;&#x5177;&#x57FA;&#x7840;&#x6807;&#x51C6;&#x5316;&#x3002;&#x5B83;&#x786E;&#x4FDD;&#x4E86;&#x5404;&#x79CD;&#x6784;&#x5EFA;&#x5DE5;&#x5177;&#x80FD;&#x591F;&#x57FA;&#x4E8E;&#x667A;&#x80FD;&#x7684;&#x9ED8;&#x8BA4;&#x914D;&#x7F6E;&#x5373;&#x53EF;&#x5E73;&#x7A33;&#x8854;&#x63A5;&#xFF0C;&#x8FD9;&#x6837;&#x4F60;&#x53EF;&#x4EE5;&#x4E13;&#x6CE8;&#x5728;&#x64B0;&#x5199;&#x5E94;&#x7528;&#x4E0A;&#xFF0C;&#x800C;&#x4E0D;&#x5FC5;&#x82B1;&#x597D;&#x51E0;&#x5929;&#x53BB;&#x7EA0;&#x7ED3;&#x914D;&#x7F6E;&#x7684;&#x95EE;&#x9898;&#x3002;&#x4E0E;&#x6B64;&#x540C;&#x65F6;&#xFF0C;&#x5B83;&#x4E5F;&#x4E3A;&#x6BCF;&#x4E2A;&#x5DE5;&#x5177;&#x63D0;&#x4F9B;&#x4E86;&#x8C03;&#x6574;&#x914D;&#x7F6E;&#x7684;&#x7075;&#x6D3B;&#x6027;&#xFF0C;&#x65E0;&#x9700; eject&#x3002;</p>
+</blockquote>
+<h3 id="&#x5B89;&#x88C5;"><a href="#&#x5B89;&#x88C5;" class="headerlink" title="&#x5B89;&#x88C5;"></a>&#x5B89;&#x88C5;</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install -g @vue/cli</span><br><span class="line"><span class="comment"># OR</span></span><br><span class="line">yarn global add @vue/cli</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="&#x9879;&#x76EE;&#x521B;&#x5EFA;"><a href="#&#x9879;&#x76EE;&#x521B;&#x5EFA;" class="headerlink" title="&#x9879;&#x76EE;&#x521B;&#x5EFA;"></a>&#x9879;&#x76EE;&#x521B;&#x5EFA;</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># &#x6CE8;&#x610F;&#xFF0C;&#x8FD9;&#x4E2A;project&#x7684;&#x540D;&#x5B57;&#x5FC5;&#x987B;&#x5168;&#x4E3A;&#x5C0F;&#x5199;</span></span><br><span class="line">$ vue create project</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="UI&#x4F7F;&#x7528;"><a href="#UI&#x4F7F;&#x7528;" class="headerlink" title="UI&#x4F7F;&#x7528;"></a>UI&#x4F7F;&#x7528;</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vue ui</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="DEV-start-amp-build"><a href="#DEV-start-amp-build" class="headerlink" title="DEV start&amp;build"></a>DEV start&amp;build</h3><figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># dev start</span><br><span class="line">$ cnpm run serve</span><br><span class="line"># dev build</span><br><span class="line">$ cnpm run build</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="&#x62C9;&#x53D6;Vue-cli-2-x&#xFF1F;"><a href="#&#x62C9;&#x53D6;Vue-cli-2-x&#xFF1F;" class="headerlink" title="&#x62C9;&#x53D6;Vue cli 2.x&#xFF1F;"></a>&#x62C9;&#x53D6;Vue cli 2.x&#xFF1F;</h3><blockquote>
+<p>&#x2003;&#x2003;&#x4F60;&#x53EF;&#x80FD;&#x8FD8;&#x662F;&#x6BD4;&#x8F83;&#x4E60;&#x60EF;Vue cli2.x&#x7684;&#x4F7F;&#x7528;&#xFF0C;&#x4E60;&#x60EF;<code>vue init webpack xxx</code>&#x3002;</p>
+</blockquote>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g @vue/cli-init</span><br><span class="line"><span class="comment"># `vue init` &#x7684;&#x8FD0;&#x884C;&#x6548;&#x679C;&#x5C06;&#x4F1A;&#x8DDF; `vue-cli@2.x` &#x76F8;&#x540C;</span></span><br><span class="line">$ vue init webpack my-project</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="&#x914D;&#x7F6E;vue-config-js"><a href="#&#x914D;&#x7F6E;vue-config-js" class="headerlink" title="&#x914D;&#x7F6E;vue.config.js"></a>&#x914D;&#x7F6E;<code>vue.config.js</code></h3><blockquote>
+<p>&#x2003;&#x2003;&#x521B;&#x5EFA;&#x5728;&#x9879;&#x76EE;&#x6839;&#x76EE;&#x5F55;&#x3002;</p>
+</blockquote>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">module.exports = {</span><br><span class="line">  //&#x5224;&#x65AD;&#x662F;&#x5426;&#x4E3A;&#x751F;&#x4EA7;&#x73AF;&#x5883;</span><br><span class="line">  baseUrl: process.env.NODE_ENV === <span class="string">&apos;production&apos;</span></span><br><span class="line">    ? <span class="string">&apos;./&apos;</span></span><br><span class="line">    : <span class="string">&apos;./&apos;</span>,</span><br><span class="line">  //&#x5B9A;&#x4E49;&#x8F93;&#x51FA;&#x76EE;&#x5F55;</span><br><span class="line">  outputDir:<span class="string">&apos;dist&apos;</span>,</span><br><span class="line">  //&#x5B9A;&#x4E49;&#x9759;&#x6001;&#x8D44;&#x6E90;&#x76EE;&#x5F55;</span><br><span class="line">  assetsDir:<span class="string">&apos;production-sub-path&apos;</span>,</span><br><span class="line">  //&#x5B9A;&#x4E49;&#x4E3B;&#x5165;&#x53E3;</span><br><span class="line">  indexPath:<span class="string">&apos;index.html&apos;</span>,</span><br><span class="line">  //&#x662F;&#x5426;&#x5141;&#x8BB8;&#x6587;&#x4EF6;&#x540D;<span class="built_in">hash</span>&#x5904;&#x7406;</span><br><span class="line">  filenameHashing:<span class="literal">true</span>,</span><br><span class="line">  //&#x6240;&#x6709;&#x76EE;&#x5F55;&#x7684;&#x4E3B;&#x76EE;&#x5F55;&#x5747;&#x8BBE;&#x7F6E;index&#x4E3A;&#x5165;&#x53E3;</span><br><span class="line">  pages: {</span><br><span class="line">    index: {</span><br><span class="line">      // page &#x7684;&#x5165;&#x53E3;</span><br><span class="line">      entry: <span class="string">&apos;src/main.js&apos;</span>,</span><br><span class="line">      // &#x6A21;&#x677F;&#x6765;&#x6E90;</span><br><span class="line">      template: <span class="string">&apos;public/index.html&apos;</span>,</span><br><span class="line">      // &#x5728; dist/index.html &#x7684;&#x8F93;&#x51FA;</span><br><span class="line">      filename: <span class="string">&apos;index.html&apos;</span>,</span><br><span class="line">      // &#x5F53;&#x4F7F;&#x7528; title &#x9009;&#x9879;&#x65F6;&#xFF0C;</span><br><span class="line">      // template &#x4E2D;&#x7684; title &#x6807;&#x7B7E;&#x9700;&#x8981;&#x662F; &lt;title&gt;&lt;%= htmlWebpackPlugin.options.title %&gt;&lt;/title&gt;</span><br><span class="line">      title: <span class="string">&apos;Index Page&apos;</span>,</span><br><span class="line">      // &#x5728;&#x8FD9;&#x4E2A;&#x9875;&#x9762;&#x4E2D;&#x5305;&#x542B;&#x7684;&#x5757;&#xFF0C;&#x9ED8;&#x8BA4;&#x60C5;&#x51B5;&#x4E0B;&#x4F1A;&#x5305;&#x542B;</span><br><span class="line">      // &#x63D0;&#x53D6;&#x51FA;&#x6765;&#x7684;&#x901A;&#x7528; chunk &#x548C; vendor chunk&#x3002;</span><br><span class="line">      chunks: [<span class="string">&apos;chunk-vendors&apos;</span>, <span class="string">&apos;chunk-common&apos;</span>, <span class="string">&apos;index&apos;</span>]</span><br><span class="line">    },</span><br><span class="line">  },</span><br><span class="line">  //&#x662F;&#x5426;&#x5141;&#x8BB8;&#x5355;&#x72EC;&#x63D0;&#x53D6;CSS</span><br><span class="line">  css: {</span><br><span class="line">    modules: <span class="literal">false</span>,</span><br><span class="line">    extract:<span class="literal">false</span>,</span><br><span class="line">    //&#x52A0;&#x8F7D;&#x914D;&#x7F6E;</span><br><span class="line">    loaderOptions: {</span><br><span class="line">      css: {</span><br><span class="line">        // &#x8FD9;&#x91CC;&#x7684;&#x9009;&#x9879;&#x4F1A;&#x4F20;&#x9012;&#x7ED9; css-loader</span><br><span class="line">      },</span><br><span class="line">      postcss: {</span><br><span class="line">        // &#x8FD9;&#x91CC;&#x7684;&#x9009;&#x9879;&#x4F1A;&#x4F20;&#x9012;&#x7ED9; postcss-loader</span><br><span class="line">      },</span><br><span class="line">  }</span><br><span class="line">},</span><br><span class="line">  //&#x5B9A;&#x4E49;webpack&#x542F;&#x52A8;</span><br><span class="line">  devServer: {</span><br><span class="line">    //&#x662F;&#x5426;&#x8FDB;&#x884C;&#x4E3B;&#x673A;&#x68C0;&#x67E5;&#xFF0C;&#x4E00;&#x822C;&#x8FD9;&#x4E2A;&#x5728;&#x8FDB;&#x884C;&#x5185;&#x7F51;&#x6620;&#x5C04;&#x7684;&#x65F6;&#x5019;&#x8BBE;&#x7F6E;</span><br><span class="line">    disableHostCheck: <span class="literal">true</span>,</span><br><span class="line">    //&#x5B9A;&#x4E49;&#x670D;&#x52A1;&#x5668;&#x542F;&#x52A8;&#x7AEF;&#x53E3;</span><br><span class="line">    port: 8089, // can be overwritten by process.env.PORT, <span class="keyword">if</span> port is <span class="keyword">in</span> use, a free one will be determined</span><br><span class="line">    //&#x5B9A;&#x4E49;&#x70ED;&#x542F;&#x52A8;</span><br><span class="line">    hot: <span class="literal">true</span>,</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://bigbigdreamer.github.io">BillWang</a></p><p> <span>Link:  </span><a href="https://bigbigdreamer.github.io/2018/11/05/vue/">https://bigbigdreamer.github.io/2018/11/05/vue/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2018/11/04/axios/" title="axios的二次封装"><span>NextPost ></span><br><span class="nextTitle">axios的二次封装</span></a><div class="clear"></div></div><div id="comment"><div id="lv-container" data-id="city" data-uid="MTAyMC80MDczNC8xNzI2MA"><script>(function (d, s) {
+  var j, e = d.getElementsByTagName(s)[0];
+  if (typeof LivereTower === 'function') { return; }
+  j = d.createElement(s);
+  j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+  j.async = true;
+  e.parentNode.insertBefore(j, e);
+})(document, 'script');</script></div></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + '490c72c80e7c5f485272ffc6d84c956b';
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();</script></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#开心一刻"><span class="toc-number">1.</span> <span class="toc-text">开心一刻</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vue-cli-3-0"><span class="toc-number">2.</span> <span class="toc-text">Vue @cli 3.0</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#概述"><span class="toc-number">2.1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装"><span class="toc-number">2.2.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#项目创建"><span class="toc-number">2.3.</span> <span class="toc-text">项目创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UI使用"><span class="toc-number">2.4.</span> <span class="toc-text">UI使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DEV-start-amp-build"><span class="toc-number">2.5.</span> <span class="toc-text">DEV start&amp;build</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#拉取Vue-cli-2-x？"><span class="toc-number">2.6.</span> <span class="toc-text">拉取Vue cli 2.x？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#配置vue-config-js"><span class="toc-number">2.7.</span> <span class="toc-text">配置vue.config.js</span></a></li></ol></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
