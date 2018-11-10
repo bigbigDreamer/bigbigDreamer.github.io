@@ -1,0 +1,138 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="BillWang"><meta name="renderer" content="webkit"><meta name="copyright" content="BillWang"><meta name="keywords" content="BillWang"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>queue模拟 · BillWang's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/alarm.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/alarm.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">BillWang</div><div class="profile-signature">每个人距离成功都只差一步坚持。</div><div class="friends"><div>FRIENDS</div><span><a href="https://desirefire.github.io/" target="_black">Natalia Tsunako</a></span><span><a href="//itzmn.github.io" target="_black">七夜</a></span><span><a href="http://elickzhao.github.io" target="_black">elickzhao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-lg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">凌瑶宫</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">queue模拟</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2018-11-10</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="queue"> queue</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="es6"> es6</a><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="数据结构"> 数据结构</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">262</span> | Reading time: <span class="post-count">1</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h3 id="&#x524D;&#x8A00;"><a href="#&#x524D;&#x8A00;" class="headerlink" title="&#x524D;&#x8A00;"></a>&#x524D;&#x8A00;</h3><blockquote>
+<p>&#x2003;&#x2003;&#x6570;&#x636E;&#x7ED3;&#x6784;&#x662F;&#x6BCF;&#x4E00;&#x4E2A;&#x7A0B;&#x5E8F;&#x5458;&#x7684;&#x5185;&#x529F;&#xFF0C;&#x65E0;&#x8BBA;&#x600E;&#x6837;&#xFF0C;&#x6211;&#x4EEC;&#x90FD;&#x5E94;&#x8BE5;&#x53BB;&#x575A;&#x6301;&#x4FEE;&#x70BC;&#x597D;&#x8FD9;&#x95E8;&#x5185;&#x529F;&#x5FC3;&#x6CD5;&#x3002;&#x5E9F;&#x8BDD;&#x4E0D;&#x591A;&#x8BB2;&#xFF0C;&#x5F00;&#x59CB;queue&#x6A21;&#x62DF;&#xFF0C;&#x4ECA;&#x5929;&#x5F00;&#x59CB;&#xFF0C;&#x6BCF;&#x5929;&#x6A21;&#x62DF;&#x4E00;&#x79CD;&#x6570;&#x636E;&#x7ED3;&#x6784;&#x3002;</p>
+</blockquote>
+<h3 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @time  2018/11/10 22:54</span><br><span class="line"> * @author  Bill Wang &lt;1826001146@qq.com&gt;</span><br><span class="line"> * @desc  &#x961F;&#x5217;&#x6A21;&#x62DF;</span><br><span class="line"> * @param null {string}</span><br><span class="line"> * @todo &#x6A21;&#x62DF;&#x961F;&#x5217;</span><br><span class="line"> */</span><br><span class="line">class Queue {</span><br><span class="line">    <span class="function"><span class="title">constructor</span></span>() {</span><br><span class="line">        this.queue = [];</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    enter(element) {</span><br><span class="line">        this.queue.push(element);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="title">outer</span></span>() {</span><br><span class="line">        this.queue.shift();</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="title">empty</span></span>() {</span><br><span class="line">        this.queue = [];</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="title">show</span></span>() {</span><br><span class="line">        <span class="built_in">return</span> this.queue;</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">const queue = new Queue();</span><br><span class="line">queue.enter(3);</span><br><span class="line">queue.enter(4);</span><br><span class="line">queue.enter(5);</span><br><span class="line">queue.enter(6);</span><br><span class="line">console.log(queue.show());</span><br><span class="line">queue.outer();</span><br><span class="line">console.log(queue.show());</span><br><span class="line">queue.empty();</span><br><span class="line">console.log(queue.show());</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="&#x539F;&#x7406;&#x89E3;&#x6790;"><a href="#&#x539F;&#x7406;&#x89E3;&#x6790;" class="headerlink" title="&#x539F;&#x7406;&#x89E3;&#x6790;"></a>&#x539F;&#x7406;&#x89E3;&#x6790;</h3><blockquote>
+<p>&#x2003;&#x2003;&#x4F17;&#x6240;&#x5468;&#x77E5;&#xFF0C;&#x961F;&#x5217;&#x7684;&#x89C4;&#x5219;&#x5C31;&#x662F;&#x5148;&#x8FDB;&#x5148;&#x51FA;&#xFF0C;&#x6240;&#x4EE5;&#x65E0;&#x8BBA;&#x662F;<code>enter</code>&#x8FD8;&#x662F;<code>outer</code>&#xFF0C;<code>empty</code>&#x6216;&#x8005;<code>show</code>&#xFF0C;&#x90FD;&#x9075;&#x5FAA;&#x961F;&#x5217;&#x7684;&#x4E00;&#x822C;&#x539F;&#x5219;&#xFF0C;&#x8FD9;&#x91CC;&#x6211;&#x7528;&#x6570;&#x7EC4;&#x6A21;&#x62DF;&#x3002;</p>
+</blockquote>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://bigbigdreamer.github.io">BillWang</a></p><p> <span>Link:  </span><a href="https://bigbigdreamer.github.io/2018/11/10/queue/">https://bigbigdreamer.github.io/2018/11/10/queue/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2018/11/07/vueRouter/" title="vue-router"><span>NextPost ></span><br><span class="nextTitle">vue-router</span></a><div class="clear"></div></div><div id="comment"><div id="lv-container" data-id="city" data-uid="MTAyMC80MDczNC8xNzI2MA"><script>(function (d, s) {
+  var j, e = d.getElementsByTagName(s)[0];
+  if (typeof LivereTower === 'function') { return; }
+  j = d.createElement(s);
+  j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+  j.async = true;
+  e.parentNode.insertBefore(j, e);
+})(document, 'script');</script></div></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + '490c72c80e7c5f485272ffc6d84c956b';
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();</script></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Demo"><span class="toc-number">2.</span> <span class="toc-text">Demo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#原理解析"><span class="toc-number">3.</span> <span class="toc-text">原理解析</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
