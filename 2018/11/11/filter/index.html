@@ -1,0 +1,141 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="BillWang"><meta name="renderer" content="webkit"><meta name="copyright" content="BillWang"><meta name="keywords" content="BillWang"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>寻找句子中最长的单词 · BillWang's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/alarm.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/img/assets/alarm.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">BillWang</div><div class="profile-signature">每个人距离成功都只差一步坚持。</div><div class="friends"><div>FRIENDS</div><span><a href="https://desirefire.github.io/" target="_black">Natalia Tsunako</a></span><span><a href="//itzmn.github.io" target="_black">七夜</a></span><span><a href="http://elickzhao.github.io" target="_black">elickzhao</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-lg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">凌瑶宫</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">寻找句子中最长的单词</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-edit"></i><span>2018-11-11</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="ES6"> ES6</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">494</span> | Reading time: <span class="post-count">3</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h3 id="&#x9898;&#x76EE;&#x8981;&#x6C42;"><a href="#&#x9898;&#x76EE;&#x8981;&#x6C42;" class="headerlink" title="&#x9898;&#x76EE;&#x8981;&#x6C42;"></a>&#x9898;&#x76EE;&#x8981;&#x6C42;</h3><blockquote>
+<p>&#x2003;&#x2003;&#x6839;&#x636E;&#x6240;&#x7ED9;&#x7684;&#x53E5;&#x5B50;&#xFF0C;&#x5224;&#x65AD;&#x53E5;&#x5B50;&#x4E2D;&#x6700;&#x957F;&#x7684;&#x4E00;&#x4E2A;&#x7684;&#x5355;&#x8BCD;&#xFF0C;&#x5E76;&#x4E14;&#x80FD;&#x591F;&#x8FD4;&#x56DE;&#x6700;&#x957F;&#x7684;&#x90A3;&#x4E2A;&#x5355;&#x8BCD;&#x4EE5;&#x53CA;&#x5355;&#x8BCD;&#x7684;&#x957F;&#x5EA6;&#x3002;</p>
+</blockquote>
+<h3 id="&#x89E3;&#x51B3;&#x601D;&#x8DEF;"><a href="#&#x89E3;&#x51B3;&#x601D;&#x8DEF;" class="headerlink" title="&#x89E3;&#x51B3;&#x601D;&#x8DEF;"></a>&#x89E3;&#x51B3;&#x601D;&#x8DEF;</h3><blockquote>
+<p>&#x2003;&#x2003;&#x6839;&#x636E;&#x6240;&#x7ED9;&#x53E5;&#x5B50;&#xFF0C;&#x5148;&#x8FDB;&#x884C;&#x5355;&#x8BCD;&#x5206;&#x5272;&#xFF0C;&#x5C06;&#x5206;&#x5272;&#x5355;&#x8BCD;&#x5B58;&#x653E;&#x8FDB;&#x6570;&#x7EC4;&#x4E4B;&#x4E2D;&#xFF0C;&#x7136;&#x540E;&#x5229;&#x7528;map&#x65B9;&#x6CD5;&#x8FDB;&#x884C;&#x8FC7;&#x6EE4;&#xFF0C;&#x8FD4;&#x56DE;&#x5355;&#x8BCD;&#x7684;&#x957F;&#x5EA6;&#x6570;&#x7EC4;&#x3002;&#x6700;&#x540E;&#x5229;&#x7528;forEach&#x65B9;&#x6CD5;&#x8FDB;&#x884C;&#x7B5B;&#x9009;&#xFF0C;&#x5982;&#x679C;&#x76F8;&#x540C;&#xFF0C;&#x5C31;&#x8FD4;&#x56DE;&#x90A3;&#x4E2A;&#x5355;&#x8BCD;&#xFF0C;&#x5728;&#x5904;&#x7406;&#x5355;&#x8BCD;&#x957F;&#x5EA6;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x5229;&#x7528;Math&#x5185;&#x7F6E;&#x7684;max&#x65B9;&#x6CD5;&#xFF0C;&#x518D;&#x52A0;ES6&#x63D0;&#x4F9B;&#x7684;rest&#x8FD0;&#x7B97;&#x7B26;&#x81EA;&#x904D;&#x5386;&#x6570;&#x7EC4;&#x53D6;&#x51FA;&#x6700;&#x5927;&#x503C;&#x3002;</p>
+</blockquote>
+<figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @time  2018/11/11 14:21</span></span><br><span class="line"><span class="comment"> * @author  Bill Wang &lt;1826001146@qq.com&gt;</span></span><br><span class="line"><span class="comment"> * @desc  &#x627E;&#x51FA;&#x53E5;&#x5B50;&#x4E2D;&#x7684;&#x6700;&#x957F;&#x7684;&#x5355;&#x8BCD;&#x5E76;&#x8FD4;&#x56DE;&#x7684;&#x4ED6;&#x7684;&#x957F;&#x5EA6;&#xFF0C;&#x522B;&#x4EBA;&#x63D0;&#x7684;&#x95EE;&#x9898;&#xFF0C;&#x6211;&#x6765;&#x5C1D;&#x8BD5;&#x5C1D;&#x8BD5;</span></span><br><span class="line"><span class="comment"> * @param sentence {string} -&#x6267;&#x884C;&#x9700;&#x8981;&#x67E5;&#x627E;&#x7684;&#x5B57;&#x7B26;&#x4E32;</span></span><br><span class="line"><span class="comment"> * @todo</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dreamer</span></span>{</span><br><span class="line">    <span class="keyword">constructor</span>(){</span><br><span class="line">        <span class="comment">//&#x5185;&#x90E8;&#x5904;&#x7406;&#x7684;&#x53E5;&#x5B50;</span></span><br><span class="line">        <span class="keyword">this</span>.sentence = <span class="literal">null</span>;</span><br><span class="line">        <span class="comment">//&#x7528;&#x4E8E;&#x5B58;&#x50A8;&#x5206;&#x5272;&#x53E5;&#x5B50;&#x540E;&#x7684;&#x5355;&#x8BCD;</span></span><br><span class="line">        <span class="keyword">this</span>.box = [];</span><br><span class="line">        <span class="comment">//&#x7528;&#x4E8E;&#x5B58;&#x50A8;&#x53E5;&#x5B50;&#x5355;&#x8BCD;&#x7684;&#x4E34;&#x65F6;&#x7BB1;&#x5B50;</span></span><br><span class="line">        <span class="keyword">this</span>.tempBox = [];</span><br><span class="line">        <span class="comment">//&#x7528;&#x4E8E;&#x63A5;&#x6536;&#x67E5;&#x627E;&#x5339;&#x914D;&#x503C;</span></span><br><span class="line">        <span class="keyword">this</span>.tempStr = <span class="literal">null</span>;</span><br><span class="line">    }</span><br><span class="line">    find (sentence){</span><br><span class="line">        <span class="keyword">this</span>.sentence = sentence;</span><br><span class="line">        <span class="keyword">this</span>.box = <span class="keyword">this</span>.sentence.split(<span class="string">&apos; &apos;</span>);</span><br><span class="line">        <span class="keyword">this</span>.tempBox = <span class="keyword">this</span>.box</span><br><span class="line">                 .map(<span class="function">(<span class="params">item,index</span>)=&gt;</span>{</span><br><span class="line">           <span class="keyword">return</span> item.length;</span><br><span class="line">        });</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">`&#x67E5;&#x8BE2;&#x5230;&#x6700;&#x957F;&#x7684;&#x5355;&#x8BCD;&#xFF1A;<span class="subst">${<span class="keyword">this</span>.filter(<span class="keyword">this</span>.box,<span class="built_in">Math</span>.max(...<span class="keyword">this</span>.tempBox))}</span>&#xFF0C;&#x5B83;&#x7684;&#x957F;&#x5EA6;&#x5927;&#x6982;&#x6709;&#xFF1A;<span class="subst">${<span class="built_in">Math</span>.max(...<span class="keyword">this</span>.tempBox)}</span>`</span>);</span><br><span class="line">       <span class="comment">// return Math.max(...this.tempBox);</span></span><br><span class="line">    }</span><br><span class="line">    filter(arr,length){</span><br><span class="line">        <span class="keyword">let</span> s =  arr.forEach(<span class="function">(<span class="params">item,index</span>)=&gt;</span>{</span><br><span class="line">            <span class="keyword">if</span>(item.length === length){</span><br><span class="line">                <span class="keyword">this</span>.tempStr = item;</span><br><span class="line">            }</span><br><span class="line">        });</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.tempStr;</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="keyword">const</span> obj = <span class="keyword">new</span> Dreamer();</span><br><span class="line">obj.find(<span class="string">&apos;Hello Worid5 Boy&apos;</span>);</span><br></pre></td></tr></tbody></table></figure>
+<blockquote>
+<p>&#x63A7;&#x5236;&#x53F0;&#x6253;&#x5370;</p>
+</blockquote>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;E:\WebStorm 2018.2.2\bin\runnerw.exe&quot;</span> E:\node.exe D:\knowledgeOver\JS&#x9AD8;&#x7EA7;&#x590D;&#x4E60;\&#x627E;&#x51FA;&#x53E5;&#x5B50;&#x4E2D;&#x6700;&#x957F;&#x7684;&#x5355;&#x8BCD;.js</span><br><span class="line">&#x67E5;&#x8BE2;&#x5230;&#x6700;&#x957F;&#x7684;&#x5355;&#x8BCD;&#xFF1A;Worid5&#xFF0C;&#x5B83;&#x7684;&#x957F;&#x5EA6;&#x5927;&#x6982;&#x6709;&#xFF1A;6</span><br><span class="line"></span><br><span class="line">Process finished with <span class="built_in">exit</span> code 0</span><br></pre></td></tr></tbody></table></figure><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://bigbigdreamer.github.io">BillWang</a></p><p> <span>Link:  </span><a href="https://bigbigdreamer.github.io/2018/11/11/filter/">https://bigbigdreamer.github.io/2018/11/11/filter/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="nextSlogan" href="/2018/11/10/queue/" title="queue模拟"><span>NextPost ></span><br><span class="nextTitle">queue模拟</span></a><div class="clear"></div></div><div id="comment"><div id="lv-container" data-id="city" data-uid="MTAyMC80MDczNC8xNzI2MA"><script>(function (d, s) {
+  var j, e = d.getElementsByTagName(s)[0];
+  if (typeof LivereTower === 'function') { return; }
+  j = d.createElement(s);
+  j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+  j.async = true;
+  e.parentNode.insertBefore(j, e);
+})(document, 'script');</script></div></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?" + '490c72c80e7c5f485272ffc6d84c956b';
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();</script></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#题目要求"><span class="toc-number">1.</span> <span class="toc-text">题目要求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解决思路"><span class="toc-number">2.</span> <span class="toc-text">解决思路</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
