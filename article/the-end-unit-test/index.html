@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="zh" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>单元测试--终章 - Eric&#39;s Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79" />
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco" />
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar&#39;s blog,被测组件划分
+展示组件：通常定义为只用于展示的组件，例如 Icon、Badge……，遵循 Props –&amp;gt; UI；
+
+
+业务组件：为业务服务，通常集成了独立的功能，可以单独作为模块组件，也可自,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric&#39;s Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric&#39;s Blog</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">单元测试--终章</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">单元测试--终章</h1>
+        <div class="stuff">
+            <span>一月 17, 2021</span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/React/" rel="tag">React</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h2 id="被测组件划分"><a href="#被测组件划分" class="headerlink" title="被测组件划分"></a>被测组件划分</h2><blockquote>
+<p>展示组件：通常定义为只用于展示的组件，例如 Icon、Badge……，遵循 Props –&gt; UI；</p>
+</blockquote>
+<blockquote>
+<p>业务组件：为业务服务，通常集成了独立的功能，可以单独作为模块组件，也可自定义配置；</p>
+</blockquote>
+<blockquote>
+<p>功能组件：通常是支撑业务组件的基类组件，提供一些功能性的支撑，像分页组件的跳转；</p>
+</blockquote>
+<h2 id="测试场景"><a href="#测试场景" class="headerlink" title="测试场景"></a>测试场景</h2><h3 id="网络请求模拟-发起真实请求"><a href="#网络请求模拟-发起真实请求" class="headerlink" title="网络请求模拟/发起真实请求"></a>网络请求模拟/发起真实请求</h3><ol>
+<li>可以模拟封装网络请求的方法，借助<code>jest.mock</code>模拟引用文件，返回需要结果的<code>Promise</code>。</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@desc <span class="variable">example</span></span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">import</span> &#123; mount &#125; <span class="keyword">from</span> <span class="string">&#x27;enzyme&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> App <span class="keyword">from</span> <span class="string">&#x27;Componets/app.jsx&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> postData <span class="keyword">from</span> <span class="string">&#x27;../api&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// we can mock it like this as follow</span></span><br><span class="line">jest.mock(<span class="string">&#x27;../api&#x27;</span>, <span class="function">() =&gt;</span> jest.fn(<span class="function">() =&gt;</span> <span class="built_in">Promise</span>.then(&#123;<span class="attr">data</span>: &#123; <span class="attr">name</span>: <span class="string">&#x27;eric&#x27;</span>, <span class="attr">age</span>: <span class="number">18</span> &#125;&#125;)));</span><br><span class="line"></span><br><span class="line">describe(<span class="string">&#x27;An Test Example&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    it(<span class="string">&#x27;Should called if mount&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> wrapper = mount(<span class="xml"><span class="tag">&lt;<span class="name">App</span>/&gt;</span></span>);</span><br><span class="line">        expect(postData).toBeCalledTimes(<span class="number">1</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>直接模拟真实请求，借助<code>enzyme</code>断言回调的<code>done</code>函数或者<code>async</code>。</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@desc  </span>done example</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date </span>2021-01-13  19:56:58</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author </span>eric wang &lt;jadeface.scholar<span class="doctag">@gmail</span>.com&gt;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@copyright </span>2021 Eric</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">import</span> &#123; mount &#125; <span class="keyword">from</span> <span class="string">&#x27;enzyme&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> fetchData <span class="keyword">from</span> <span class="string">&#x27;../api&#x27;</span>;</span><br><span class="line"></span><br><span class="line">test(<span class="string">&#x27;Test Fetch Data&#x27;</span>, <span class="function">(<span class="params">done</span>) =&gt;</span> &#123;</span><br><span class="line">    fetchData()</span><br><span class="line">        .then(<span class="function"><span class="params">r</span> =&gt;</span> r)</span><br><span class="line">        .finally(<span class="function">() =&gt;</span> done())</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@desc </span>async example</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date </span>2021-01-13  20:02:29</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author </span>eric wang &lt;jadeface.scholar<span class="doctag">@gmail</span>.com&gt;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@copyright </span>2021 Eric</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line">test(<span class="string">&#x27;Test Fetch Data&#x27;</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> res = <span class="keyword">await</span> fetchData();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="built_in">console</span>.error(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>根目录新建<code>__mocks__</code>文件夹，内部新建<code>request.js</code>，模拟用户请求。</li>
+</ol>
+<p>测试异步请求其实还有其余的两种方案可以选择，像请求成功与请求失败：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">jest.mock(<span class="string">&#x27;../request&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> user <span class="keyword">from</span> <span class="string">&#x27;../user&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//断言必须返回一个primose</span></span><br><span class="line">it(<span class="string">&#x27;works with promises&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  expect.assertions(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">return</span> user.getUserName(<span class="number">4</span>).then(<span class="function"><span class="params">data</span> =&gt;</span> expect(data).toEqual(<span class="string">&#x27;Mark&#x27;</span>));</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">it(<span class="string">&#x27;works with resolves&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  expect.assertions(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">return</span> expect(user.getUserName(<span class="number">5</span>)).resolves.toEqual(<span class="string">&#x27;Paul&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="jest测试环境之node-amp-browser切换"><a href="#jest测试环境之node-amp-browser切换" class="headerlink" title="jest测试环境之node&amp;browser切换"></a><code>jest</code>测试环境之<code>node</code>&amp;<code>browser</code>切换</h3><p><code>jest</code>默认<code>browser</code>环境，如果需要切换<code>node</code>环境，在顶部追加一段注释就可以了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@jest</span>-environment jsdom</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@jest</span>-environment node</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<p>也可以自己内置沙盒去做为<code>jest</code>预置环境。<br><a target="_blank" rel="noopener" href="https://jestjs.io/docs/en/configuration">文档指引</a></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@jest</span>-environment ./my-custom-environment</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="定时器模拟"><a href="#定时器模拟" class="headerlink" title="定时器模拟"></a>定时器模拟</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jest.useFakeTimers();</span><br><span class="line"></span><br><span class="line">test(<span class="string">&#x27;Test one timer unit case&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    jest.runAllTimers();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="未实现模块模拟"><a href="#未实现模块模拟" class="headerlink" title="未实现模块模拟"></a>未实现模块模拟</h3><p>诸如<code>window</code>上的某些模块并未实现，像<code>location</code>模块，我们可以借助<code>node</code>环境的<code>global</code>模块下去模拟一个纯净的模块。</p>
+<p>像包中的<code>peerDependences</code>我们可以借助，虚拟模块或者真实自定义模块模拟。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> user = jest.createMockFromModule(<span class="string">&#x27;../user&#x27;</span>);</span><br><span class="line"></span><br><span class="line">user.getAuthenticated = <span class="function">() =&gt;</span> (&#123;</span><br><span class="line">  age: <span class="number">622</span>,</span><br><span class="line">  name: <span class="string">&#x27;Mock name&#x27;</span>,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> user;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 例如我们也可以在 TDD 模式下去模拟写未完成的虚拟模块，纯虚拟的</span></span><br><span class="line">jest.mock(</span><br><span class="line">    <span class="string">&#x27;../moduleName&#x27;</span>,</span><br><span class="line">    () =&gt; &#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * Custom implementation of a module that doesn&#x27;t exist in JS,</span></span><br><span class="line"><span class="comment">         * like a generated module or a native module in react-native.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;<span class="attr">virtual</span>: <span class="literal">true</span>&#125;,</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>在观摩<code>antd</code>的测试用例的时候，有看到过这样的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// https://github.com/ant-design/ant-design/issues/20948</span></span><br><span class="line">it(<span class="string">&#x27;not repeat render when Form.Item is not a real Field&#x27;</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> shouldNotRender = jest.fn();</span><br><span class="line">  <span class="keyword">const</span> StaticInput = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    shouldNotRender();</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Input</span> /&gt;</span></span>;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> shouldRender = jest.fn();</span><br><span class="line">  <span class="keyword">const</span> DynamicInput = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    shouldRender();</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Input</span> /&gt;</span></span>;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> formRef = React.createRef();</span><br><span class="line"></span><br><span class="line">  mount(</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;Form ref=&#123;formRef&#125;&gt;</span><br><span class="line">        &lt;Form.Item&gt;</span><br><span class="line">          &lt;StaticInput /&gt;</span><br><span class="line">        &lt;/Form.Item&gt;</span><br><span class="line">        &lt;Form.Item name=<span class="string">&quot;light&quot;</span>&gt;</span><br><span class="line">          &lt;DynamicInput /&gt;</span><br><span class="line">        &lt;/Form.Item&gt;</span><br><span class="line">      &lt;/Form&gt;</span><br><span class="line">    &lt;/div&gt;,</span><br><span class="line">  );</span><br><span class="line"></span><br><span class="line">  expect(shouldNotRender).toHaveBeenCalledTimes(<span class="number">1</span>);</span><br><span class="line">  expect(shouldRender).toHaveBeenCalledTimes(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">  formRef.current.setFieldsValue(&#123; <span class="attr">light</span>: <span class="string">&#x27;bamboo&#x27;</span> &#125;);</span><br><span class="line">  <span class="keyword">await</span> <span class="built_in">Promise</span>.resolve();</span><br><span class="line">  expect(shouldNotRender).toHaveBeenCalledTimes(<span class="number">1</span>);</span><br><span class="line">  expect(shouldRender).toHaveBeenCalledTimes(<span class="number">2</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='http://link.hhtjim.com/163/425570952.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+		data-enable='true'
+        data-ae='false'
+        data-ci='400eb29d3e9a8200ebce'
+        data-cs='3752a31c14ca2baf0f2f24cd1c47905b1b01697d'
+        data-r='bigbigDreamer.github.io'
+        data-o='bigbigDreamer'
+        data-a='bigbigDreamer'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+</html>

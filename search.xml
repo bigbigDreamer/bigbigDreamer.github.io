@@ -1,0 +1,1269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>遗忘过去，重头开始</title>
+    <url>/article/restart-life/</url>
+    <content><![CDATA[<p><img src="https://user-images.githubusercontent.com/39019913/95016483-d93cf580-0685-11eb-95c0-c071593d24ee.png"></p>
+<h2 id="序言"><a href="#序言" class="headerlink" title="序言"></a>序言</h2><p>也许是经历了太多坎坷与挫折，让我有了萌生重头开始的念头，遗忘那些痛苦不堪的回忆与往事。</p>
+<p>心态变了，心态早变了，是怕父母变老也是怕自己没钱可赚，赚钱不够花，慢慢变得爱钱了，可能长大了吧。</p>
+<p>经营了两年多的博客，让我给删的一干二净。理由就是没有任何的营养含量，只能算笔记，不可以叫博客。</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/95016404-6469bb80-0685-11eb-92ca-8ea08f547d43.png"></p>
+<h2 id="第一篇-涉世未深"><a href="#第一篇-涉世未深" class="headerlink" title="第一篇 涉世未深"></a>第一篇 涉世未深</h2><p>刚刚毕业，稍有些懵懂，可能是一个人来到了“魔都”这个繁华又让人向往的城市。</p>
+<p>可能是对于落选大厂也有些许不甘，所以扎根在心底的执念。</p>
+<h2 id="第二篇-百炼成钢"><a href="#第二篇-百炼成钢" class="headerlink" title="第二篇 百炼成钢"></a>第二篇 百炼成钢</h2><p>年轻人，难免会有一些锐气与傲气，需要被磨炼与摧残掉。这样才能更好的心平气和的去做一些事。</p>
+<p>转眼间，来到上海快一年了，我做了什么？收获了什么？</p>
+<p>收获的更多的可能是工作上的经验，同时也收获了更多的知识与解决问题的技巧。</p>
+<h2 id="第三篇-之后的路"><a href="#第三篇-之后的路" class="headerlink" title="第三篇 之后的路"></a>第三篇 之后的路</h2><ol>
+<li>在做业务的同时，补给知识的养分，对于学过的已经模糊的知识回顾复习，对于未来的，新的知识，作以了解；</li>
+<li>应当花费一定量的时间去充实底层原理的理论知识，并且夯实概念化思维，毕竟了解底层知识后，对于这个技术或者框架就会有一个比较全面且直观的认识；</li>
+<li>这条路还有很长，自己到底有几斤几两，自己是最清楚的；</li>
+<li>做过一次、照猫画虎写写总结，那不叫会了，那叫牛刀小试，可能真实编码过程中就会bug百出；</li>
+</ol>
+]]></content>
+      <categories>
+        <category>生活</category>
+      </categories>
+      <tags>
+        <tag>琐事</tag>
+        <tag>心情</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>记一次Github Actions自动化部署实践</title>
+    <url>/article/github-ci/</url>
+    <content><![CDATA[<p>写在前面的话，事情应该发生在去年我换电脑的时候，因为博客使用<code>hexo</code>搭建的，所以源代码也就都遗留在了本地，每次发布的时候只提交<code>generator</code>之后剩余的静态资源文件。</p>
+<p>但是换完电脑忘记拷贝源代码了，所以给自己埋的坑就是原来写的博客源文件全部遗失。不过没关系，正好我有重头开始的准备。</p>
+<p>这不，<code>Github Action</code>出现了，从根本上解决了我的痛点。</p>
+<h2 id="认知储备"><a href="#认知储备" class="headerlink" title="认知储备"></a>认知储备</h2><h4 id="什么是Github-Actions？"><a href="#什么是Github-Actions？" class="headerlink" title="什么是Github Actions？"></a>什么是<code>Github Actions</code>？</h4><p><img src="https://user-images.githubusercontent.com/39019913/95061791-a7339e00-072e-11eb-96f9-2521d83105f0.png" alt="alt"></p>
+<p>直接点击传送门，看看阮一峰大佬的<a href="http://www.ruanyifeng.com/blog/2019/09/getting-started-with-github-actions.html">Github Actions 入门教程</a>;</p>
+<h4 id="git公钥、私钥的理解"><a href="#git公钥、私钥的理解" class="headerlink" title="git公钥、私钥的理解"></a><code>git</code>公钥、私钥的理解</h4><p><code>git</code>的公钥与私钥好比钥匙与锁的关系，一个公钥对应一个私钥。</p>
+<p>如何生成？</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C <span class="string">&#x27;your email&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>会有两个文件，一个文件是<code>xxx.pub</code>是公钥，<code>xxx</code>是私钥与之对应。</p>
+<p>具体解释，参见<a href="https://git-scm.com/book/zh/v2/%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84-Git-%E7%94%9F%E6%88%90-SSH-%E5%85%AC%E9%92%A5"> 服务器上的 Git - 生成 SSH 公钥</a></p>
+<h4 id="怎么理解Hexo博客自动部署？"><a href="#怎么理解Hexo博客自动部署？" class="headerlink" title="怎么理解Hexo博客自动部署？"></a>怎么理解<code>Hexo</code>博客自动部署？</h4><p>简单来讲就是借助<code>Github Actions</code>所提供的虚拟机环境，读取<code>博客源仓库</code>所携带的私钥，写入虚拟机环境的<code>~/.ssh/id_rsa</code>，保证正常<code>push</code>可以有权限进行。而对应的公钥则是保留在目标仓库里面。</p>
+<p>其实核心操作还是<code>Hexo</code>提供的<code>deploy commond</code>;</p>
+<blockquote>
+<p>当执行 <code>hexo deploy</code> 时，<code>Hexo</code> 会将 <code>public</code> 目录中的文件和目录推送至 <code>_config.yml</code> 中指定的远端仓库和分支中，并且完全覆盖该分支下的已有内容。</p>
+</blockquote>
+<iframe width="100%" height="450" src="https://www.youtube.com/embed/B0yVJ46CTR8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<p>参见<a href="https://hexo.io/zh-cn/docs/one-command-deployment.html">hexo官方文档-部署</a></p>
+<h2 id="开始部署"><a href="#开始部署" class="headerlink" title="开始部署"></a>开始部署</h2><p>文章假设你已经准备好了两个仓库<code>blog（应该设置为私有仓库，毕竟一些隐私密码都会存在这里）</code>and<code>xxx.github.io</code>。前者用于存放hexo博客源代码，后者用于自动部署的仓库。</p>
+<p>绑定公钥与私钥，<code>公钥</code>—–&gt;<code>xxx.github.io</code>，<code>私钥</code>—–&gt;<code>blog</code>；</p>
+<p>下图应该详细阐述了怎么绑定公钥与私钥~<br><img src="https://user-images.githubusercontent.com/39019913/95065127-3478f180-0733-11eb-935e-52a5c21df7d6.png"></p>
+<h2 id="编写Github-Actions-workflow-file"><a href="#编写Github-Actions-workflow-file" class="headerlink" title="编写Github Actions workflow file"></a>编写<code>Github Actions workflow file</code></h2><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">Blog</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span> [<span class="string">push</span>] <span class="comment"># 当有新push时运行</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build-and-deploy:</span> <span class="comment"># 创建job</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span> <span class="comment"># 在最新版的Ubuntu系统下运行</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span> <span class="comment"># 将仓库内master分支的内容下载到工作目录</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">actions/checkout@v1</span> <span class="comment"># 脚本来自 https://github.com/actions/checkout</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Use</span> <span class="string">Node.js</span> <span class="number">10.</span><span class="string">x</span> <span class="comment"># 配置Node环境</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">actions/setup-node@v1</span> <span class="comment"># 配置脚本来自 https://github.com/actions/setup-node</span></span><br><span class="line">      <span class="attr">with:</span></span><br><span class="line">        <span class="attr">node-version:</span> <span class="string">&quot;10.x&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">Hexo</span> <span class="string">Env</span></span><br><span class="line">      <span class="attr">env:</span></span><br><span class="line">        <span class="attr">ACTION_DEPLOY_KEY:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.HEXO_DEPLOY_KEY</span> <span class="string">&#125;&#125;</span> <span class="comment"># 拿到仓库配置的私钥：HEXO_DEPLOY_KEY</span></span><br><span class="line">      <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line">        <span class="comment"># set up private key for push code</span></span><br><span class="line">        <span class="string">mkdir</span> <span class="string">-p</span> <span class="string">~/.ssh/</span></span><br><span class="line">        <span class="string">echo</span> <span class="string">&quot;$ACTION_DEPLOY_KEY&quot;</span> <span class="string">&gt;</span> <span class="string">~/.ssh/id_rsa</span> <span class="comment"># 配置秘钥</span></span><br><span class="line">        <span class="string">chmod</span> <span class="number">700</span> <span class="string">~/.ssh</span></span><br><span class="line">        <span class="string">chmod</span> <span class="number">600</span> <span class="string">~/.ssh/id_rsa</span></span><br><span class="line">        <span class="string">ssh-keyscan</span> <span class="string">github.com</span> <span class="string">&gt;&gt;</span> <span class="string">~/.ssh/known_hosts</span></span><br><span class="line">        <span class="comment"># set git config</span></span><br><span class="line">        <span class="string">git</span> <span class="string">config</span> <span class="string">--global</span> <span class="string">user.name</span> <span class="string">&quot;your name&quot;</span></span><br><span class="line">        <span class="string">git</span> <span class="string">config</span> <span class="string">--global</span> <span class="string">user.email</span> <span class="string">&quot;your email&quot;</span></span><br><span class="line">        <span class="comment"># install dependencies</span></span><br><span class="line">        <span class="string">npm</span> <span class="string">i</span> <span class="string">-g</span> <span class="string">hexo-cli</span> <span class="comment"># 安装hexo</span></span><br><span class="line">        <span class="string">npm</span> <span class="string">i</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Hexo</span> <span class="string">Deploy</span></span><br><span class="line">      <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line">        <span class="comment"># deploy and automatic push code</span></span><br><span class="line">        <span class="string">hexo</span> <span class="string">generate</span> <span class="string">&amp;&amp;</span> <span class="string">hexo</span> <span class="string">deploy</span> <span class="comment"># 执行部署程序</span></span><br></pre></td></tr></table></figure>
+
+<p><em>温馨提示：</em> 别懵了啊，这个文件是在<code>blog</code>仓库下建立的。</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/95066240-b74e7c00-0734-11eb-8d97-25a9746f4d8f.png" alt="alt"></p>
+<h2 id="The-End"><a href="#The-End" class="headerlink" title="The End"></a>The End</h2><p>最后，来看看我们的成果吧~</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/95066453-04cae900-0735-11eb-8238-94a83b699c47.png" alt="alt"></p>
+<p><img src="https://user-images.githubusercontent.com/39019913/95066607-3479f100-0735-11eb-9c79-e7669cadeac3.png" alt="alt"></p>
+<p>有没有视觉疲劳呢？来放松一下吧~</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/95066764-6ab77080-0735-11eb-90c9-2c840a70f51d.png" alt="alt"></p>
+]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>经验</tag>
+        <tag>学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>由reduce引发的Promise决议思考</title>
+    <url>/article/reduce-to-promise/</url>
+    <content><![CDATA[<h2 id="reduce有哪些奇淫巧技？"><a href="#reduce有哪些奇淫巧技？" class="headerlink" title="reduce有哪些奇淫巧技？"></a><code>reduce</code>有哪些<code>奇淫巧技</code>？</h2><ul>
+<li>最基本的累加数</li>
+<li>数组转对象</li>
+<li>顺序执行异步任务</li>
+</ul>
+<p>本文不再阐述一些比较官方的话语。</p>
+<blockquote>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce"><code>reduce</code>方法的MDN传送门</a></p>
+</blockquote>
+<h3 id="最基本的累加"><a href="#最基本的累加" class="headerlink" title="最基本的累加"></a>最基本的累加</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];</span><br><span class="line"><span class="keyword">const</span> addResult = arr.reduce(<span class="function">(<span class="params">a, b</span>) =&gt;</span> a+b);</span><br></pre></td></tr></table></figure>
+
+<h3 id="数组转对象"><a href="#数组转对象" class="headerlink" title="数组转对象"></a>数组转对象</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 用过 loadsh 的小伙伴都应该知道，lodash 提供了_keyBy 提供了这样的功能</span></span><br><span class="line"><span class="keyword">const</span> data = [&#123;</span><br><span class="line">    name: <span class="string">&#x27;张飒&#x27;</span>,</span><br><span class="line">    id: <span class="number">1</span></span><br><span class="line">&#125;, &#123;</span><br><span class="line">    name: <span class="string">&#x27;李四&#x27;</span>,</span><br><span class="line">    id: <span class="number">2</span></span><br><span class="line">&#125;, &#123;</span><br><span class="line">    name: <span class="string">&#x27;赵柳&#x27;</span>,</span><br><span class="line">    id: <span class="number">3</span></span><br><span class="line">&#125;]</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> targetObj = data.reduce(<span class="function">(<span class="params">a, b</span>) =&gt;</span> &#123; ...a, &#123; [b.id]: b &#125; &#125;, &#123;&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// console</span></span><br><span class="line"><span class="comment">// &#123; 1: &#123; name: &#x27;张飒&#x27;, id: 1 &#125;, 2: &#123; name: &#x27;李四&#x27;, id: 2 &#125;, 3: &#123; name: &#x27;赵柳&#x27;, id: 3 &#125;&#125;</span></span><br></pre></td></tr></table></figure>
+<h3 id="顺序执行异步任务"><a href="#顺序执行异步任务" class="headerlink" title="顺序执行异步任务"></a>顺序执行异步任务</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> PromiseTaskA = <span class="function">() =&gt;</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve</span>) =&gt;</span> &#123; <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;即将执行A&#x27;</span>);</span><br><span class="line">    resolve(<span class="string">&#x27;PromiseTaskA&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">2000</span>) &#125;)</span><br><span class="line"><span class="keyword">const</span> PromiseTaskB = <span class="function">() =&gt;</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve</span>) =&gt;</span> &#123; <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;即将执行B&#x27;</span>);</span><br><span class="line">    resolve(<span class="string">&#x27;PromiseTaskB&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">2000</span>) &#125;)</span><br><span class="line"><span class="keyword">const</span> PromiseTaskC = <span class="function">() =&gt;</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve</span>) =&gt;</span> &#123; <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;即将执行C&#x27;</span>);</span><br><span class="line">    resolve(<span class="string">&#x27;PromiseTaskC&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">1000</span>) &#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> tasks = [PromiseTaskA, PromiseTaskC, PromiseTaskB];</span><br><span class="line">tasks.reduce(<span class="function">(<span class="params">a, b</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(a, <span class="string">&#x27;00&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span> a.then(<span class="function">() =&gt;</span> b())</span><br><span class="line">&#125;, <span class="built_in">Promise</span>.resolve(&#123;&#125;) )</span><br><span class="line">    .then(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;all done&#x27;</span>)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// console.log</span></span><br><span class="line"><span class="comment">// Promise &#123; &#123;&#125; &#125; 00</span></span><br><span class="line"><span class="comment">// Promise &#123; &lt;pending&gt; &#125; 00</span></span><br><span class="line"><span class="comment">// Promise &#123; &lt;pending&gt; &#125; 00</span></span><br><span class="line"><span class="comment">// 即将执行A</span></span><br><span class="line"><span class="comment">// 即将执行C</span></span><br><span class="line"><span class="comment">// 即将执行B</span></span><br><span class="line"><span class="comment">// all done</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>当到这里的时候，我突然联想到一个问题，<code>Promise.all</code>是顺序执行的吗？为什么他可以在<code>then</code>里对应传入异步任务数组返回相应的结果？</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> PromiseTaskA = <span class="function">() =&gt;</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve</span>) =&gt;</span> &#123; <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;即将执行A&#x27;</span>);</span><br><span class="line">    resolve(<span class="string">&#x27;PromiseTaskA&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">2000</span>) &#125;)</span><br><span class="line"><span class="keyword">const</span> PromiseTaskB = <span class="function">() =&gt;</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve</span>) =&gt;</span> &#123; <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;即将执行B&#x27;</span>);</span><br><span class="line">    resolve(<span class="string">&#x27;PromiseTaskB&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">2000</span>) &#125;)</span><br><span class="line"><span class="keyword">const</span> PromiseTaskC = <span class="function">() =&gt;</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve</span>) =&gt;</span> &#123; <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;即将执行C&#x27;</span>);</span><br><span class="line">    resolve(<span class="string">&#x27;PromiseTaskC&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">1000</span>) &#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">Promise</span>.all([PromiseTaskA(), PromiseTaskB(), PromiseTaskC()])</span><br><span class="line">.then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(res)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// console</span></span><br><span class="line"><span class="comment">// 即将执行C</span></span><br><span class="line"><span class="comment">// 即将执行A</span></span><br><span class="line"><span class="comment">// 即将执行B</span></span><br><span class="line"><span class="comment">// [ &#x27;PromiseTaskA&#x27;, &#x27;PromiseTaskB&#x27;, &#x27;PromiseTaskC&#x27; ]</span></span><br></pre></td></tr></table></figure>
+
+<p>原因很简单，<code>Promise.all</code>是并行的，也就是宏观意义上的并行，也可以说是同时执行，当哪个异步任务执行结束，就把对应的执行结果塞进数组内部，所以就可以实现结果对应。</p>
+<p><code>Promise.all</code>并不会顺序执行，请不要依赖<code>Promise.all</code>去做顺序执行流程任务。</p>
+<blockquote>
+<p>问题又来了？怎么保证<code>Promise</code>的执行尽管失败了，但是<code>Promise.all</code>并不会中断？</p>
+</blockquote>
+<p>其实也很好解决，把异步任务的<code>catch</code>给<code>resolve出来</code>，保证整个并行任务流的正常运行。</p>
+<blockquote>
+<p>扩展一个知识点，<code>Promise</code>为什么会发生值透传？</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.resolve(<span class="number">1</span>)</span><br><span class="line">.then(<span class="number">3</span>)</span><br><span class="line">.then(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(data)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// console？</span></span><br><span class="line"><span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+
+<p>原因也很简单，因为<code>Promise</code>的<code>then</code>、<code>catch</code>期望的是一个函数，如果出现<code>!Function</code>就会发生透传。</p>
+<blockquote>
+<p>继续扩展一个知识点，<code>Promise</code>是微任务吗？<code>then</code>是同步还是异步的。</p>
+</blockquote>
+<p><code>Promise</code>构造函数是同步的，<code>then</code>、<code>catch</code>也是同步的，但是内部的<code>callback</code>被扔进了异步队列里。</p>
+]]></content>
+      <categories>
+        <category>Javascript</category>
+      </categories>
+      <tags>
+        <tag>经验</tag>
+        <tag>学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>树</title>
+    <url>/article/js-tree/</url>
+    <content><![CDATA[<h2 id="树是什么？"><a href="#树是什么？" class="headerlink" title="树是什么？"></a>树是什么？</h2><ul>
+<li><code>JS</code>中没有树，但是可以用<code>Object</code>和<code>Array</code>构建树；</li>
+<li>树的常用操作<ul>
+<li>深度优先遍历</li>
+<li>广度优先遍历</li>
+<li>先、中、后序遍历</li>
+</ul>
+</li>
+</ul>
+<h2 id="深度优先遍历：尽可能深的搜索树的分支。-DFS"><a href="#深度优先遍历：尽可能深的搜索树的分支。-DFS" class="headerlink" title="深度优先遍历：尽可能深的搜索树的分支。(DFS)"></a>深度优先遍历：尽可能深的搜索树的分支。(<code>DFS</code>)</h2><p><img src="https://user-images.githubusercontent.com/39019913/95301390-20f49480-08b3-11eb-9bee-89a5929bb3cf.png" alt="alt"></p>
+<p>武功心法：访问根节点—对根节点的<code>children</code>挨个进行深度优先遍历。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> tree = &#123;</span><br><span class="line">    val: <span class="string">&#x27;a&#x27;</span>,</span><br><span class="line">    children: [</span><br><span class="line">        &#123;</span><br><span class="line">            val: <span class="string">&#x27;1&#x27;</span>,</span><br><span class="line">            children: [</span><br><span class="line">                &#123;</span><br><span class="line">                    val: <span class="string">&#x27;b&#x27;</span>,</span><br><span class="line">                    children: [</span><br><span class="line">                        &#123;</span><br><span class="line">                            val: <span class="string">&#x27;1&#x27;</span>,</span><br><span class="line">                            children: []</span><br><span class="line">                        &#125;, &#123;</span><br><span class="line">                            val: <span class="string">&#x27;2&#x27;</span>,</span><br><span class="line">                            children: []</span><br><span class="line">                        &#125;,</span><br><span class="line">                    ],</span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;, &#123;</span><br><span class="line">            val: <span class="string">&#x27;2&#x27;</span>,</span><br><span class="line">            children: []</span><br><span class="line">        &#125;,</span><br><span class="line">    ],</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> dfs = <span class="function"><span class="params">root</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(root.val)</span><br><span class="line">    root.children.forEach(dfs)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">dfs(tree)</span><br><span class="line"><span class="comment">// console</span></span><br><span class="line"><span class="comment">/* a</span></span><br><span class="line"><span class="comment">   1</span></span><br><span class="line"><span class="comment">   b</span></span><br><span class="line"><span class="comment">   1</span></span><br><span class="line"><span class="comment">   2</span></span><br><span class="line"><span class="comment">   2 */</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="广度优先遍历：先访问距离根节点最近的节点。-BFS"><a href="#广度优先遍历：先访问距离根节点最近的节点。-BFS" class="headerlink" title="广度优先遍历：先访问距离根节点最近的节点。(BFS)"></a>广度优先遍历：先访问距离根节点最近的节点。(<code>BFS</code>)</h2><p><img src="https://user-images.githubusercontent.com/39019913/95301390-20f49480-08b3-11eb-9bee-89a5929bb3cf.png" alt="alt"></p>
+<p>武功心法：<br>    - 新建一个队列，根节点入队<br>    - 队头出队并访问<br>    - 队头的children挨个入队<br>    - 重复第二、三步，直到队列为空</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> bfs = <span class="function"><span class="params">root</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> q = [root];</span><br><span class="line">    <span class="keyword">while</span> (q.length &gt;<span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">const</span> n = q.shift();</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;bfs&#x27;</span>,n.val);</span><br><span class="line">        n.children.forEach(<span class="function"><span class="params">child</span> =&gt;</span> &#123;</span><br><span class="line">            q.push(child);</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bfs(tree)</span><br><span class="line"></span><br><span class="line"><span class="comment">// console</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    bfs a</span></span><br><span class="line"><span class="comment">    bfs 1</span></span><br><span class="line"><span class="comment">    bfs 2</span></span><br><span class="line"><span class="comment">    bfs b</span></span><br><span class="line"><span class="comment">    bfs 1</span></span><br><span class="line"><span class="comment">    bfs 2</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<h2 id="二叉树的先、中、后序遍历"><a href="#二叉树的先、中、后序遍历" class="headerlink" title="二叉树的先、中、后序遍历"></a>二叉树的先、中、后序遍历</h2><p>什么是二叉树？</p>
+<p>树种每个节点最多只能由两个子节点。</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Binary_tree.svg"></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 二叉树</span></span><br><span class="line"><span class="keyword">const</span> BTree = &#123;</span><br><span class="line">    val: <span class="number">2</span>,</span><br><span class="line">    left: &#123;</span><br><span class="line">        val: <span class="number">7</span>,</span><br><span class="line">        left: &#123;</span><br><span class="line">            val: <span class="number">2</span>,</span><br><span class="line">            left: <span class="literal">null</span>,</span><br><span class="line">            right: <span class="literal">null</span></span><br><span class="line">        &#125;,</span><br><span class="line">        right: &#123;</span><br><span class="line">            val: <span class="number">6</span>,</span><br><span class="line">            left: &#123;</span><br><span class="line">                val: <span class="number">5</span>,</span><br><span class="line">                left: <span class="literal">null</span>,</span><br><span class="line">                right: <span class="literal">null</span></span><br><span class="line">            &#125;,</span><br><span class="line">            right: &#123;</span><br><span class="line">                val: <span class="number">11</span>,</span><br><span class="line">                left: <span class="literal">null</span>,</span><br><span class="line">                right: <span class="literal">null</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;,</span><br><span class="line">    right: &#123;</span><br><span class="line">        val: <span class="number">5</span>,</span><br><span class="line">        left: <span class="literal">null</span>,</span><br><span class="line">        right: &#123;</span><br><span class="line">            val: <span class="number">9</span>,</span><br><span class="line">            left: &#123;</span><br><span class="line">                val: <span class="number">4</span>,</span><br><span class="line">                left: <span class="literal">null</span>,</span><br><span class="line">                right: <span class="literal">null</span></span><br><span class="line">            &#125;,</span><br><span class="line">            right: <span class="literal">null</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="先序遍历内功心法"><a href="#先序遍历内功心法" class="headerlink" title="先序遍历内功心法"></a>先序遍历内功心法</h3><ul>
+<li>根左右</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> POrder = <span class="function"><span class="params">tree</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(!tree) &#123; <span class="keyword">return</span> &#125;</span><br><span class="line">    <span class="built_in">console</span>.log(tree.val);</span><br><span class="line">    POrder(tree.left)</span><br><span class="line">    POrder(tree.right)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">POrder(BTree)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2 7 2 6 5 11 5 9 4 </span></span><br></pre></td></tr></table></figure>
+
+<h3 id="中序遍历内功心法"><a href="#中序遍历内功心法" class="headerlink" title="中序遍历内功心法"></a>中序遍历内功心法</h3><ul>
+<li>左根右</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> POrder = <span class="function"><span class="params">tree</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(!tree) &#123; <span class="keyword">return</span> &#125;</span><br><span class="line">    POrder(tree.left)</span><br><span class="line">    <span class="built_in">console</span>.log(tree.val);</span><br><span class="line">    POrder(tree.right)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">POrder(BTree)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2 7 5 6 11 2 5 4 9</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="后续遍历内功心法"><a href="#后续遍历内功心法" class="headerlink" title="后续遍历内功心法"></a>后续遍历内功心法</h3><ul>
+<li><p>左右根</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> POrder = <span class="function"><span class="params">tree</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(!tree) &#123; <span class="keyword">return</span> &#125;</span><br><span class="line">    POrder(tree.left)</span><br><span class="line">    POrder(tree.right)</span><br><span class="line">    <span class="built_in">console</span>.log(tree.val);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">POrder(BTree)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2 5 11 6 7 4 9 5 2</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>数据结构</category>
+      </categories>
+      <tags>
+        <tag>学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>堆</title>
+    <url>/article/js-heap/</url>
+    <content><![CDATA[<h1 id="堆是什么？"><a href="#堆是什么？" class="headerlink" title="堆是什么？"></a>堆是什么？</h1><p>堆是一种特殊的完全二叉树</p>
+<p>每层节点都全部填满，如果没有填满，则只缺少右侧的若干节点。</p>
+<p>最小堆：父节点都比子节点小</p>
+<p>最大堆：父节点都比子节点大</p>
+]]></content>
+      <categories>
+        <category>数据结构</category>
+      </categories>
+      <tags>
+        <tag>学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>React组件单元测试指北</title>
+    <url>/article/react-unit-test/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>写这篇文章的时候，我其实是顶着很大的压力去写的，因为文章本身内容可能会很多，涉及的东西也可能会很多，所以我准备拿一个兼顾所有测试场景的组件去<code>Mock</code>测试场景，介绍各种测试方案的进行。</p>
+<p>未完待续。。。</p>
+]]></content>
+      <categories>
+        <category>单元测试</category>
+      </categories>
+      <tags>
+        <tag>单元测试</tag>
+        <tag>React</tag>
+        <tag>Enzyme</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>手撕函数柯里化</title>
+    <url>/article/write-code-curry/</url>
+    <content><![CDATA[<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 计算两数之和</span></span><br><span class="line"><span class="keyword">const</span> carry = <span class="function">(<span class="params">f, o</span>) =&gt;</span> &#123;</span><br><span class="line">    o = o || []</span><br><span class="line">    <span class="keyword">const</span> _len = f.length;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(o)</span><br><span class="line">       <span class="keyword">const</span> _o = [].concat(o.slice(), <span class="built_in">Array</span>.from(<span class="built_in">arguments</span>));</span><br><span class="line">        <span class="keyword">if</span>(_o.length &lt; _len) &#123;</span><br><span class="line">            <span class="keyword">return</span> carry.call(<span class="built_in">this</span>, f, _o);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> f.apply(<span class="built_in">this</span>, _o);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> sum = <span class="function">(<span class="params">a,b,c</span>) =&gt;</span> a+b+c</span><br><span class="line"><span class="keyword">const</span> newSum = carry(sum)</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(newSum(<span class="number">1</span>)(<span class="number">2</span>)(<span class="number">3</span>))</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>柯里化的核心就是：不断拆解<code>新生curry工厂函数</code>的形参，内部闭包缓存，最终比对初始函数的形参个数与缓存形参个数。相同就实现再次调用。</p>
+<p><strong>需要注意的点：</strong></p>
+<ul>
+<li><code>this</code>和<code>arguements</code>只有在<code>functional</code>函数中存在，<code>箭头函数</code>是没有这个东西的;</li>
+<li><code>arguements</code>只是一个<code>伪数组</code>，只拥有数组的个别几个<code>方法和属性</code>，可以借助<code>Array.from</code>转换为<code>真实数组</code>;</li>
+<li>注意区分<code>call</code>与<code>apply</code>的区别;</li>
+<li>理解闭包的特性</li>
+</ul>
+]]></content>
+      <categories>
+        <category>手写代码</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>手撕Promise</title>
+    <url>/article/write-code-promise/</url>
+    <content><![CDATA[<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 手写Promise</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyPromise</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(fn) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> fn !== <span class="string">&quot;function&quot;</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">&#x27;MyPromise Expect A Function&#x27;</span>)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">this</span>.status = <span class="string">&#x27;Pending&#x27;</span>;</span><br><span class="line">        <span class="built_in">this</span>.onResolvedCallback = [];</span><br><span class="line">        <span class="built_in">this</span>.onRejectedCallback = [];</span><br><span class="line">        <span class="built_in">this</span>.val = <span class="literal">undefined</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">const</span> resolve = <span class="function">(<span class="params">val</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                <span class="built_in">console</span>.log(<span class="built_in">this</span>.status, <span class="built_in">this</span>.onResolvedCallback)</span><br><span class="line">                <span class="keyword">if</span>(<span class="built_in">this</span>.status === <span class="string">&#x27;Pending&#x27;</span>) &#123;</span><br><span class="line">                    <span class="built_in">this</span>.status = <span class="string">&#x27;Resolved&#x27;</span></span><br><span class="line">                    <span class="built_in">this</span>.val = val;</span><br><span class="line">                    <span class="built_in">this</span>.onResolvedCallback.forEach(<span class="function"><span class="params">item</span> =&gt;</span> item(val))</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;, <span class="number">0</span>)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">const</span> reject = <span class="function">(<span class="params">val</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                <span class="keyword">if</span>(<span class="built_in">this</span>.status === <span class="string">&#x27;Pending&#x27;</span>) &#123;</span><br><span class="line">                    <span class="built_in">this</span>.status = <span class="string">&#x27;Rejected&#x27;</span></span><br><span class="line">                    <span class="built_in">this</span>.val = val;</span><br><span class="line">                    <span class="built_in">this</span>.onRejectedCallback.forEach(<span class="function"><span class="params">item</span> =&gt;</span> item(val))</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;, <span class="number">0</span>)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            fn(resolve, reject)</span><br><span class="line">        &#125;  <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">           reject(e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.status;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    then(onFulfilled, onRejected) &#123;</span><br><span class="line">        onFulfilled = <span class="keyword">typeof</span> onFulfilled === <span class="string">&#x27;function&#x27;</span> ? onFulfilled : <span class="function"><span class="params">o</span> =&gt;</span> o;</span><br><span class="line">        onRejected = <span class="keyword">typeof</span> onRejected === <span class="string">&#x27;function&#x27;</span> ? onRejected : <span class="function"><span class="params">err</span> =&gt;</span> &#123; <span class="keyword">throw</span> err &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MyPromise(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.onResolvedCallback.push(<span class="function">(<span class="params">val</span>) =&gt;</span> &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">const</span> res = onFulfilled(val)</span><br><span class="line">                    <span class="keyword">if</span>(res <span class="keyword">instanceof</span> MyPromise) &#123;</span><br><span class="line">                        res.then(resolve, reject)</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        resolve(res);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">                    reject(e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;)</span><br><span class="line"></span><br><span class="line">            <span class="built_in">this</span>.onRejectedCallback.push(<span class="function">(<span class="params">val</span>) =&gt;</span> &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">const</span> res = onRejected(val)</span><br><span class="line">                    <span class="keyword">if</span>(res <span class="keyword">instanceof</span> MyPromise) &#123;</span><br><span class="line">                        res.then(resolve, reject)</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        reject(res);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">                    reject(e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">catch</span>(onRejected) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.then(<span class="literal">null</span>, onRejected);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> p = <span class="keyword">new</span> MyPromise(<span class="function">(<span class="params">res, rej</span>) =&gt;</span> &#123;res(<span class="number">1</span>)&#125;)</span><br><span class="line"></span><br><span class="line">p.then(<span class="number">3</span>)</span><br><span class="line">    .then(<span class="function"><span class="params">cal</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(cal)</span><br><span class="line">    &#125;)</span><br><span class="line">    .catch(<span class="function"><span class="params">err</span>=&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(err)</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>手写代码</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>手撕new</title>
+    <url>/article/write-code-new/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>手撕一系列代码的初衷并不是说证明什么，而是手撕代码后的愉悦感，可以体会原理层的东西，在使用方面的疑问，通通解掉。</p>
+<h2 id="Sources"><a href="#Sources" class="headerlink" title="Sources"></a>Sources</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> MyNew = <span class="function">(<span class="params">fn, ...props</span>) =&gt;</span> &#123;</span><br><span class="line">   <span class="keyword">const</span> Constructor = fn;</span><br><span class="line">   <span class="keyword">const</span> _obj = <span class="built_in">Object</span>.create(Constructor.prototype);</span><br><span class="line">   <span class="keyword">const</span> ConsRet = Constructor.apply(_obj, props);</span><br><span class="line">    </span><br><span class="line">   <span class="keyword">return</span> (<span class="keyword">typeof</span> ConsRet === <span class="string">&#x27;object&#x27;</span> &amp;&amp; ConsRet) ? ConsRet : _obj;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="重点剖析"><a href="#重点剖析" class="headerlink" title="重点剖析"></a>重点剖析</h2><ul>
+<li>JS<code>构造函数</code>与<code>普通成员函数</code>的区别；</li>
+<li><code>this</code>指向<code>源</code>构建&amp;<code>__proto__</code>关联；</li>
+<li>实例化实参的<code>注入</code>，需理解<code>call</code>&amp;<code>apply</code>的区别；</li>
+</ul>
+]]></content>
+      <categories>
+        <category>手写代码</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>手撕 apply &amp; call</title>
+    <url>/article/write-code-apply&amp;code/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>call</code>和<code>apply</code>的区别，应该在于<code>API</code>的使用上，<code>call(context | null, args...)</code>，<code>apply(context | null, [args...])</code>；</p>
+<p>共同点在于都可以<code>自调用函数</code>，<code>硬绑定 上下文（this）</code>；</p>
+<p>现在，开启手撕模式：</p>
+<h2 id="Sources"><a href="#Sources" class="headerlink" title="Sources"></a>Sources</h2><ul>
+<li><code>Call</code></li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myCall = <span class="function"><span class="keyword">function</span> (<span class="params">context</span>) </span>&#123;</span><br><span class="line">    context = context || <span class="built_in">this</span>;</span><br><span class="line">    context.fn = <span class="built_in">this</span></span><br><span class="line">    <span class="keyword">const</span> _arr = <span class="built_in">Array</span>.from(<span class="built_in">arguments</span>);</span><br><span class="line">    _arr.shift()</span><br><span class="line">    <span class="keyword">const</span> res = context.fn(_arr.toString());</span><br><span class="line">    <span class="keyword">delete</span> context.fn</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>Apply</code></li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Function</span>.prototype.myApply = <span class="function"><span class="keyword">function</span> (<span class="params">context</span>) </span>&#123;</span><br><span class="line">    context = context || <span class="built_in">this</span></span><br><span class="line">    context.fn = <span class="built_in">this</span>;</span><br><span class="line">    <span class="keyword">const</span> _arr = <span class="built_in">Array</span>.from(<span class="built_in">arguments</span>);</span><br><span class="line">    _arr.shift();</span><br><span class="line">    <span class="keyword">const</span> res = context.fn(_arr.shift().toString())</span><br><span class="line">    <span class="keyword">delete</span> context.fn;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="The-End"><a href="#The-End" class="headerlink" title="The End"></a>The End</h2><p>最后，其实是有问题的，问题原因请看如下 <code>issue</code>;</p>
+<p><a href="https://github.com/mqyqingfeng/Blog/issues/11#issuecomment-708381446"><code>issue</code>传送门</a></p>
+]]></content>
+      <categories>
+        <category>手写代码</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redux-thunk原理探析</title>
+    <url>/article/redux-thunk-theory/</url>
+    <content><![CDATA[<p><code>Redux</code>的作用这里就不做过多赘述，简单看下<code>Redux</code>原理：</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/98236642-a34da280-1f9e-11eb-84fd-e1429548e424.png" alt="image"></p>
+<p><code>小tip：纯函数的核心理念在于：出参始终依赖于入参，不受外部的任何影响，也就是不会因为何时、何处调用而影响</code>。</p>
+<p>可以很直观的看到，<code>用户</code>从<code>UI</code>层面触发一系列的<code>DOM</code>事件，进而去<code>dispatch</code> <code>action</code>，将<code>dispatch</code>这个动作的处理交给<code>reducer（纯函数）</code>去做进一步处理。</p>
+<p><code>Redux-thunk</code>做了什么？</p>
+<p>它是为了处理异步<code>action</code>的，因为在项目中难免会有<code>异步请求数据，往redux中塞入获取的数据</code>这样的动作。</p>
+<h2 id="但是，它究竟做了什么呢？"><a href="#但是，它究竟做了什么呢？" class="headerlink" title="但是，它究竟做了什么呢？"></a>但是，它究竟做了什么呢？</h2><p>可以看看源码，一窥究竟：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 创建thunk-middleware</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createThunkMiddleware</span>(<span class="params">extraArgument</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 拦截action </span></span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">&#123; dispatch, getState &#125;</span>) =&gt;</span> <span class="function">(<span class="params">next</span>) =&gt;</span> <span class="function">(<span class="params">action</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 如果action为一个函数，那么就调用action，并且传入 dispatch、getState、extraArguement</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> action === <span class="string">&#x27;function&#x27;</span>) &#123;</span><br><span class="line">       <span class="comment">// 传入dispatch的目的是为了可以在action中去处理异步，在合适的时机dispatch</span></span><br><span class="line">      <span class="keyword">return</span> action(dispatch, getState, extraArgument);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 否则透传action</span></span><br><span class="line">    <span class="keyword">return</span> next(action);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> thunk = createThunkMiddleware();</span><br><span class="line">thunk.withExtraArgument = createThunkMiddleware;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> thunk;</span><br></pre></td></tr></table></figure>
+<p>在<code>action</code>的时候处理异步任务，在结束时，<code>dispatch</code>对应的<code>reducer  case</code>。</p>
+<h2 id="store组织"><a href="#store组织" class="headerlink" title="store组织"></a><code>store</code>组织</h2><figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createStore, applyMiddleware &#125;  <span class="keyword">from</span> <span class="string">&#x27;redux&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> thunk <span class="keyword">from</span> <span class="string">&#x27;redux-thunk&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> asyncAdd = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (dispatch: <span class="function">(<span class="params">args: &#123;<span class="keyword">type</span>: <span class="built_in">any</span>; payload?: <span class="built_in">any</span>&#125;</span>) =&gt;</span> <span class="built_in">void</span>) =&gt; &#123;</span><br><span class="line">        <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            dispatch(&#123; <span class="keyword">type</span>: <span class="string">&#x27;AsyncAdd&#x27;</span>, payload: <span class="number">9</span>&#125;)</span><br><span class="line">        &#125;, <span class="number">1000</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> syncAdd = <span class="function">(<span class="params">payload: <span class="built_in">any</span></span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        <span class="keyword">type</span>: <span class="string">&#x27;ADD&#x27;</span>,</span><br><span class="line">        payload</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">reducers</span> (<span class="params">state = &#123; num: 1 &#125;, action: <span class="built_in">any</span></span>): <span class="title">any</span> </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (action.type) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&#x27;ADD&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> &#123; ...state, num: action.payload &#125; ;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&#x27;AsyncAdd&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> &#123; ...state, num: action.payload &#125; ;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">return</span> state;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> store = createStore(reducers, applyMiddleware(thunk))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> store;</span><br></pre></td></tr></table></figure>
+
+<h2 id="End"><a href="#End" class="headerlink" title="End"></a>End</h2><p>与<code>thunk</code>相似的工具还有<code>saga</code>，但是<code>saga</code>的设计更像是<code>vuex</code>中那样，把异步<code>action</code>剖离出来。利用了<code>generator</code>的写法，单独的<code>saga</code>文件去将异步同步化。</p>
+<p>简单赘述一下<code>Redux-saga</code>处理流程：</p>
+<p>先说明下<code>Redux-MiddleWare</code>的处理流程；</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/98340671-b1f09400-2048-11eb-8c24-56fafb8de3f9.png" alt="image"></p>
+<p><code>saga</code>提供的<code>effets</code>会在处理完毕异步任务后，重新<code>dispatch</code> <code>reducer</code>中的<code>action</code>去更新<code>store</code>。监听用户<code>action</code>，将<code>saga</code>处理的异步<code>action</code>独立出来。</p>
+<blockquote>
+<p><code>小Tip：</code>什么是中间件？中间件是介于系统某几个部分的<code>衔接应用</code>，它可能只是简单地做一些数据交换任务，不处理业务逻辑，不处理底层硬件逻辑。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>redux-thunk</category>
+      </categories>
+      <tags>
+        <tag>React</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何开始测试，怎么写好测试？</title>
+    <url>/article/react-unit-test-start/</url>
+    <content><![CDATA[<h1 id="怎么开始测试呢？"><a href="#怎么开始测试呢？" class="headerlink" title="怎么开始测试呢？"></a>怎么开始测试呢？</h1><p>编写测试之前，请先<code>深呼吸</code>，<code>气沉丹田</code>，想想自己即将要攀登到<code>代码质量之巅</code>。</p>
+<p>感受着和煦的微风<del>微凉的空调风夹杂着氟利昂的气息</del>，抚过脸颊，默默拿起手边的<code>Mojito</code><del>温热的白开水伴随着野菊花的芬芳</del>。</p>
+<p>默念心法<code>given-when-then</code>，<code>不要去关注内部逻辑怎么实现的</code>。</p>
+<p>缓缓开始敲击着键盘：<br><code>describe(xxx, () =&gt; &#123;&#125;)</code>……</p>
+<hr>
+<p>正经开始吧，先从<code>TDD</code>测试模式开始起步吧。</p>
+<ul>
+<li>这里我们接了一个需求，需要写一个过滤出URL地址中的端口号工具函数。</li>
+</ul>
+<p>首先我们可能会有这样一个<code>敏捷</code>的思维，这个工具函数就是<code>1. 拿到 url</code> =&gt; <code>2. 匹配 端口号</code> =&gt; <code>3. 返回端口号</code>。</p>
+<p>于是这样一个用例出来了。这里按照预期测试完，确实返回了<code>8080</code>这个端口号</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; filterPort &#125; <span class="keyword">from</span> <span class="string">&#x27;utils&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> assert <span class="keyword">from</span> <span class="string">&#x27;assert&#x27;</span>;</span><br><span class="line"></span><br><span class="line">describe(<span class="string">&#x27;Util&#x27;</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> &#123;</span><br><span class="line">    test(<span class="string">&#x27;返回端口号&#x27;</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">&#x27;http://localhost:8080&#x27;</span>;</span><br><span class="line">        <span class="keyword">const</span> res = filterPort(url);</span><br><span class="line"></span><br><span class="line">        assert(res === <span class="string">&#x27;8080&#x27;</span>);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/39019913/96442449-b988fe00-123d-11eb-8f86-326e6628029e.png" alt="image"></p>
+<p>按照<code>TDD</code>开发的顺序，先跟着<code>feel</code>盲写一波测试用例，然后开始简要的开发，让测试用例通过。</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 定义函数模板</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> FilterPortProps &#123;</span><br><span class="line">    (url: <span class="built_in">string</span>): <span class="built_in">string</span> | <span class="literal">undefined</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 编写最基本的函数</span></span><br><span class="line"><span class="keyword">import</span> &#123; FilterPortProps &#125; <span class="keyword">from</span> <span class="string">&#x27;../lib/interface/utils&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> filterPort: FilterPortProps = <span class="function">(<span class="params">url</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> url.match(<span class="regexp">/(?&lt;=:)\d+/g</span>)?.[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来就是紧张而又自豪的时刻了：</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/96444809-8a748b80-1241-11eb-994b-d5bab299b8f9.png" alt="image"></p>
+<p>按照<code>TDD</code>的规则，我们继续编写测试（<code>未实现的测试</code>）；</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line">test(<span class="string">&#x27;返回 null&#x27;</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> &#123;</span><br><span class="line">     <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">&#x27;http://localhost&#x27;</span>;</span><br><span class="line">     <span class="keyword">const</span> res = filterPort(url);</span><br><span class="line">     <span class="built_in">console</span>.log(res)</span><br><span class="line">     assert(res === <span class="literal">null</span>);</span><br><span class="line"> &#125;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/39019913/96448545-21dbdd80-1246-11eb-811f-66932f79fcea.png" alt="image"></p>
+<p>这里的行为，应该是返回<code>null</code>，所以源代码应该修改为这样：</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; FilterPortProps &#125; <span class="keyword">from</span> <span class="string">&#x27;../lib/interface/utils&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> filterPort: FilterPortProps = <span class="function">(<span class="params">url</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> url.match(<span class="regexp">/(?&lt;=:)\d+/g</span>)?.[<span class="number">0</span>] || <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/39019913/96449112-f4dbfa80-1246-11eb-9765-1b26f056e346.png" alt="image"></p>
+<p>我们再次完成了一个 由<code>红</code>变<code>绿</code>的过程，但是这时候的设计并不完美。</p>
+<p>再从<code>BDD</code>深扣实现细节出发，返回出一个正确的结果，我们需要两个步骤：</p>
+<ol>
+<li><code>url</code>确实存在；</li>
+<li><code>正则匹配</code>返回结果；</li>
+</ol>
+<p>我们思考的是，在什么情况下，会有什么表现，代码层面会有什么体现。</p>
+<p>所以针对这个工具函数，我们应该遵循<code>黑盒测试用例</code>设计方案，设计有效/无效等价类；</p>
+<ul>
+<li><p>有效等价类</p>
+<ol>
+<li>url存在，且只有一个</li>
+</ol>
+</li>
+<li><p>无效等价类</p>
+<ol>
+<li>url 不存在</li>
+<li>url 存在，但是数目大于一个</li>
+</ol>
+</li>
+</ul>
+<p>场景一：在后端数据存在问题时，我们的程序应该爆出合适的错误去引导开发者最快速度的定位到错误；</p>
+<p>场景二：在别的开发者使用错误的时候，但是并不阻碍程序正常运行，应该适当地爆出<code>warning</code>去引导且告诉使用者，这样做是违反我工具的使用规则的；</p>
+<p>接下来，我们的测试用例又会新增两条用例去覆盖我们的<code>无效等价类</code>或者<code>BDD场景 </code>；</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 源代码</span></span><br><span class="line"><span class="keyword">import</span> &#123; FilterPortProps &#125; <span class="keyword">from</span> <span class="string">&#x27;../lib/interface/utils&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> filterPort: FilterPortProps = <span class="function"><span class="keyword">function</span> (<span class="params">url</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// if url is undefined \ null \ &#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">if</span>(!url) &#123; <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">&#x27;Function expect a param at least&#x27;</span>); &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// if arguements&#x27;s length 大于 1</span></span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">arguments</span>.length &gt; <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="built_in">console</span>.warn(<span class="string">`</span></span><br><span class="line"><span class="string">        Function only handle one param, if you want to handle one group params: </span></span><br><span class="line"><span class="string">            you can use example as follow: </span></span><br><span class="line"><span class="string">              [param1, param2, ...].reduce(a, b =&gt; a.concat(filterPort(item)), [])</span></span><br><span class="line"><span class="string">        `</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> url.match(<span class="regexp">/(?&lt;=:)\d+/g</span>)?.[<span class="number">0</span>] || <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; filterPort &#125; <span class="keyword">from</span> <span class="string">&#x27;../../../utils&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> assert <span class="keyword">from</span> <span class="string">&#x27;assert&#x27;</span>;</span><br><span class="line"></span><br><span class="line">describe(<span class="string">&#x27;Util&#x27;</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> &#123;</span><br><span class="line"></span><br><span class="line">    it(<span class="string">&#x27;当调用工具函数后，且传入正确的 url 并且匹配到正确结果&#x27;</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">&#x27;http://localhost:8080&#x27;</span>;</span><br><span class="line">        <span class="keyword">const</span> res = filterPort(url);</span><br><span class="line"></span><br><span class="line">        assert(res === <span class="string">&#x27;8080&#x27;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">&#x27;当调用工具函数后，且传入正确的 url，但没有匹配到结果应该返回null&#x27;</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">&#x27;http://localhost&#x27;</span>;</span><br><span class="line">        <span class="keyword">const</span> res = filterPort(url);</span><br><span class="line"></span><br><span class="line">        assert(res === <span class="literal">null</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">&#x27;当调用工具函数后，接收入参为null的情况下，程序应该反馈出正确的信息&#x27;</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> url = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            filterPort(url);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">            assert(e.toString().length &gt; <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    it(<span class="string">&#x27;当调用工具函数后，接收参数超过一个的时候，只匹配第一个参数的结果，并且程序应该给出warning提示&#x27;</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">&#x27;http://localhost:8080&#x27;</span>;</span><br><span class="line">        <span class="built_in">global</span>.console.warn = jest.fn();</span><br><span class="line">        <span class="keyword">const</span> res = filterPort(url, url);</span><br><span class="line">        assert(res === <span class="string">&#x27;8080&#x27;</span>);</span><br><span class="line">        expect(<span class="built_in">global</span>.console.warn).toBeCalledTimes(<span class="number">1</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>最后：</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/96456695-6caf2280-1251-11eb-84b4-5469f70e4483.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/39019913/96457170-04ad0c00-1252-11eb-8fec-00e919b9559a.png" alt="image"></p>
+<p>相信你已经对于如何去设计一个完美的测试用例有了一个大体的认识，也了解了从<code>UTDD</code>和<code>ATDD</code>层级去驱动设计测试进而驱动开发。最后，始终去关注测试原则：<br>保证<code>given-when-then</code>细则；</p>
+<p><code>只考虑</code></p>
+<p>名词解释：<br><code>ATDD(“Acceptance Test Driven Development)</code>: 验收测试驱动，所有的产品（代码产出）都应该符合验收细则，而不是虚拟的指标；（应该出现的时间节点在 需求分析时）<br><code>UTDD(Unit Test Driven Development)</code>: 单元测试驱动开发；（应该出现的时间节点在于：代码开发之前）</p>
+<p>然后可以聊聊重构？</p>
+<p>什么是重构，重构是重构代码细节，但是重构后的应用的表现形态是不该不破坏的。</p>
+<p>依旧拿上面的示例来讲，有一天我接到了一个需求，要重构上面的函数，实现方案是不允许用正则去处理：</p>
+<p>A同学，使用了一些<code>奇淫巧技</code>实现了这个功能，完了之后去跑我们的测试用例；用例应该是正常运行的。</p>
+<p>这样的测试用例才算是健壮的，利于重构代码的，可以为重构代码提供导向性作用；</p>
+<h2 id="可能你对于上面的表述会显得有些意识模糊"><a href="#可能你对于上面的表述会显得有些意识模糊" class="headerlink" title="可能你对于上面的表述会显得有些意识模糊"></a>可能你对于上面的表述会显得有些意识模糊</h2><p>那么我们开始一个简单的 todo list 开发；</p>
+<p>需求：请完成一个<code>todolist</code>，纯新增：支持回车新增与按钮点击新增；</p>
+<p>从（<code>UTDD</code>）角度出发：</p>
+<p>分三个组件：</p>
+<ul>
+<li><code>Operate-Panel</code>用于操作；</li>
+<li><code>List</code>用于展示<code>todo item</code>组；</li>
+</ul>
+<h5 id="operate-panel"><a href="#operate-panel" class="headerlink" title="operate-panel"></a><code>operate-panel</code></h5><p>先大致建好文件，分析测试：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">describe(&#39;Operate-Panel&#39;, (): void &#x3D;&gt; &#123;</span><br><span class="line"></span><br><span class="line">    let wrapper: ShallowWrapper;</span><br><span class="line">    const dispatch &#x3D; jest.fn();</span><br><span class="line"></span><br><span class="line">    beforeEach(() &#x3D;&gt; &#123;</span><br><span class="line">        wrapper &#x3D; shallow(&lt;OperatePanel dispatch&#x3D;&#123;dispatch&#125;&#x2F;&gt;)</span><br><span class="line">    &#125;);</span><br><span class="line">    afterEach(() &#x3D;&gt; &#123;</span><br><span class="line">       wrapper.unmount();</span><br><span class="line">       jest.clearAllMocks();</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">   test(&#39;输入内容后，回车调用外层的 dispatch&#39;, () &#x3D;&gt; &#123;</span><br><span class="line">        const todoContent &#x3D; &#39;今天需要读书&#39;;</span><br><span class="line">        wrapper.find(&#39;input&#39;).simulate(&#39;input&#39;, &#123; target: &#123; value: todoContent &#125; &#125;);</span><br><span class="line">        wrapper.find(&#39;input&#39;).simulate(&#39;keyup&#39;, &#123; key: &#39;Enter&#39; &#125;);</span><br><span class="line">        expect(dispatch).toBeCalledTimes(1);</span><br><span class="line">        &#x2F;&#x2F; expect(dispatch).toHaveBeenCalledWith(todoContent);</span><br><span class="line">   &#125;);</span><br><span class="line"></span><br><span class="line">   test(&#39;input 内容为空时，什么都不做，不触发 dispatch&#39;, () &#x3D;&gt; &#123;</span><br><span class="line">       const todoContent &#x3D; &#39;今天需要读书&#39;;</span><br><span class="line">       wrapper.find(&#39;input&#39;).simulate(&#39;input&#39;, &#123; target: &#123; value: todoContent &#125; &#125;);</span><br><span class="line">       expect(dispatch).toBeCalledTimes(0);</span><br><span class="line">   &#125;);</span><br><span class="line"></span><br><span class="line">    test(&#39;输入内容后，不回车，不会触发 dispatch&#39;, () &#x3D;&gt; &#123;</span><br><span class="line">        const todoContent &#x3D; &#39;今天需要读书&#39;;</span><br><span class="line">        wrapper.find(&#39;input&#39;).simulate(&#39;input&#39;, &#123; target: &#123; value: todoContent &#125; &#125;);</span><br><span class="line">        wrapper.find(&#39;input&#39;).simulate(&#39;keyup&#39;, &#123; key: &#39;Tab&#39; &#125;);</span><br><span class="line">        expect(dispatch).toBeCalledTimes(0);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/39019913/96727154-5934c080-13e5-11eb-810c-906f1cb6bfd0.png" alt="image"></p>
+<p>然后按照这个思路完善与这个测试相关的业务代码，不要多写与当前测试用例无关的业务代码；</p>
+<p>根据<code>TDD</code>测试模式，测试覆盖率通常可以达到<code>90%-100%</code>之间。<br><code>（小tip：在进行测试用例的设计中，可以依照白盒测试设计：路径覆盖、逻辑覆盖）</code><br><img src="https://user-images.githubusercontent.com/39019913/96736447-34454b00-13ef-11eb-85e8-ec3b3bd60e7b.png" alt="image"></p>
+<h3 id="那么其实与TDD相互配合的还有BDD测试模式"><a href="#那么其实与TDD相互配合的还有BDD测试模式" class="headerlink" title="那么其实与TDD相互配合的还有BDD测试模式"></a>那么其实与<code>TDD</code>相互配合的还有<code>BDD</code>测试模式</h3><p><code>BDD</code>的行为细则属于怎样的呢？</p>
+<p>全称：<code>Behavior Driven Development</code>行为驱动开发。说的直白一点，更多的应该是，需求驱动开发，也就是当前组件的测试是面向需求的，需求满足则测试通过。<br>但是不好的一点是失去了单测目的，非需求部分的逻辑代码得不到测试覆盖，无法谈及质量观。</p>
+<p>测试模式宏观的方案就是写完业务代码后，针对需求进行编撰测试。</p>
+]]></content>
+      <categories>
+        <category>单元测试</category>
+      </categories>
+      <tags>
+        <tag>React</tag>
+        <tag>unit test</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>打通webpack任督二脉</title>
+    <url>/article/webpack-advanced/</url>
+    <content><![CDATA[<p><img src="https://user-images.githubusercontent.com/39019913/92306504-2c0d8980-efc2-11ea-80c7-bec809bc72e7.png" alt="image"></p>
+<h2 id="一、基础梳理（上帝视角de灵魂拷问）"><a href="#一、基础梳理（上帝视角de灵魂拷问）" class="headerlink" title="一、基础梳理（上帝视角de灵魂拷问）"></a>一、基础梳理（上帝视角de灵魂拷问）</h2><h3 id="1-1-webpack是什么？"><a href="#1-1-webpack是什么？" class="headerlink" title="1.1 webpack是什么？"></a>1.1 webpack是什么？</h3><ul>
+<li><del>webpack就是一个js的翻译器</del><ul>
+<li>它只认识<code>import</code> 这样的语句，其他高级<code>js</code>语法，一概不认。</li>
+</ul>
+</li>
+</ul>
+<p><strong>核心定义</strong>：模块打包工具 👏👏👏</p>
+<ul>
+<li>识别<code>import</code>，引入<code>import</code>模块，打包生成最终的模块。</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/39019913/92325392-e3ff6d00-f07c-11ea-8f89-97ee4eaa5570.png" alt="image"></p>
+<h3 id="1-2-什么是webpack模块"><a href="#1-2-什么是webpack模块" class="headerlink" title="1.2 什么是webpack模块"></a>1.2 什么是webpack模块</h3><p><img src="https://user-images.githubusercontent.com/39019913/92325431-4d7f7b80-f07d-11ea-9e37-2eef765bc862.png" alt="image"></p>
+<h3 id="1-3-webpack-config-js的作用是什么？"><a href="#1-3-webpack-config-js的作用是什么？" class="headerlink" title="1.3 webpack.config.js的作用是什么？"></a>1.3 webpack.config.js的作用是什么？</h3><p>扩展<code>webpack</code>的能力，提供给<code>webpack</code>使用，<code>webpack</code>会默认读取<code>webpack.config.js</code>的信息。</p>
+<h3 id="1-4-Loader是什么？"><a href="#1-4-Loader是什么？" class="headerlink" title="1.4 Loader是什么？"></a>1.4 Loader是什么？</h3><p>我的理解：它就是一个对于特定文件所提供给<code>webpack</code>打包的一种打包方案。</p>
+<p><strong>stackoverflow Reference</strong> <a href="https://stackoverflow.com/a/46176755/7552246">https://stackoverflow.com/a/46176755/7552246</a></p>
+<h4 id="Loaders"><a href="#Loaders" class="headerlink" title="Loaders"></a>Loaders</h4><p>Loaders work at the individual file level during or before the bundle is generated.<br><em>在<code>bundle</code>生成期间或之前，<code>loader</code>在单个文件级别工作。</em></p>
+<h4 id="Plugins"><a href="#Plugins" class="headerlink" title="Plugins"></a>Plugins</h4><p>Plugins work at bundle or chunk level and usually work at the end of the bundle generation process. Plugins can also modify how the bundles themselves are created. Plugins have more powerful control than loaders.<br><code>plugin</code>在<code>bundle</code>或<code>chunk</code>级别工作，通常在<code>bundle</code>生成结束时工作。插件还可以修改<code>bundle</code>本身的创建方式。<code>plugin</code>具有比<code>loader</code>更强大的控制功能。</p>
+<p><img src="https://i.stack.imgur.com/P7hTM.png" alt="image"></p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><ol>
+<li>什么是AST？</li>
+</ol>
+<p>AST(Abstract Syntax Tree)，</p>
+<ol start="2">
+<li>AST在JS代码执行的那个阶段产生？</li>
+</ol>
+<p>词法分析–&gt;语法分析(生成AST)–&gt;预编译–&gt;解释执行</p>
+<ol start="3">
+<li>AST语法树</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">type:         描述该语句的类型  --&gt; 变量声明的语句</span><br><span class="line">kind:         变量声明的关键字  </span><br><span class="line">declaration:  声明内容的数组，里面每一项也是一个对象</span><br><span class="line">            type: 描述该语句的类型</span><br><span class="line">            id:   描述变量名称的对象</span><br><span class="line">                type: 定义</span><br><span class="line">                name: 变量的名字</span><br><span class="line">            init: 初始化变量值的对象</span><br><span class="line">                type:   类型</span><br><span class="line">                value:  值 </span><br><span class="line">                row:    值，判别是否 带引号</span><br></pre></td></tr></table></figure>
+
+<h2 id="基础配置优化"><a href="#基础配置优化" class="headerlink" title="基础配置优化"></a>基础配置优化</h2><ol>
+<li><p>利用好<code>webpack.config.js</code>配置中的<code>resolve</code>，主动告诉<code>webpack</code>，我们需要对于哪些文件进行一个打包查找：（这里优先介绍常用的）</p>
+<p>1&gt; <code>extensions</code>，告诉<code>webpack</code>，我们需要优先查找哪些没有后缀名但是拥有<code>前缀名</code>的文件，列在数组首位的后缀名优先。</p>
+<p>2&gt; <code>alias</code>设置别名路径，当路径过长的时候，可以使用<code>alias</code>设置短链接指向。</p>
+</li>
+<li><p>在<code>合适</code>的<code>场景</code>，利用好<code>合适</code>的<code>loader</code>去处理<code>合适</code>的<code>文件</code>，例如可以利用<code>url-loader</code>去处理图片文件，将图片适当的<code>base64</code>化。</p>
+</li>
+<li><p>在<code>loader</code>中配置<code>exclude</code> &amp; <code>include</code>，缩小<code>complier</code>范围。</p>
+</li>
+<li><p>利用<code>cache-loader</code> &amp; <code>cache-plugin</code>缓存大体量的<code>loader</code> OR <code>plugin</code>，实现提效。</p>
+</li>
+</ol>
+<h2 id="分割打包策略"><a href="#分割打包策略" class="headerlink" title="分割打包策略"></a>分割打包策略</h2><p>为什么要分包？分什么包？怎么分包？分包可以达到什么效果？</p>
+<ul>
+<li>为什么要分包？<ul>
+<li>原始的打包会将<code>node_modules</code>与<code>需要打包的(src)</code>文件打包进一个<code>bundle</code>，在<code>client</code>进行缓存的时候，重新打包请求，耗费时间，导致首页白屏时间较长，可以选择将<code>需要稳定版本的node_modules</code>持久缓存起来，经常变化的<code>lib</code>/<code>src</code>待编译文件打包进核心的<code>bundle</code>。</li>
+</ul>
+</li>
+<li>分什么包？<ul>
+<li>可以将稳定版本的<code>node_modules</code>分包进一个<code>stable vendor</code>；可以将需要<code>latest</code>版本的<code>node_modules</code>分包进一个<code>lazy vendor</code>；可以将核心待编译文件分包进<code>main bundle</code>；可以将测试文件分包进<code>test vendor</code>，注意需要在<code>main bundle</code>中<code>exclude</code>出<code>测试文件</code>；</li>
+</ul>
+</li>
+<li>怎么分包？<ul>
+<li><code>webpack 4</code>之前利用的是<code>SplitChunksPlugin</code>这个插件，但是<code>4</code>版本中已被废弃，可以直接在内部通过<code>optimization</code>进行配置。<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">         optimization: &#123;</span><br><span class="line">             runtimeChunk: <span class="string">&#x27;single&#x27;</span>,</span><br><span class="line">             splitChunks: &#123;</span><br><span class="line">                 chunks: <span class="string">&#x27;all&#x27;</span>,</span><br><span class="line">                 maxInitialRequests: <span class="literal">Infinity</span>,</span><br><span class="line">                 minSize: <span class="number">0</span>,</span><br><span class="line">                 cacheGroups: &#123;</span><br><span class="line">                     <span class="keyword">default</span>: &#123;</span><br><span class="line">                         name: <span class="string">&#x27;common&#x27;</span>,</span><br><span class="line">                         chunks: <span class="string">&#x27;initial&#x27;</span>,</span><br><span class="line">                         minChunks: <span class="number">5</span>,  <span class="comment">//模块被引用5次以上的才抽离</span></span><br><span class="line">                         <span class="comment">// priority: -1 // 设置优先级</span></span><br><span class="line">                     &#125;,</span><br><span class="line">                     vendor: &#123;</span><br><span class="line">                         test: <span class="regexp">/[\\/]node_modules[\\/]/</span>,</span><br><span class="line">                         name(<span class="built_in">module</span>) &#123;</span><br><span class="line">                             <span class="keyword">const</span> packageName = <span class="built_in">module</span>.context.match(<span class="regexp">/[\\/]node_modules[\\/](.*?)([\\/]|$)/</span>)[<span class="number">1</span>];</span><br><span class="line">                             <span class="comment">// 部分模块是以 @ 开头的，直接在分包命名中过滤掉</span></span><br><span class="line">                             <span class="keyword">return</span> <span class="string">`npm.vendor.<span class="subst">$&#123;packageName.replace(<span class="string">&#x27;@&#x27;</span>, <span class="string">&#x27;&#x27;</span>)&#125;</span>`</span>;</span><br><span class="line">                         &#125;,</span><br><span class="line">                     &#125;,</span><br><span class="line">                     testModule: &#123;</span><br><span class="line">                         chunks: <span class="string">&#x27;all&#x27;</span>,</span><br><span class="line">                         test: <span class="regexp">/__test__\/*/</span>,</span><br><span class="line">                         name: <span class="string">&#x27;test.vendor&#x27;</span> ,</span><br><span class="line">                     &#125;</span><br><span class="line">                 &#125;,</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;,</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>分包可以达到什么效果？<ul>
+<li><img src="https://user-images.githubusercontent.com/39019913/100823073-823d7c00-348e-11eb-8954-1d76f1ae1add.png" alt="image"></li>
+</ul>
+</li>
+</ul>
+<h2 id="缓存优化构建策略"><a href="#缓存优化构建策略" class="headerlink" title="缓存优化构建策略"></a>缓存优化构建策略</h2><ol>
+<li><p><code>happypack</code>，之前有提到这个工具，但是其作者已经不维护了，另外多进程打包考验<code>cpu</code>能力，核数越高，打包越快，所以一般可能很难见成效；</p>
+</li>
+<li><p><code>cache-loader</code>、<code>cache-plugin</code>可以很好的缓存那些大体量的<code>loader</code>或者<code>plugin</code>编译的结果在<code>disk</code>内存中，下次编译的时候可以直接从<code>disk</code>中拿。如果在服务端也可以在放置在<code>redis</code>中。</p>
+</li>
+<li><p><code>HardSourceWebpackPlugin</code>可以实现持久缓存，第一次构建可能效果不明显，第一次之后，效果可以实现提升。</p>
+</li>
+</ol>
+<h2 id="怎么理解chunk、bundle？"><a href="#怎么理解chunk、bundle？" class="headerlink" title="怎么理解chunk、bundle？"></a>怎么理解<code>chunk</code>、<code>bundle</code>？</h2><p><img src="https://user-images.githubusercontent.com/39019913/100825341-c468bc80-3492-11eb-878a-5fae3529e211.png" alt="image"></p>
+<p>如上图，其实还是很好理解的：</p>
+<p><code>module</code>是打包前的引入文件，<code>chunk</code>是打包时的处理文件，<code>bundle</code>是<code>webpack</code>处理<code>chunk</code>的产物。</p>
+<p><code>chunk</code>的数目怎么计算？很好识别的：一个入口文件一个<code>chunk</code>，一个分包策略一个<code>chunk</code>。</p>
+<h2 id="webpack的构建流程是怎样的呢？"><a href="#webpack的构建流程是怎样的呢？" class="headerlink" title="webpack的构建流程是怎样的呢？"></a><code>webpack</code>的构建流程是怎样的呢？</h2><ol>
+<li><p>合并<code>shell</code>参数与<code>webpack.config.js</code>中的配置。</p>
+</li>
+<li><p>在<code>config</code>配置文件中去确定<code>entry</code>入口。</p>
+</li>
+<li><p>开始执行<code>run</code>编译，对应文件使用对应<code>file-loader</code>，递归处理模块。</p>
+</li>
+<li><p>根据入口与代码分割方案生成<code>chunk</code>。</p>
+</li>
+<li><p>处理<code>chunk</code>，生成最终的 <code>bundle</code>。</p>
+</li>
+<li><p>输出完成。</p>
+</li>
+</ol>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a href="https://medium.com/@rajaraodv/webpack-the-confusing-parts-58712f8fcad9#.5fxzupi03">Webpack — The Confusing Parts</a></li>
+<li><a href="https://webpack.js.org/contribute/writing-a-loader/">Write A Loader | Webpack</a></li>
+<li><a href="https://cheogo.github.io/learn-javascript/201709/runtime.html">JavaScript 语法解析、AST、V8、JIT</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>webpack</category>
+      </categories>
+      <tags>
+        <tag>新得感悟</tag>
+        <tag>总结</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>从设计模式出发，带你认识Blob、FileReader</title>
+    <url>/article/design-pattern-blob-fileReader/</url>
+    <content><![CDATA[<p>从设计模式入手，介绍<code>Blob</code>、<code>FileReader</code>。</p>
+<h2 id="虚拟代理模式"><a href="#虚拟代理模式" class="headerlink" title="虚拟代理模式"></a>虚拟代理模式</h2><p>当提及<code>虚拟代理</code>时，你可能下意识的会想到<code>proxy</code>，虚拟代理的核心思想就是在目标对象身上架设起一座桥梁，为它去做一些额外的事。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> target = &#123;</span><br><span class="line">    message1: <span class="string">&quot;hello&quot;</span>,</span><br><span class="line">    message2: <span class="string">&quot;everyone&quot;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> handler3 = &#123;</span><br><span class="line">    get (target, prop, receiver) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(target, prop, receiver)</span><br><span class="line">        <span class="keyword">if</span> (prop === <span class="string">&quot;message2&quot;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&quot;world&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">Reflect</span>.get(...arguments);</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    set (target, prop, receiver) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;set&#x27;</span>, prop, target, receiver, <span class="built_in">this</span>)</span><br><span class="line">        <span class="keyword">if</span> (prop === <span class="string">&#x27;message1&#x27;</span>) &#123;</span><br><span class="line">            target[prop] = receiver</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> proxy3 = <span class="keyword">new</span> <span class="built_in">Proxy</span>(target, handler3);</span><br><span class="line"></span><br><span class="line">proxy3.message1 = <span class="string">&#x27;ssdsd&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(proxy3.message1); <span class="comment">// ssdsd</span></span><br><span class="line"><span class="built_in">console</span>.log(proxy3.message2); <span class="comment">// world</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>粘贴了<code>MDN</code>的<code>Proxy</code>示例，配合<code>Reflect</code>去做一些既保留原始行为，又可以自定义行为的功能。</p>
+<p>同样的，虚拟代理的原理也很简单，拿一个图片的<code>预加载</code>举一个<code>栗子</code>：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 真实 dom 对象，以及行为   </span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TDomObj</span> </span>&#123;</span><br><span class="line">       <span class="keyword">constructor</span>(obj) &#123;</span><br><span class="line">           <span class="built_in">this</span>.trueDom = obj;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       setSrc (url) &#123;</span><br><span class="line">           <span class="built_in">this</span>.trueDom.src = url</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">// 代理真实 dom</span></span><br><span class="line">   <span class="class"><span class="keyword">class</span> <span class="title">ProxyTDom</span> </span>&#123;</span><br><span class="line">       <span class="keyword">constructor</span>(TDom) &#123;</span><br><span class="line">           <span class="built_in">this</span>.TDom = TDom;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       setSrc (url) &#123;</span><br><span class="line">           <span class="comment">// 预加载已设置好的预览图</span></span><br><span class="line">           <span class="built_in">this</span>.TDom.setSrc(<span class="string">&#x27;https://segmentfault.com/img/bVbIDbC&#x27;</span>);</span><br><span class="line">           <span class="comment">// new 一个虚拟的 Image 对象</span></span><br><span class="line">           <span class="keyword">const</span> img = <span class="keyword">new</span> Image();</span><br><span class="line">           img.onload =  <span class="function">() =&gt;</span> &#123;</span><br><span class="line">               <span class="comment">// 监听虚拟 img 加载完毕后，平滑 set</span></span><br><span class="line">               <span class="built_in">this</span>.TDom.setSrc(url);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="comment">// 虚拟 img 对象去加载真实 img 资源</span></span><br><span class="line">           img.src = url;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>那么，有人会问了，这些跟 <code>Blob</code>、<code>FileReader</code>有什么关系呢？</p>
+<h4 id="FileReader"><a href="#FileReader" class="headerlink" title="FileReader"></a><code>FileReader</code></h4><p><code>FileReader</code>可以读取用户计算机上的二进制文件。以<code>Blob</code>对象的数据格式去处理。</p>
+<p>怎么获取用户计算机文件呢？</p>
+<ol>
+<li><p>利用<code>input</code>手动上传，监听<code>change</code>；</p>
+</li>
+<li><p>利用<code>ajax</code>获取服务端文件，可以设置<code>responseType</code>为<code>Blob</code>对象。</p>
+</li>
+</ol>
+<p>（小<code>tip</code>: 阿里 <code>OSS</code> 的图片、文件（pdf等）<code>CDN</code>是不支持预览的，可以借助<code>ajax</code>获取服务端文件，以<code>Blob</code>形式获取后，创建<code>Blob URL</code>，利用<code>createObjectURL(:blob)</code>生成，<code>window.open</code>预览）</p>
+<h4 id="Blob"><a href="#Blob" class="headerlink" title="Blob"></a><code>Blob</code></h4><p><code>Blob</code>是一种原始数据对象（其实就是二进制数据对象）；【<code>File</code>继承自<code>Blob</code>】</p>
+<p><code>File</code>继承自<code>Blob</code>，所以也就可以引申我们接下来要提到的，<code>图片分片上传</code>，利用<code>Blob</code>对象的<code>splice</code>方法，它可以返回一个新的<code>Blob</code>对象。</p>
+<p>相比于一般的<code>base 64</code>的 <code>data url</code>而言，<code>Blob Url</code>更短，字节数更少，所以文件也就很少，可以作为提升性能的一个手段，但是它的局限性在于只能在当前应用内使用，应为生成的<code>Blob URL</code>前缀为当前应用的根路径。不可以跨应用使用。</p>
+<h2 id="Now-Show-My-Time"><a href="#Now-Show-My-Time" class="headerlink" title="Now, Show My Time!!!"></a><code>Now, Show My Time!!!</code></h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!doctype html&gt;</span><br><span class="line">&lt;html lang&#x3D;&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;meta name&#x3D;&quot;viewport&quot;</span><br><span class="line">          content&#x3D;&quot;width&#x3D;device-width, user-scalable&#x3D;no, initial-scale&#x3D;1.0, maximum-scale&#x3D;1.0, minimum-scale&#x3D;1.0&quot;&gt;</span><br><span class="line">    &lt;meta http-equiv&#x3D;&quot;X-UA-Compatible&quot; content&#x3D;&quot;ie&#x3D;edge&quot;&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;&#x2F;title&gt;</span><br><span class="line"></span><br><span class="line">&lt;&#x2F;head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;input type&#x3D;&quot;file&quot; placeholder&#x3D;&quot;请上传&quot; id&#x3D;&quot;UPLOAD&quot;&gt;</span><br><span class="line">&lt;img id&#x3D;&quot;OUTPUT&quot; src&#x3D;&quot;&quot;&#x2F;&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    class TDomObj &#123;</span><br><span class="line">        constructor(obj) &#123;</span><br><span class="line">            this.trueDom &#x3D; obj;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        setSrc (url) &#123;</span><br><span class="line">            this.trueDom.src &#x3D; url</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    class ProxyTDom &#123;</span><br><span class="line">        constructor(TDom) &#123;</span><br><span class="line">            this.TDom &#x3D; TDom;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        setSrc (url) &#123;</span><br><span class="line">            this.TDom.setSrc(&#39;https:&#x2F;&#x2F;segmentfault.com&#x2F;img&#x2F;bVbIDbC&#39;);</span><br><span class="line">            const img &#x3D; new Image();</span><br><span class="line">            img.onload &#x3D;  () &#x3D;&gt; &#123;</span><br><span class="line">                this.TDom.setSrc(url);</span><br><span class="line">            &#125;</span><br><span class="line">            img.src &#x3D; url;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    const tdom &#x3D; document.getElementById(&#39;OUTPUT&#39;);</span><br><span class="line"></span><br><span class="line">    const t &#x3D; new TDomObj(tdom);</span><br><span class="line"></span><br><span class="line">    const p &#x3D; new ProxyTDom(t);</span><br><span class="line"></span><br><span class="line">    document.getElementById(&#39;UPLOAD&#39;).addEventListener(&#39;change&#39;, (e) &#x3D;&gt; &#123;</span><br><span class="line">        console.log(e);</span><br><span class="line">        const reader &#x3D; new FileReader();</span><br><span class="line">        reader.onload &#x3D; function () &#123;</span><br><span class="line">            console.log(reader.result)</span><br><span class="line">            p.setSrc(reader.result)</span><br><span class="line">        &#125;</span><br><span class="line">        reader.readAsDataURL(e.target.files[0]);</span><br><span class="line">    &#125;)</span><br><span class="line">&lt;&#x2F;script&gt;</span><br><span class="line">&lt;&#x2F;body&gt;</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li>自律并不可怕，可怕的是坚持自律。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>设计模式</category>
+        <category>Blob</category>
+        <category>FileReader</category>
+      </categories>
+      <tags>
+        <tag>新得感悟</tag>
+        <tag>总结</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>单元测试--终章</title>
+    <url>/article/the-end-unit-test/</url>
+    <content><![CDATA[<h2 id="被测组件划分"><a href="#被测组件划分" class="headerlink" title="被测组件划分"></a>被测组件划分</h2><blockquote>
+<p>展示组件：通常定义为只用于展示的组件，例如 Icon、Badge……，遵循 Props –&gt; UI；</p>
+</blockquote>
+<blockquote>
+<p>业务组件：为业务服务，通常集成了独立的功能，可以单独作为模块组件，也可自定义配置；</p>
+</blockquote>
+<blockquote>
+<p>功能组件：通常是支撑业务组件的基类组件，提供一些功能性的支撑，像分页组件的跳转；</p>
+</blockquote>
+<h2 id="测试场景"><a href="#测试场景" class="headerlink" title="测试场景"></a>测试场景</h2><h3 id="网络请求模拟-发起真实请求"><a href="#网络请求模拟-发起真实请求" class="headerlink" title="网络请求模拟/发起真实请求"></a>网络请求模拟/发起真实请求</h3><ol>
+<li>可以模拟封装网络请求的方法，借助<code>jest.mock</code>模拟引用文件，返回需要结果的<code>Promise</code>。</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@desc <span class="variable">example</span></span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">import</span> &#123; mount &#125; <span class="keyword">from</span> <span class="string">&#x27;enzyme&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> App <span class="keyword">from</span> <span class="string">&#x27;Componets/app.jsx&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> postData <span class="keyword">from</span> <span class="string">&#x27;../api&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// we can mock it like this as follow</span></span><br><span class="line">jest.mock(<span class="string">&#x27;../api&#x27;</span>, <span class="function">() =&gt;</span> jest.fn(<span class="function">() =&gt;</span> <span class="built_in">Promise</span>.then(&#123;<span class="attr">data</span>: &#123; <span class="attr">name</span>: <span class="string">&#x27;eric&#x27;</span>, <span class="attr">age</span>: <span class="number">18</span> &#125;&#125;)));</span><br><span class="line"></span><br><span class="line">describe(<span class="string">&#x27;An Test Example&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    it(<span class="string">&#x27;Should called if mount&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> wrapper = mount(<span class="xml"><span class="tag">&lt;<span class="name">App</span>/&gt;</span></span>);</span><br><span class="line">        expect(postData).toBeCalledTimes(<span class="number">1</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>直接模拟真实请求，借助<code>enzyme</code>断言回调的<code>done</code>函数或者<code>async</code>。</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@desc  </span>done example</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date </span>2021-01-13  19:56:58</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author </span>eric wang &lt;jadeface.scholar<span class="doctag">@gmail</span>.com&gt;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@copyright </span>2021 Eric</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">import</span> &#123; mount &#125; <span class="keyword">from</span> <span class="string">&#x27;enzyme&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> fetchData <span class="keyword">from</span> <span class="string">&#x27;../api&#x27;</span>;</span><br><span class="line"></span><br><span class="line">test(<span class="string">&#x27;Test Fetch Data&#x27;</span>, <span class="function">(<span class="params">done</span>) =&gt;</span> &#123;</span><br><span class="line">    fetchData()</span><br><span class="line">        .then(<span class="function"><span class="params">r</span> =&gt;</span> r)</span><br><span class="line">        .finally(<span class="function">() =&gt;</span> done())</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@desc </span>async example</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date </span>2021-01-13  20:02:29</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author </span>eric wang &lt;jadeface.scholar<span class="doctag">@gmail</span>.com&gt;</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@copyright </span>2021 Eric</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line">test(<span class="string">&#x27;Test Fetch Data&#x27;</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> res = <span class="keyword">await</span> fetchData();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="built_in">console</span>.error(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>根目录新建<code>__mocks__</code>文件夹，内部新建<code>request.js</code>，模拟用户请求。</li>
+</ol>
+<p>测试异步请求其实还有其余的两种方案可以选择，像请求成功与请求失败：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">jest.mock(<span class="string">&#x27;../request&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> user <span class="keyword">from</span> <span class="string">&#x27;../user&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//断言必须返回一个primose</span></span><br><span class="line">it(<span class="string">&#x27;works with promises&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  expect.assertions(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">return</span> user.getUserName(<span class="number">4</span>).then(<span class="function"><span class="params">data</span> =&gt;</span> expect(data).toEqual(<span class="string">&#x27;Mark&#x27;</span>));</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">it(<span class="string">&#x27;works with resolves&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  expect.assertions(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">return</span> expect(user.getUserName(<span class="number">5</span>)).resolves.toEqual(<span class="string">&#x27;Paul&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="jest测试环境之node-amp-browser切换"><a href="#jest测试环境之node-amp-browser切换" class="headerlink" title="jest测试环境之node&amp;browser切换"></a><code>jest</code>测试环境之<code>node</code>&amp;<code>browser</code>切换</h3><p><code>jest</code>默认<code>browser</code>环境，如果需要切换<code>node</code>环境，在顶部追加一段注释就可以了。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@jest</span>-environment jsdom</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@jest</span>-environment node</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<p>也可以自己内置沙盒去做为<code>jest</code>预置环境。<br><a href="https://jestjs.io/docs/en/configuration">文档指引</a></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@jest</span>-environment ./my-custom-environment</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="定时器模拟"><a href="#定时器模拟" class="headerlink" title="定时器模拟"></a>定时器模拟</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">jest.useFakeTimers();</span><br><span class="line"></span><br><span class="line">test(<span class="string">&#x27;Test one timer unit case&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    jest.runAllTimers();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="未实现模块模拟"><a href="#未实现模块模拟" class="headerlink" title="未实现模块模拟"></a>未实现模块模拟</h3><p>诸如<code>window</code>上的某些模块并未实现，像<code>location</code>模块，我们可以借助<code>node</code>环境的<code>global</code>模块下去模拟一个纯净的模块。</p>
+<p>像包中的<code>peerDependences</code>我们可以借助，虚拟模块或者真实自定义模块模拟。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> user = jest.createMockFromModule(<span class="string">&#x27;../user&#x27;</span>);</span><br><span class="line"></span><br><span class="line">user.getAuthenticated = <span class="function">() =&gt;</span> (&#123;</span><br><span class="line">  age: <span class="number">622</span>,</span><br><span class="line">  name: <span class="string">&#x27;Mock name&#x27;</span>,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> user;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 例如我们也可以在 TDD 模式下去模拟写未完成的虚拟模块，纯虚拟的</span></span><br><span class="line">jest.mock(</span><br><span class="line">    <span class="string">&#x27;../moduleName&#x27;</span>,</span><br><span class="line">    () =&gt; &#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * Custom implementation of a module that doesn&#x27;t exist in JS,</span></span><br><span class="line"><span class="comment">         * like a generated module or a native module in react-native.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;<span class="attr">virtual</span>: <span class="literal">true</span>&#125;,</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>在观摩<code>antd</code>的测试用例的时候，有看到过这样的代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// https://github.com/ant-design/ant-design/issues/20948</span></span><br><span class="line">it(<span class="string">&#x27;not repeat render when Form.Item is not a real Field&#x27;</span>, <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> shouldNotRender = jest.fn();</span><br><span class="line">  <span class="keyword">const</span> StaticInput = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    shouldNotRender();</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Input</span> /&gt;</span></span>;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> shouldRender = jest.fn();</span><br><span class="line">  <span class="keyword">const</span> DynamicInput = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    shouldRender();</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Input</span> /&gt;</span></span>;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> formRef = React.createRef();</span><br><span class="line"></span><br><span class="line">  mount(</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;Form ref=&#123;formRef&#125;&gt;</span><br><span class="line">        &lt;Form.Item&gt;</span><br><span class="line">          &lt;StaticInput /&gt;</span><br><span class="line">        &lt;/Form.Item&gt;</span><br><span class="line">        &lt;Form.Item name=<span class="string">&quot;light&quot;</span>&gt;</span><br><span class="line">          &lt;DynamicInput /&gt;</span><br><span class="line">        &lt;/Form.Item&gt;</span><br><span class="line">      &lt;/Form&gt;</span><br><span class="line">    &lt;/div&gt;,</span><br><span class="line">  );</span><br><span class="line"></span><br><span class="line">  expect(shouldNotRender).toHaveBeenCalledTimes(<span class="number">1</span>);</span><br><span class="line">  expect(shouldRender).toHaveBeenCalledTimes(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">  formRef.current.setFieldsValue(&#123; <span class="attr">light</span>: <span class="string">&#x27;bamboo&#x27;</span> &#125;);</span><br><span class="line">  <span class="keyword">await</span> <span class="built_in">Promise</span>.resolve();</span><br><span class="line">  expect(shouldNotRender).toHaveBeenCalledTimes(<span class="number">1</span>);</span><br><span class="line">  expect(shouldRender).toHaveBeenCalledTimes(<span class="number">2</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>单元测试</category>
+      </categories>
+      <tags>
+        <tag>React</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>你还在头疼的`eslint`,`tsconifg.json`其实很好玩</title>
+    <url>/article/tsconfig/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>typescript</code>是一个让人用习惯了就无法自拔的工具，作为<code>javascript</code>的类型扩展工具，可以让本是弱类型的<code>javascript</code>拥有强类型约束，<br>在编译期间报错，提示开发者类型是否符合约束，可以在开发期间和后期的维护期间起到很好的作用。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>可能大多数人，看到一些配置文件都会各种头疼，其实完全没必要虚的，因为配置就是一个查阅文档的过程，没有人会全部记住它，用到什么配置就加一下，<br>不过一些常用的配置是需要知道的。</p>
+<h2 id="我遇到了什么问题，我要解决什么问题？"><a href="#我遇到了什么问题，我要解决什么问题？" class="headerlink" title="我遇到了什么问题，我要解决什么问题？"></a>我遇到了什么问题，我要解决什么问题？</h2><ul>
+<li>当在项目中引入非<code>ts</code>文件或者没有<code>d.ts</code>声明的时候，编辑器报<code>warning</code>怎么办？</li>
+</ul>
+<ol>
+<li><p>第三方包且拥有<code>types</code>包的，下载对应的<code>@types/packageName</code>；</p>
+</li>
+<li><p>第三方包或者私有库的包，如果没有<code>types</code>，需要手动为包补全<code>d.ts</code>，或者是在项目的<code>src</code>目录下添加<code>@types</code>文件夹，定义<code>definition.d.ts</code>；</p>
+</li>
+</ol>
+<ul>
+<li>当项目中某些新特性不支持或者<code>window</code>下的某些参数，报错怎么处理？</li>
+</ul>
+<ol>
+<li>添加<code>declare</code></li>
+</ol>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @desc 手动声明 es2018 PromiseConstructor finally</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">interface</span> PromiseConstructor &#123;</span><br><span class="line">    <span class="keyword">finally</span>: <span class="function">() =&gt;</span> <span class="built_in">void</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @desc 手动声明 es2016 ObjectConstructor assign</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">interface</span> ObjectConstructor &#123;</span><br><span class="line">    assign(...objects: Record&lt;<span class="built_in">string</span>, <span class="built_in">any</span>&gt;[]): Record&lt;<span class="built_in">string</span>, <span class="built_in">any</span>&gt;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @desc 手动声明 Window 全局对象 propTypes</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">interface</span> Window &#123;</span><br><span class="line">    [key: <span class="built_in">string</span>]: <span class="built_in">any</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">declare</span> <span class="keyword">module</span> &#x27;*.png&#x27;</span><br><span class="line">declare <span class="keyword">module</span> &#x27;*.jpg&#x27;</span><br></pre></td></tr></table></figure>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>新年快乐~给你们看我女神</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/yangmi.jpg" alt="ALT"></p>
+]]></content>
+      <categories>
+        <category>经验</category>
+      </categories>
+      <tags>
+        <tag>tsconfig</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Windows安装WSL</title>
+    <url>/article/install-wsl/</url>
+    <content><![CDATA[<h1 id="Windows-安装-WSL"><a href="#Windows-安装-WSL" class="headerlink" title="Windows 安装 WSL"></a><code>Windows</code> 安装 <code>WSL</code></h1><p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/2021-1-31-2.png" alt="alt"></p>
+<h2 id="详细教程"><a href="#详细教程" class="headerlink" title="详细教程"></a>详细教程</h2><p><a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">https://docs.microsoft.com/en-us/windows/wsl/install-win10</a></p>
+<h2 id="Install-oh-my-zsh"><a href="#Install-oh-my-zsh" class="headerlink" title="Install oh-my-zsh"></a><code>Install</code> <code>oh-my-zsh</code></h2><h3 id="Step-1"><a href="#Step-1" class="headerlink" title="Step 1"></a>Step 1</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># update install source</span></span><br><span class="line">$ sudo apt-get update</span><br><span class="line">$ sudo apt-get upgrade</span><br></pre></td></tr></table></figure>
+
+<h3 id="Step-2"><a href="#Step-2" class="headerlink" title="Step 2"></a>Step 2</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># install zsh</span></span><br><span class="line">$ sudo apt-get install zsh</span><br></pre></td></tr></table></figure>
+
+<h3 id="Step-3"><a href="#Step-3" class="headerlink" title="Step 3"></a>Step 3</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># set default shell</span></span><br><span class="line">$ chsh -s $(<span class="built_in">which</span> zsh)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Step-4"><a href="#Step-4" class="headerlink" title="Step 4"></a>Step 4</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># install oh-my-zsh</span></span><br><span class="line">$ sh -c <span class="string">&quot;<span class="subst">$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)</span>&quot;</span></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line">$ sh -c <span class="string">&quot;<span class="subst">$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)</span>&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Step-5（安装-nvm）"><a href="#Step-5（安装-nvm）" class="headerlink" title="Step 5（安装 nvm）"></a>Step 5（安装 <code>nvm</code>）</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># install &amp; update</span></span><br><span class="line">$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash</span><br><span class="line"><span class="comment"># or</span></span><br><span class="line">$ wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># setUp Path</span></span><br><span class="line">$ vi ~/.zshrc</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> NVM_DIR=<span class="string">&quot;<span class="variable">$HOME</span>/.nvm&quot;</span></span><br><span class="line">[ -s <span class="string">&quot;<span class="variable">$NVM_DIR</span>/nvm.sh&quot;</span> ] &amp;&amp; \. <span class="string">&quot;<span class="variable">$NVM_DIR</span>/nvm.sh&quot;</span>  <span class="comment"># This loads nvm</span></span><br><span class="line">[ -s <span class="string">&quot;<span class="variable">$NVM_DIR</span>/bash_completion&quot;</span> ] &amp;&amp; \. <span class="string">&quot;<span class="variable">$NVM_DIR</span>/bash_completion&quot;</span>  <span class="comment"># This loads nvm bash_completion</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">source</span> ~/.zshrc</span><br></pre></td></tr></table></figure>
+
+<h3 id="Step-6（重要提示）"><a href="#Step-6（重要提示）" class="headerlink" title="Step 6（重要提示）"></a>Step 6（重要提示）</h3><p>完成了上述步骤，需要做最后一步，屏蔽<code>windows</code>的环境变量，使<code>wsl</code>与<code>windows</code>独立环境。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ vi ~/.zshrc</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games&quot;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">source</span> ~/.zshrc</span><br></pre></td></tr></table></figure>
+
+<h2 id="采坑指南"><a href="#采坑指南" class="headerlink" title="采坑指南"></a>采坑指南</h2><ol>
+<li>当你的 <code>WSL</code>抽风时，例如报错<code>错误0x8000000d</code>;</li>
+</ol>
+<p>解决办法：</p>
+<p><code>可以打开管理员（PowerShell），运行Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux</code></p>
+<p><em>如果没用！请重装系统，或者是重置 <code>windows</code></em></p>
+<ol start="2">
+<li>当<code>curl</code>的时候报如下错误：</li>
+</ol>
+<p>1&gt; <code>SSL certificate problem: unable to get local issuer certificate</code></p>
+<p>2&gt; <code>curl:Failed to connect to raw.githubusercontent.com port 443: Connection refused </code></p>
+<p>3&gt; <code>404 not found</code></p>
+<p>我们可以选用 <code>ProxyChains</code> 这个软件，能够使特定的命令走<code>SOCKS5</code></p>
+<ul>
+<li>Step 1</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sudo apt install proxychains</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Step 2</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sudo vim /etc/proxychains.conf</span><br><span class="line"></span><br><span class="line"><span class="comment">###按i键进入vim的写入模式####</span></span><br><span class="line"></span><br><span class="line"><span class="comment">###将最后一行改成socks5 你的代理服务器IP 端口号###</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># socks5 127.0.0.1 1080</span></span><br><span class="line"></span><br><span class="line"><span class="comment">###按下Esc后键入“:x”保存并退出vim编辑器###</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><code>github</code> clone 仓库很慢？</li>
+</ol>
+<p>添加如下 <code>host</code> 到 <code>/etc/hosts</code>;</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 199.232.68.133  raw.githubusercontent.com</span></span><br><span class="line"><span class="comment"># 199.232.68.133  user-images.githubusercontent.com</span></span><br><span class="line"><span class="comment"># 199.232.68.133  avatars2.githubusercontent.com</span></span><br><span class="line"><span class="comment"># 199.232.68.133  avatars1.githubusercontent.com</span></span><br><span class="line"><span class="comment"># 151.101.108.133 raw.github.com</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sudo vi /etc/hosts</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">source</span> /etc/hosts</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/2021-1-31-1.png" alt="alt"></p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>WSL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>重温V8引擎事件循环，反思异步带来的现代化开发壁障</title>
+    <url>/article/v8toasyncQeq/</url>
+    <content><![CDATA[<blockquote>
+<p>孔夫子有云：温故而知新。</p>
+</blockquote>
+<p>不断的回味以前对于知识的理解，不断的实践，不断的推翻，逆向思考，新的知识就会慢慢浮现。</p>
+<h2 id="一分钟理解微任务、宏任务"><a href="#一分钟理解微任务、宏任务" class="headerlink" title="一分钟理解微任务、宏任务"></a>一分钟理解微任务、宏任务</h2><p><code>宏任务</code>:</p>
+<ul>
+<li><code>DOM</code>事件</li>
+<li><code>setTimeout</code></li>
+<li><code>setInterval</code></li>
+<li>脚本</li>
+<li><code>I/O</code></li>
+</ul>
+<p><code>微任务</code></p>
+<ul>
+<li><code>promise</code></li>
+<li><code>GC</code></li>
+<li>等等</li>
+</ul>
+<p><strong>当然，<code>requestIdleCallback</code>和<code>requestAnimationFrame</code>不属于<code>task</code>，它们是浏览器渲染过程的一步，和<code>task</code>／<code>microtask</code>的执行是分离的。</strong> </p>
+<p>小二，先上一道烂大街的面试题！</p>
+<p><img src="http://wx4.sinaimg.cn/large/006APoFYly1gjlvliia2tj30hs0hgdl5.jpg" alt="alt"></p>
+<p>讲述下事件循环：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;同步代码开始&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">asycn1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">async2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">    <span class="keyword">await</span> async1()</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">4</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;同步代码结束&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>答案公布：</p>
+<p>同步代码开始</p>
+<p>3</p>
+<p>2</p>
+<p>同步代码结束</p>
+<p>4</p>
+</blockquote>
+<p><img src="http://wx3.sinaimg.cn/large/006GJQvhly1g0n0fwd2yhj30qo0qph24.jpg" alt="alt"></p>
+<p>第一步：整个代码块被扔进了<code>宏任务</code>中；</p>
+<p>第二步：<code>console</code>同步代码被放入执行栈中开始执行，打印 <em>同步代码开始</em></p>
+<p>第三步：<code>Promise</code>构造函数是同步代码，压栈执行，打印<em>3</em>、<em>2</em></p>
+<p>第四步：<code>console</code>同步代码被放入执行栈中开始执行，打印 <em>同步代码结束</em></p>
+<p>第五步：宏任务代码执行完毕，检查是否有微任务代码可以执行。</p>
+<p>第六步：<code>async</code>函数中的出现 <code>await</code> 后，之后的代码被放入<code>Promise.then</code>中，微任务队列开始执行。</p>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p>【1】从一道题浅说js事件循环（<a href="https://github.com/dwqs/blog/issues/61">https://github.com/dwqs/blog/issues/61</a> ）</p>
+<p>【2】requestIdleCallback和requestAnimationFrame详解（<a href="https://www.cnblogs.com/cangqinglang/p/13877078.html">https://www.cnblogs.com/cangqinglang/p/13877078.html</a> ）</p>
+<h2 id="反思壁障"><a href="#反思壁障" class="headerlink" title="反思壁障"></a>反思壁障</h2><p><img src="http://wx2.sinaimg.cn/large/c8d9b766ly1fdaybn0noqj20j60asabe.jpg"></p>
+<h3 id="由快慢async发出的思考"><a href="#由快慢async发出的思考" class="headerlink" title="由快慢async发出的思考"></a>由快慢<code>async</code>发出的思考</h3><p>【1】slow-async-await（<a href="https://mdn.github.io/learning-area/javascript/asynchronous/async-await/slow-async-await.html%EF%BC%89">https://mdn.github.io/learning-area/javascript/asynchronous/async-await/slow-async-await.html）</a></p>
+<p>【2】fast-async-await（<a href="https://mdn.github.io/learning-area/javascript/asynchronous/async-await/fast-async-await.html%EF%BC%89">https://mdn.github.io/learning-area/javascript/asynchronous/async-await/fast-async-await.html）</a></p>
+<p>接下来，我们慢慢食用代码：</p>
+<p>— <code>timeoutPromise</code> —</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">timeoutPromise</span>(<span class="params">interval</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">      resolve(<span class="string">&quot;done&quot;</span>);</span><br><span class="line">    &#125;, interval);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>— <code>计时程序</code> —</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> startTime = <span class="built_in">Date</span>.now();</span><br><span class="line">timeTest().then(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> finishTime = <span class="built_in">Date</span>.now();</span><br><span class="line">  <span class="keyword">let</span> timeTaken = finishTime - startTime;</span><br><span class="line">  alert(<span class="string">&quot;Time taken in milliseconds: &quot;</span> + timeTaken);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>— <code>slow-async-await</code> —</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">timeTest</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">await</span> timeoutPromise(<span class="number">3000</span>);</span><br><span class="line">  <span class="keyword">await</span> timeoutPromise(<span class="number">3000</span>);</span><br><span class="line">  <span class="keyword">await</span> timeoutPromise(<span class="number">3000</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>— <code>fast-async-await</code> —</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">timeTest</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> timeoutPromise1 = timeoutPromise(<span class="number">3000</span>);</span><br><span class="line">  <span class="keyword">const</span> timeoutPromise2 = timeoutPromise(<span class="number">3000</span>);</span><br><span class="line">  <span class="keyword">const</span> timeoutPromise3 = timeoutPromise(<span class="number">3000</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">await</span> timeoutPromise1;</span><br><span class="line">  <span class="keyword">await</span> timeoutPromise2;</span><br><span class="line">  <span class="keyword">await</span> timeoutPromise3;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>看下<code>MDN</code>的解释：</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-17_20-51-49.png"></p>
+<p>这句<code>同时启动它们的关联进程</code>可能很难理解，其实不难，理解了<code>async await</code>—&gt; <code>promise</code>后，原理一目了然：</p>
+<p><img src="http://wx3.sinaimg.cn/large/006dMd5bgy1gl40yu56k8j30hs0hst9y.jpg"></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 转换前</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">async1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">1</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 转换后</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">async1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">        res();</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>起因就是因为<code>async</code>将异步代码真的<code>同步化</code>了，导致同步代码也进入了<code>异步等待中</code>，所以使用变量保存<code>Promise</code>的执行状态，实际上可以理解为<code>并行执行了异步的构造任务</code>。</p>
+<h4 id="参考链接-1"><a href="#参考链接-1" class="headerlink" title="参考链接"></a>参考链接</h4><p>【1】MDN（<a href="https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Asynchronous/Async_await">https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Asynchronous/Async_await</a> ）</p>
+<p>【2】js异步梳理：1.从浏览器的多进程到JS的单线程，理解JS运行机制（<a href="https://www.cnblogs.com/hezhi/p/10484884.html">https://www.cnblogs.com/hezhi/p/10484884.html</a> ）</p>
+<p>【3】为什么要在变量中存储Promise对象？（<a href="https://www.debugcn.com/article/53568001.html">https://www.debugcn.com/article/53568001.html</a> ）</p>
+<h3 id="由useState闭包引发的思考与如何跳出闭包壁障"><a href="#由useState闭包引发的思考与如何跳出闭包壁障" class="headerlink" title="由useState闭包引发的思考与如何跳出闭包壁障"></a>由<code>useState</code>闭包引发的思考与如何跳出闭包壁障</h3><p>国际惯例，先扔一道烂大街的面试题：</p>
+<blockquote>
+<p>React 闭包陷阱如何用 useReducer 解决? </p>
+<pre><code>              ---- 阿里云前端面试</code></pre>
+</blockquote>
+<p>直接上代码地址：<a href="https://imweb.io/topic/5cd845cadcd62f86299fcd76">https://imweb.io/topic/5cd845cadcd62f86299fcd76</a></p>
+<p>问题原因请慢慢食用，解决方案如下：</p>
+<ul>
+<li><code>useState</code> 的实现原理就是利用了闭包。</li>
+</ul>
+<blockquote>
+<p>官方原话是：useEffect、useMemo、useCallback都是自带闭包的。每一次组件的渲染，它们都会捕获当前组件函数上下文中的状态(state, props)，所以每一次这三种hooks的执行，反映的也都是当前的状态，你无法使用它们来捕获上一次的状态。</p>
+</blockquote>
+<ul>
+<li>怎么解决呢？</li>
+</ul>
+<p>useReducer 的 dispatch 可以在全局中保持唯一不变的引用，所以用它更新一定能操作最新的值，其次是借助 setState 使用函数更新，更新当前闭包 作用域的旧值，还可以借助 useRef 在外围拿到最新值，因为对象引用不变，所以也能拿到最新值，其次是添加依赖项。</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Kapture_2021_03_17_1.gif"></p>
+<p><img src="https://tva1.sinaimg.cn/large/006tKfTcgy1fpn4emgz3ng308c04ohdt.gif"></p>
+<h2 id="End"><a href="#End" class="headerlink" title="End"></a>End</h2><p>以上就是今日份的知识总结，请君慢用～～～</p>
+]]></content>
+      <categories>
+        <category>V8</category>
+      </categories>
+      <tags>
+        <tag>原理</tag>
+        <tag>javascript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>重识闭包</title>
+    <url>/article/re-know-clouser/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>为什么再次选择重温<code>闭包</code>这个神奇的物种呢？可能是脑海里还存在以前的<code>疑虑</code>吧？</p>
+<blockquote>
+<p>函数就是闭包，这是最暴力的解释，也是最直观的解释，因为在全局作用域下，函数引用了函数作用域外的变量，像<code>DOM</code>引用；</p>
+</blockquote>
+<blockquote>
+<p>函数内的函数引用了函数内部的变量或者函数外部的变量，闭包由此生成；（也是目前我能接受的理解，包含《你不知道的JavaScript中》所解释的，回调皆闭包）；</p>
+</blockquote>
+<h2 id="切题引入"><a href="#切题引入" class="headerlink" title="切题引入"></a>切题引入</h2><blockquote>
+<p>完成一个for循环，依次打印1-10，要求每隔一秒打印；</p>
+</blockquote>
+<h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 记录setTimeout堆栈</span></span><br><span class="line"><span class="keyword">let</span> timerQueue = &#123;&#125;</span><br><span class="line"><span class="comment">// 闭包打印</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">printf</span> (<span class="params">i</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 形成闭包作用域</span></span><br><span class="line">    <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 每次打印结束后，清空上一次定时器的闭包引用</span></span><br><span class="line">        timerQueue[i] = <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">console</span>.log(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i =<span class="number">0</span>; i &lt; <span class="number">10</span> ; i ++) &#123;</span><br><span class="line">    <span class="comment">// 保存定时器引用</span></span><br><span class="line">    timerQueue[i] = <span class="built_in">setTimeout</span>(printf(i), <span class="number">1000</span>*i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i&lt;<span class="number">10</span>; i ++) &#123;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(i)</span><br><span class="line">    &#125;, <span class="number">1000</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方案三"><a href="#方案三" class="headerlink" title="方案三"></a>方案三</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 睡眠函数</span></span><br><span class="line"><span class="keyword">const</span> sleep = <span class="function">(<span class="params">timer</span>) =&gt;</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> &#123;<span class="built_in">setTimeout</span>(resolve, timer)&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 打印</span></span><br><span class="line"><span class="keyword">const</span> print = <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i =<span class="number">0</span>; i&lt;<span class="number">10</span>;i++) &#123;</span><br><span class="line">        <span class="comment">// 睡眠</span></span><br><span class="line">        <span class="keyword">await</span> sleep(<span class="number">1000</span>);</span><br><span class="line">        <span class="built_in">console</span>.log(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">print()</span><br></pre></td></tr></table></figure>
+
+<p>方案一主要利用了<code>闭包</code>的特性；方案二主要利用了<code>ES6``let</code>模块作用域的特性，for循环每次都保留上一次的值开始循环；方案三主要利用了<code>async</code>异步同步化；</p>
+<h2 id="函数的生命周期"><a href="#函数的生命周期" class="headerlink" title="函数的生命周期"></a>函数的生命周期</h2><p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-09_00-29-48.png" alt="alt"></p>
+<h2 id="图解"><a href="#图解" class="headerlink" title="图解"></a>图解</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 记录setTimeout堆栈</span></span><br><span class="line"><span class="keyword">let</span> timerQueue = &#123;&#125;</span><br><span class="line"><span class="comment">// 闭包打印</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">printf</span> (<span class="params">i</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 形成闭包作用域</span></span><br><span class="line">    <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 每次打印结束后，清空上一次定时器的闭包引用</span></span><br><span class="line">        timerQueue[i] = <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">console</span>.log(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i =<span class="number">0</span>; i &lt; <span class="number">10</span> ; i ++) &#123;</span><br><span class="line">    <span class="comment">// 保存定时器引用</span></span><br><span class="line">    timerQueue[i] = <span class="built_in">setTimeout</span>(printf(i), <span class="number">1000</span>*i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-09_01-23-48.png" alt="alt"></p>
+<p>每次执行完一次<code>for</code>循环之后，蓝色的线条都会断开，作为<code>函数生命周期的结束标志</code>，但是内部函数还是会保留上次<code>AO</code>对象，且闭包作用域是内部的<code>无名</code>函数。</p>
+<p>利用外围<code>timerQueue</code>对象保存定时器引用，适时清空，优化内存占用。</p>
+]]></content>
+      <categories>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>知识</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一道有意思的题目</title>
+    <url>/article/a-meaning-page/</url>
+    <content><![CDATA[<h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * add = num =&gt; num+10</span></span><br><span class="line"><span class="comment"> * mult = num =&gt; num*2</span></span><br><span class="line"><span class="comment"> * 实现一个fn = compose(mult, add)</span></span><br><span class="line"><span class="comment"> * 使得fn(5) = 20</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="答案一"><a href="#答案一" class="headerlink" title="答案一"></a>答案一</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">const</span> add = <span class="function"><span class="params">num</span> =&gt;</span> num + <span class="number">10</span>;</span><br><span class="line"><span class="keyword">const</span> mult = <span class="function"><span class="params">num</span> =&gt;</span> num*<span class="number">2</span>;</span><br><span class="line"><span class="keyword">const</span> other = <span class="function"><span class="params">num</span> =&gt;</span> num *<span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> compose = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> _o = <span class="built_in">Array</span>.from(<span class="built_in">arguments</span>) || [];</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">inner</span>(<span class="params">...rest</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!_o.length) &#123; <span class="keyword">return</span> &#125;</span><br><span class="line">        <span class="keyword">if</span> (_o.length &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> inner.call(<span class="literal">null</span>, _o.splice(<span class="number">0</span>, <span class="number">1</span>)[<span class="number">0</span>].apply(<span class="literal">null</span>, rest))</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> _o[<span class="number">0</span>].apply(<span class="literal">null</span>, rest);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> add = <span class="function"><span class="params">num</span> =&gt;</span> num + <span class="number">10</span>;</span><br><span class="line"><span class="keyword">const</span> mult = <span class="function"><span class="params">num</span> =&gt;</span> num*<span class="number">2</span>;</span><br><span class="line"><span class="keyword">const</span> other = <span class="function"><span class="params">num</span> =&gt;</span> num *<span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">compose</span>(<span class="params">...funcs</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (funcs.length === <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="function"><span class="params">arg</span> =&gt;</span> arg</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (funcs.length === <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> funcs[<span class="number">0</span>]</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> funcs.reduceRight(<span class="function">(<span class="params">a, b</span>) =&gt;</span> <span class="function">(<span class="params">...args</span>) =&gt;</span> a(b(...args)))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面是比较好的两种方法，其中第一种是利用了递归的思路，第二种利用了<code>reduce</code>函数，实现了函数组合，至于函数组合的执行顺序，借助<code>reduce</code>&amp;<code>reduceRight</code>来控制。</p>
+<h2 id="End"><a href="#End" class="headerlink" title="End"></a>End</h2><p>结尾处，可以再次引什出函数柯里化：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 计算两数之和</span></span><br><span class="line"><span class="keyword">const</span> carry = <span class="function">(<span class="params">f, o</span>) =&gt;</span> &#123;</span><br><span class="line">    o = o || [];</span><br><span class="line">    <span class="keyword">const</span> _len = f.length;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">const</span> _o = [...o.slice(), ...Array.from(<span class="built_in">arguments</span>)];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(_o.length &lt; _len) &#123;</span><br><span class="line">            <span class="keyword">return</span> carry.call(<span class="built_in">this</span>, f, _o);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> f.apply(<span class="built_in">this</span>, _o);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> sum = <span class="function">(<span class="params">a,b,c</span>) =&gt;</span> a+b+c;</span><br><span class="line"><span class="keyword">const</span> newSum = carry(sum);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(newSum(<span class="number">1</span>)(<span class="number">2</span>)(<span class="number">3</span>));</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>核心思维：借助闭包的活动对象，保留柯里参数，当柯里参数与被柯里函数的参数长度一致的时候执行。</p>
+]]></content>
+      <categories>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>知识</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>从防抖节流再次思考业务，怎么让用户体验更佳</title>
+    <url>/article/debounce&amp;throlle/</url>
+    <content><![CDATA[<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-14_14-09-41.png"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>早些时候看到了防抖节流的一个新的实现，<a href="https://github.com/mqyqingfeng/Blog/issues/22">传送门</a>;</p>
+<p>当看到第四部分的实现，源码如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 第四版</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">debounce</span>(<span class="params">func, wait, immediate</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> timeout;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> context = <span class="built_in">this</span>;</span><br><span class="line">        <span class="keyword">var</span> args = <span class="built_in">arguments</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (timeout) <span class="built_in">clearTimeout</span>(timeout);</span><br><span class="line">        <span class="keyword">if</span> (immediate) &#123;</span><br><span class="line">            <span class="comment">// 如果已经执行过，不再执行</span></span><br><span class="line">            <span class="keyword">var</span> callNow = !timeout;</span><br><span class="line">            timeout = <span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                timeout = <span class="literal">null</span>;</span><br><span class="line">            &#125;, wait)</span><br><span class="line">            <span class="keyword">if</span> (callNow) func.apply(context, args)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            timeout = <span class="built_in">setTimeout</span>(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                func.apply(context, args)</span><br><span class="line">            &#125;, wait);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于这个<code>immediate</code>参数也是不明觉厉，思考了一番，那我们之前的用法岂不是稍微有一点问题的？<br>带着这个疑问，我再次打开了<code>IDE</code>，开始调试代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 连续触发 n 秒后执行</span></span><br><span class="line"><span class="comment">// 连续触发，但是只执行第一次触发的函数，之后在n秒后，再次执行函数</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> debounce = <span class="function">(<span class="params">fn, delay, immediate = <span class="literal">false</span></span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> timer;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="function">(<span class="params">...rest</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(timer) &#123; <span class="built_in">clearTimeout</span>(timer) &#125;</span><br><span class="line">        <span class="comment">// 当开启立即模式，也就是先执行，后防抖，更加合理</span></span><br><span class="line">        <span class="keyword">if</span>(immediate) &#123;</span><br><span class="line">            <span class="keyword">const</span> nowDo = !timer;</span><br><span class="line">            timer = <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                <span class="built_in">clearTimeout</span>(timer);</span><br><span class="line">            &#125;, delay);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (nowDo) &#123;</span><br><span class="line">                fn.apply(<span class="built_in">this</span>, rest);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            timer = <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                fn.apply(<span class="built_in">this</span>, rest);</span><br><span class="line">            &#125;, delay);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 模式一</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> print = <span class="function">() =&gt;</span> &#123; <span class="built_in">console</span>.log(<span class="string">&quot;dayin&quot;</span>) &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> deP = debounce(print, <span class="number">800</span>)</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;模式一&#x27;</span>)</span><br><span class="line">deP()</span><br><span class="line">deP()</span><br><span class="line">deP()</span><br><span class="line">deP()</span><br><span class="line">deP()</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&#x27;模式二&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> deP2 = debounce(print, <span class="number">800</span>,<span class="literal">true</span>)</span><br><span class="line"></span><br><span class="line">deP2()</span><br><span class="line">deP2()</span><br><span class="line">deP2()</span><br><span class="line">deP2()</span><br><span class="line">deP2()</span><br><span class="line">deP2()</span><br></pre></td></tr></table></figure>
+
+<p>分别从两种模式出发，看到了这个参数的作用，这个时候真实眼前一亮，这不是更符合用户体验规则。</p>
+<p><strong>从开发人员过度到用户，我们始终追求的是用户体验极致的效果，因为，用户希望一点击之后就会有效果，而不是点击后若干秒之后再去响应</strong></p>
+<p><code>demo</code>如下:</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Kapture%202021-03-14%20at%2016.09.46.gif"></p>
+<p>应该可以很清晰看到：模式二先执行，并且只打印了一次，而模式一后执行，也只打印了一次。</p>
+<h2 id="真实线上体验"><a href="#真实线上体验" class="headerlink" title="真实线上体验"></a>真实线上体验</h2><p>以下是我重构且维护过的一块业务逻辑，其中登陆为了防止用户恶意触发登陆接口，所以加了防抖控制。</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-14_14-12-23.png"></p>
+<p>略微有点缺陷就是，防抖时机可能不太合适，后续可以考虑优化掉，虽然影响不大，但是程序猿就是要追求极致。</p>
+<h2 id="番外篇"><a href="#番外篇" class="headerlink" title="番外篇"></a>番外篇</h2><p>今天是<code>白色情人节</code>，这么晴朗的日子里，小王当然是在<code>KFC</code>陪我的代码女朋友度过了。</p>
+<p>生活中有许多我们可以坚持的事，无论好与坏，都是值得的。</p>
+<p>有若干次都有一种感觉，仿佛回到了高三那个时候，再次寒窗苦读，这或许就是学习负债吧，学校不努力，毕业徒伤悲，再次给补回去。</p>
+<p>为了什么呢？让自己变<code>聪明</code>点吧，通过不断思考，希望勤能补拙。</p>
+]]></content>
+      <categories>
+        <category>javascript</category>
+      </categories>
+      <tags>
+        <tag>防抖</tag>
+        <tag>节流</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>《重构》---- 读书笔记</title>
+    <url>/article/refactor-code/</url>
+    <content><![CDATA[<div><span><h1>读《重构》（第二版）有感</h1><h2><b>开篇一些好的语录</b></h2><ul><li><div>软件不死，重构不歇。----—余晟，《代码整洁之道：程序员的职业素养》译者</div></li><li><div>重构的最终目的始终是为了减少重构。</div></li><li><div>重构的先决条件是：测试先行。</div></li></ul><h3>第一章手札</h3><ul><li><div>重构手法</div></li></ul>
+<img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Image.png"/>
+  <div>我觉的最有感慨的还是对于多态取代条件表达式；</div><div>先来补一补，什么是<b>多态</b>？</div><div style="--en-callout:true;"><div>多态：一个事物的多种形态，例如动物中，小猫可以“喵喵喵”，小狗可以“汪汪汪”。</div></div><div style="--en-callout:true;"><div>为什么需要多态？</div><div>究其最终原因还是为了实现代码重用。</div></div>
+
+  <figure class="highlight js"><table><tr><td class="code"><pre><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">Movie</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(name, price) &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.price = price;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">get</span> <span class="title">movieName</span>() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">get</span> <span class="title">moviePrice</span>() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.price;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@desc </span>恐怖电影</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HorrorMovie</span> <span class="keyword">extends</span> <span class="title">Movie</span></span>&#123;</span><br><span class="line">    <span class="keyword">get</span> <span class="title">movieName</span>() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">`恐怖片片名：<span class="subst">$&#123;<span class="built_in">super</span>.movieName&#125;</span>`</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ComedyMovie</span> <span class="keyword">extends</span> <span class="title">Movie</span></span>&#123;</span><br><span class="line">    <span class="keyword">get</span> <span class="title">movieName</span>() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">`喜剧片片名：<span class="subst">$&#123;<span class="built_in">super</span>.movieName&#125;</span>`</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> horrorMovie = <span class="keyword">new</span> HorrorMovie(<span class="string">&#x27;惊悚乐园&#x27;</span>, <span class="number">18</span>);</span><br><span class="line"><span class="keyword">const</span> comedyMovie = <span class="keyword">new</span> ComedyMovie(<span class="string">&#x27;小鬼当家&#x27;</span>, <span class="number">27</span>);</span><br><span class="line"><span class="built_in">console</span>.log(horrorMovie.movieName, comedyMovie.movieName)</span><br></pre></td></tr></table></figure>
+
+<p>以上就是多态的展现手法之一，重写。</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20210220213524.png"></p>
+<p>当然。还可以通过方法重载去实现，不过<code>js</code>通常需要借助<code>arguements</code>去实现，利用<code>typescript</code>去强化实现则更佳。</p>
+<p>个人观点：我觉的重构是什么？当读完第一章后，我觉的跟我之前理解的重构相差不大。</p>
+<p>我们在每一次迭代中，尽量不去动那些运转正常的代码，当迭代或者需求变更时，那些“不该动”的代码，不得不动的时候，这个时候就需要警惕，我们需要重构了。</p>
+<p>然而，重构需要遵循以下原则：</p>
+<ul>
+<li>不破坏以往的需求点</li>
+<li>重构之前有完整的测试用例支撑现有功能点正常运行，保证我们写的重构代码是“可以被信任的”，可以用于“生产环境的”。</li>
+<li>重构的目的是更好的维护与添加现有功能，而不是仅仅是当前迭代的重构，重构应该本着不需要再次重构的方向去靠拢。</li>
+</ul>
+<h2 id="第二章手札"><a href="#第二章手札" class="headerlink" title="第二章手札"></a>第二章手札</h2><p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-02-22_20-18-12.png"></p>
+<p>带着下面的疑问，我们继续探索书籍的第二章：</p>
+<ul>
+<li>什么时候应该重构，什么时候不应该重构？</li>
+<li>重构势必会增加工作量，我们应该如何应对？</li>
+<li>好的代码需要被重构吗？</li>
+</ul>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-02-22_20-23-00.png"></p>
+<p>好的设计方法：</p>
+<ul>
+<li>简单设计</li>
+<li>增量式设计 </li>
+<li>YAGNI[mf-yagni] ——“你不会需要它”（you arenʼt going to need it）的缩写</li>
+</ul>
+<p><em>重构与性能</em></p>
+<blockquote>
+<p>克莱斯勒综合薪资系统的支付过程太慢了。虽然我们的开发还没结束，这个问题却已经开始困扰<br>我们，因为它已经拖累了测试速度。</p>
+<p>Kent Beck、Martin Fowler和我决定解决这个问题。等待大伙儿会合的时间里，凭着对这个系统的<br>全盘了解，我开始推测：到底是什么让系统变慢了？我想到数种可能，然后和伙伴们谈了几种可能的<br>修改方案。最后，我们就“如何让这个系统运行更快”，提出了一些真正的好点子。<br>然后，我们拿Kent的工具度量了系统性能。我一开始所想的可能性竟然全都不是问题肇因。我们<br>发现：系统把一半时间用来创建“日期”实例（instance）。更有趣的是，所有这些实例都有相同的几个<br>值。</p>
+<p>于是我们观察日期对象的创建逻辑，发现有机会将它优化。这些日期对象在创建时都经过了一个<br>字符串转换过程，然而这里并没有任何外部数据输入。之所以使用字符串转换方式，完全只是因为代<br>码写起来简单。好，也许我们可以优化它。</p>
+<p>然后，我们观察这些日期对象是如何被使用的。我们发现，很多日期对象都被用来产生“日期区<br>间”实例——由一个起始日期和一个结束日期组成的对象。仔细追踪下去，我们发现绝大多数日期区间<br>是空的！</p>
+<p>处理日期区间时我们遵循这样一个规则：如果结束日期在起始日期之前，这个日期区间就该是空<br>的。这是一条很好的规则，完全符合这个类的需要。采用此规则后不久，我们意识到，创建一个“起始<br>日期在结束日期之后”的日期区间，仍然不算是清晰的代码，于是我们把这个行为提炼成一个工厂函<br>数，由它专门创建“空的日期区间”。</p>
+<p>我们做了上述修改，使代码更加清晰，也意外得到了一个惊喜：可以创建一个固定不变的“空日期<br>区间”对象，并让上述调整后的工厂函数始终返回该对象，而不再每次都创建新对象。这一修改把系统<br>速度提升了几乎一倍，足以让测试速度达到可接受的程度。这只花了我们大约五分钟。<br>我和团队成员（Kent和Martin谢绝参加）认真推测过：我们了若指掌的这个程序中可能有什么错<br>误？我们甚至凭空做了些改进设计，却没有先对系统的真实情况进行度量。</p>
+<p>我们完全错了。除了一场很有趣的交谈，我们什么好事都没做。</p>
+<p>教训是：哪怕你完全了解系统，也请实际度量它的性能，不要臆测。臆测会让你学到一些东西，<br>但十有八九你是错的。</p>
+<pre><code>                                       ——Ron Jeffries</code></pre>
+</blockquote>
+<p>上面的故事，其实也从反面思维告诉了我们一个道理，<em>写好每一行代码</em>是要义，还记得以前看过一句话<em>一个优秀的程序员并不是满天飞的架构，而是他写的每一行代码</em>。</p>
+<p>看完了一整章的内容，有必要回答刚开始的三个问题：</p>
+<ul>
+<li>什么时候应该重构，什么时候不应该重构？<ul>
+<li>当一大堆“丑陋”的代码工作正常，但是不影响你正常开发下，我们并不需要重构它，因为可能会显式的增加你的工作量。那么，什么时候应该重构呢？当你的需求要求你不得不改动<br>原有的“丑陋的代码”的时候，这个时候你就需要考虑重构了。</li>
+</ul>
+</li>
+<li>重构势必会增加工作量，我们应该如何应对？<ul>
+<li>提前做好预算是必须的，特别是时间预算，务必准备好你的“健全”的测试用例。</li>
+</ul>
+</li>
+<li>好的代码需要被重构吗？<ul>
+<li>答案是很显著的，好的代码的也需要被重构，随着每次迭代的进行，好的代码终将会有“不好”的那一面，始终记得我们一开始说过的“软件不死，重构不歇”。</li>
+</ul>
+</li>
+</ul>
+<h2 id="第三章-手札"><a href="#第三章-手札" class="headerlink" title="第三章 手札"></a>第三章 手札</h2><p><strong>无论是重构还是设计代码，我们的起点始终是写好每一行代码。</strong></p>
+<p>好的代码的基本素养：</p>
+<ul>
+<li>好的命名：函数声明（124）（用于给函数改名）、变<br>量改名（137）、字段改名（244）等，其实有经验的程序员都明白一个东西就是，好的命名是不需要加注释的。</li>
+<li>避免重复代码：简洁代码的要义的“抽象”，抽象一切可复用逻辑；</li>
+<li>过长函数的优化：短小精悍的函数，更容易阐释其意思。（这里的过长函数指的是函数体内容过长，而不是函数命名）；</li>
+<li>过长参数列表的优化：对象序列化参数；</li>
+<li>抽离全局变量，添加作用域，避免污染全局；</li>
+<li>注释，一些注释是必须的，但是在写注释之前，请先考虑重构是否可以解决添加注释的必要；</li>
+</ul>
+<blockquote>
+<p>当你感觉需要撰写注释时，请先尝试重构，试着让所有注释都变得多余。</p>
+</blockquote>
+<p>小结：其实这一章节的内容主要还是阐述了如何去写好每一行代码，如何约束程序员去书写健壮的代码；’</p>
+<h2 id="第四章-手札"><a href="#第四章-手札" class="headerlink" title="第四章 手札"></a>第四章 手札</h2><p>这一章节，其实重点的笔墨应该在如何准备“健全”的测试用例上。</p>
+<blockquote>
+<p>编写未臻完善的测试并经常运行，好过对完美测试的无尽等待。</p>
+</blockquote>
+<blockquote>
+<p>不要因为测试无法捕捉所有的bug就不写测试，因为测试的确可以捕<br>捉到大多数bug。</p>
+</blockquote>
+<blockquote>
+<p>每当你收到bug报告，请先写一个单元测试来暴露这个bug。</p>
+</blockquote>
+<p>其实，我个人属于<code>敏捷开发爱好者</code>，也就是<code>TDD</code>驱动者，不过常常因为<code>工时</code>制约了<code>TDD</code>的路途，<br>因为<code>TDD</code>的要义是：<code>测试先行，由红变绿</code>；</p>
+<p>至于应该进行什么测试<code>黑盒测试</code>或者<code>白盒测试</code>，取决于你的场景。</p>
+<p>适当的补全一些<code>BDD</code>行为测试的用例，方便<code>产品</code>、<code>测试</code>或者其他人员，像读短文一样读你的测试用例，在读懂测试用例的前提下，理解既有需求。</p>
+<p>其实我觉得白盒测试更加适用于<code>TDD</code>敏捷开发思维，适用于<code>单元测试</code>层面。而<code>黑盒测试</code>更加适用于<code>BDD</code>思维，以行为驱动测试，以行为阐释需求。</p>
+<blockquote>
+<p>End：关于解释“黑匣子”和“白匣子”，我觉得这里有一篇qs问答说的比较准确，也值得推敲。<a href="https://qastack.cn/software/27491/black-box-or-white-box-testing-which-do-you-do-first">https://qastack.cn/software/27491/black-box-or-white-box-testing-which-do-you-do-first</a></p>
+</blockquote>
+<p><a href="https://qastack.cn/software/27491/black-box-or-white-box-testing-which-do-you-do-first">web端qsstack传送门</a></p>
+<h2 id="第五章-手札"><a href="#第五章-手札" class="headerlink" title="第五章 手札"></a>第五章 手札</h2><p>重构手法之<code>核心要义</code>：</p>
+<ul>
+<li>首先是名称（name）。要建造一个重构词汇表，名称是很重要的。</li>
+<li>名称之后是一个简单的速写（sketch）。这部分可以帮助你更快找到你所需要<br>的重构手法。</li>
+<li>动机（motivation）为你介绍“为什么需要做这个重构”和“什么情况下不该做这<br>个重构”。</li>
+<li>做法（mechanics）简明扼要地一步一步介绍如何进行此重构。</li>
+<li>范例（examples）以一个十分简单的例子说明此重构手法如何运作。</li>
+</ul>
+<p>貌似第五章仅仅是作者的介绍重构的<code>前戏</code>，欲听<code>后戏</code>如何，请见下章内容。</p>
+<h2 id="第六章-重构名录"><a href="#第六章-重构名录" class="headerlink" title="第六章 重构名录"></a>第六章 重构名录</h2><blockquote>
+<p>低层级代码重构的精髓—形成函数并给函数命名。</p>
+</blockquote>
+<h3 id="提炼函数法则"><a href="#提炼函数法则" class="headerlink" title="提炼函数法则"></a>提炼函数法则</h3><p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-02_23-55-22.png" alt="alt"></p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-03_00-09-37.png" alt="alt"></p>
+<p>核心观点阐释了：应该将“意图与实现分开”，“函数不要过长”；</p>
+<p>做法：</p>
+<ul>
+<li>创造一个新函数，根据这个函数的意图来对它命名（以它“做什么”来命名，而<br>不是以它“怎样做”命名）</li>
+<li>将待提炼的代码从源函数复制到新建的目标函数中。</li>
+<li>仔细检查提炼出的代码，看看其中是否引用了作用域限于源函数、在提炼出的<br>新函数中访问不到的变量。若是，以参数的形式将它们传递给新函数。</li>
+<li>所有变量都处理完之后，编译。</li>
+<li>在源函数中，将被提炼代码段替换为对目标函数的调用。</li>
+<li>测试。</li>
+<li>查看其他代码是否有与被提炼的代码段相同或相似之处。如果有，考虑使用以<br>函数调用取代内联代码（222）令其调用提炼出的新函数。</li>
+</ul>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-03_00-30-57.png" alt="alt"></p>
+<h3 id="内联函数"><a href="#内联函数" class="headerlink" title="内联函数"></a>内联函数</h3><p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-03_00-47-20.png" alt="alt"></p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-03_00-47-20.png" alt="ALT"></p>
+<p>核心观点：属于函数内部的代码就尽量去内敛它。</p>
+<p>做法：</p>
+<ul>
+<li>检查函数，确定它不具多态性。</li>
+<li>找出这个函数的所有调用点。</li>
+<li>将这个函数的所有调用点都替换为函数本体。</li>
+<li>每次替换之后，执行测试。</li>
+<li>删除该函数的定义。</li>
+</ul>
+<h3 id="提炼变量"><a href="#提炼变量" class="headerlink" title="提炼变量"></a>提炼变量</h3><p>提炼变量的法则其实很简单，就是将返回变量作为行内表达式，避免多声明一堆不必要的变量。</p>
+<ul>
+<li>检查确认变量赋值语句的右侧表达式没有副作用。</li>
+<li>如果变量没有被声明为不可修改，先将其变为不可修改，并执行测试。<blockquote>
+<p>这是为了确保该变量只被赋值一次。</p>
+</blockquote>
+</li>
+<li>找到第一处使用该变量的地方，将其替换为直接使用赋值语句的右侧表达式。<br>测试。</li>
+<li>重复前面两步，逐一替换其他所有使用该变量的地方。</li>
+<li>删除该变量的声明点和赋值语句。</li>
+<li>测试。</li>
+</ul>
+<p><code>摘录来自: 马丁·福勒(Martin Fowler). “重构：改善既有代码的设计（第2版）。” Apple Books. </code></p>
+<h3 id="改变函数声明"><a href="#改变函数声明" class="headerlink" title="改变函数声明"></a>改变函数声明</h3><p>通常的手法就是给函数换一个名字，或者去除不必要的函数，以这个函数<code>做了</code>什么去描述，而不是<code>如何去做</code>命名。</p>
+<h3 id="封装变量"><a href="#封装变量" class="headerlink" title="封装变量"></a>封装变量</h3><p>动机：<code>数据不可变性</code>；</p>
+<p>做法：提供 <code>get</code> |  <code>set</code>方法给使用者使用。</p>
+<h3 id="变量改名"><a href="#变量改名" class="headerlink" title="变量改名"></a>变量改名</h3><p>好的变量是代码阅读的基石；</p>
+<h3 id="函数组合成类"><a href="#函数组合成类" class="headerlink" title="函数组合成类"></a>函数组合成类</h3><p>当一组函数形影不离的操作一段数据，那么就可以利用函数组合成类；</p>
+<h3 id="代码拆分"><a href="#代码拆分" class="headerlink" title="代码拆分"></a>代码拆分</h3><p>将耦合代码拆分；</p>
+<h2 id="第七章-封装"><a href="#第七章-封装" class="headerlink" title="第七章 封装"></a>第七章 封装</h2><p>封装是面向对象的编程思想，好的封装手法可以更好的杜绝一些不必要的失误，也是扩展性的阐释。</p>
+]]></content>
+      <categories>
+        <category>读书笔记</category>
+      </categories>
+      <tags>
+        <tag>《重构》</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>新兴前端框架 Svelte 从入门到原理</title>
+    <url>/article/svelte/</url>
+    <content><![CDATA[<p><strong>以下文章来源于字节前端 ByteFE ，作者雾豹</strong></p>
+<hr>
+<p>在这篇文章中，我们将会介绍 Svelte 框架的特性、优缺点和底层原理。</p>
+<blockquote>
+<p>本文尽量不会涉及 Svelte 的语法，大家可以放心食用。因为 Svelte 的语法极其简单，而且官方教程学习曲线平缓<a href="https://www.sveltejs.cn/%EF%BC%8C%E7%9B%B8%E4%BF%A1%E5%A4%A7%E5%AE%B6%E5%BE%88%E5%BF%AB%E5%B0%B1%E4%BC%9A%E4%B8%8A%E6%89%8B%E8%AF%AD%E6%B3%95%E7%9A%84%EF%BC%8C%E8%BF%99%E9%87%8C%E5%B0%B1%E4%B8%8D%E5%81%9A%E5%AE%98%E7%BD%91%E6%90%AC%E8%BF%90%E5%B7%A5%E4%BA%86%E3%80%82">https://www.sveltejs.cn/，相信大家很快就会上手语法的，这里就不做官网搬运工了。</a></p>
+</blockquote>
+<p>前端领域是发展迅速，各种轮子层出不穷的行业。最近这些年，随着三大框架<code>React</code>、<code>Vue</code>、<code>Angular</code>版本逐渐稳定，前端技术栈的迭代似乎缓慢下来，<code>React 16</code>版本推出了 <code>Fiber</code>， <code>Vue 3.0</code> 也已经在襁褓之中。</p>
+<p>如果我们把目光拉伸到未来十年的视角，前端行业会出现哪些框架有可能会挑战<code>React</code>或者<code>Vue</code>呢？我们认为，崭露头角的 <code>Svelte</code> 应该是其中的选项之一。</p>
+<h2 id="Svelte-简介"><a href="#Svelte-简介" class="headerlink" title="Svelte 简介"></a>Svelte 简介</h2><p><code>Svelte</code>叫法是<code>[Svelte]</code>, 本意是苗条纤瘦的，是一个新兴热门的前端框架.</p>
+<p>在最新的<code>《State of JS survey of 2020》</code>中，它被预测为未来十年可能取代React和Vue等其他框架的新兴技术。如果你不确定自己是否该了解 <code>Svelte</code>，可以先看一下 <code>Svelte</code> 的一些发展趋势。</p>
+<h3 id="开发者满意度"><a href="#开发者满意度" class="headerlink" title="开发者满意度"></a>开发者满意度</h3><p>从<code>2019</code>年开始, <code>Svelte</code>出现在榜单中。刚刚过去的<code>2020</code>年，<code>Svelte</code>在满意度排行榜中超越了<code>react</code>，跃升到了第一位。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NLjjxw1ChYSIbUALyYoToS2FmeEfibRUwHS4NoIj7IpbEzk8FJEoptKQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<h3 id="开发者兴趣度"><a href="#开发者兴趣度" class="headerlink" title="开发者兴趣度"></a>开发者兴趣度</h3><p>在开发者兴趣度方面，Svelte 蝉联了第一。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NPlyRwWFzs1FcicHKRvdnzTepQo44lsHAMDMDIT1hlsT4pNrawUEKY6Q/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<h3 id="市场占有率"><a href="#市场占有率" class="headerlink" title="市场占有率"></a>市场占有率</h3><p>如果你在19年还没有听说过Svelte，不用紧张，因为svelte 当时仍是小众的开发框架，在社区里仍然没有流行开来.</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NFB4fL39zia5Drl9vx64Zj9s9zF2H8XPNmzeWjUuKSUGZoEIe7oQyVoQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>2020年，Svelte 的市场占有率从第6名跃升到第4名，仅次于 React、Angular、Vue 老牌前端框架。</p>
+<h2 id="svelte作者——Rich-Harris"><a href="#svelte作者——Rich-Harris" class="headerlink" title="svelte作者——Rich Harris"></a>svelte作者——Rich Harris</h2><p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8Nf60n9PAu4JoLtx0bMEEIUrkq5A9rxcYZibg1gic7nibCeua36ibSu4mUxw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p><code>Svelte</code>作者是前端轮子哥 <code>Rich Harris</code>，同时也是<code>Rollup</code> 的作者。<code>Rich Harris</code> 作者本人在介绍 <code>Svelte</code> 时，有一个非常精彩的演讲<code>《Rethinking reactivity》</code>，<a href="https://www.youtube.com/watch?v=AdNJ3fydeao&t=1900s">油管连接</a>，感兴趣的同学不要错过。</p>
+<p>他设计<code>Svelte</code>的核心思想在于『通过静态编译减少框架运行时的代码量』，也就是说，<code>vue</code> 和 <code>react</code> 这类传统的框架，都必须引入运行时 <code>(runtime)</code> 代码，用于虚拟<code>dom</code>、<code>diff</code> 算法。<code>Svelted</code>完全溶入<code>JavaScript</code>，应用所有需要的运行时代码都包含在<code>bundle.js</code>里面了，除了引入这个组件本身，你不需要再额外引入一个运行代码。</p>
+<h2 id="Svelte-优势有哪些"><a href="#Svelte-优势有哪些" class="headerlink" title="Svelte 优势有哪些"></a>Svelte 优势有哪些</h2><p>我们先来看一下 <code>Svelte</code> 和<code>React</code>，<code>Vue</code> 相比，有哪些优势。</p>
+<h3 id="No-Runtime-——-无运行时代码"><a href="#No-Runtime-——-无运行时代码" class="headerlink" title="No Runtime —— 无运行时代码"></a>No Runtime —— 无运行时代码</h3><p><code>React</code> 和 <code>Vue</code> 都是基于运行时的框架，当用户在你的页面进行各种操作改变组件的状态时，框架的运行时会根据新的组件状态（state）计算（diff）出哪些DOM节点需要被更新，从而更新视图。</p>
+<p>这就意味着，框架本身所依赖的代码也会被打包到最终的构建产物中。这就不可避免增加了打包后的体积，有一部分的体积增加是不可避免的，那么这部分体积大约是多少呢？请看下面的数据：</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NLwvPiaLPH24Zy9zMvIsxianXs0UZ4YOvIfkPlcunhJWbVBfBDTAWyfyQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>常用的框架中，最小的<code>Vue</code>都有<code>58k</code>，<code>React</code>更有<code>97.5k</code>。我们使用<code>React</code>开发一个小型组件，即使里面的逻辑代码很少，但是打包出来的<code>bundle size</code>轻轻松松都要<code>100k</code>起步。对于大型后台管理系统来说，<code>100k</code> 不算什么，但是对于特别注重用户端加载性能的场景来说，一个组件<code>100k</code> 多，还是太大了。</p>
+<p>如果你特别在意打包出来的体积，Svelte 就是一个特别好的选择。下面是Jacek Schae大神的统计，使用市面上主流的框架，来编写同样的<code>Realword</code> 应用的体积：</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NYIYfHbibic8wU8eX5UZInacXESYVTXHbKM8sNeLlWBgKOXECnGMA0ic9g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>从上图的统计，Svelte简直是神奇！竟然只有 9.7 KB ! 果然魔法消失 UI 框架，无愧其名。</p>
+<p>可以看出，Svelte的bundle size大小是Vue的1/4，是React的1/20，体积上的优势还是相当明显的。</p>
+<h3 id="Less-Code-——写更少的代码"><a href="#Less-Code-——写更少的代码" class="headerlink" title="Less-Code ——写更少的代码"></a>Less-Code ——写更少的代码</h3><p>在写svelte组件时，你就会发现，和 Vue 或 React 相比只需要更少的代码。开发者的梦想之一，就是敲更少的代码。因为更少的代码量，往往意味着有更好的语义性，也有更少的几率写出bug。</p>
+<p>下面的例子，可以看出Svelte和React的不同：</p>
+<ol>
+<li><code>React</code>的代码</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">increment</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  setCount(count + <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><code>Svelte</code>的代码</li>
+</ol>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">increment</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  count += <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>虽然用上了<code>16</code>版本最新的 <code>hooks</code>，但是和<code>svelte</code>相比，代码还是很冗余。</p>
+<p>在React中，我们要么使用<code>useState</code>钩子，要么使用<code>setState</code>设置状态。而在<code>Svelte</code>中，可以直接使用赋值操作符更新状态。</p>
+<p>如果说上面的例子太简单了，可以看下面的统计，分别使用<code>React</code>和 <code>Svelte</code> 实现下面的组件所需要的代码行数.</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8Nvs9cIUVHoqtHB3QyNgFb11ia6c6n7Kt5b4xPpblBpD8oJWiaA0cUngtA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>下面还是 Jacek Schae 老哥的统计，编写同样的Realword 应用，各个框架所需要的行数.</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NmzgnqeMUn926nJwNgwvILdfmJySkwNXFziciak1t5JrkJia1Sad4rG06w/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<h3 id="Hight-Performance-——高性能"><a href="#Hight-Performance-——高性能" class="headerlink" title="Hight-Performance ——高性能"></a>Hight-Performance ——高性能</h3><p>在Virtual Dom已经是前端框架标配的今天， Svelte 声称自己是没有Virtual Dom加持的， 怎么还能保证高性能呢？</p>
+<p>不急，慢慢看。</p>
+<h4 id="性能测评"><a href="#性能测评" class="headerlink" title="性能测评"></a>性能测评</h4><p>Jacek Schae 在《A RealWorld Comparison of Front-End Frameworks with Benchmarks》中用主流的前端框架来编写 RealWorld 应用，使用 Chrome 的Lighthouse Audit测试性能，得出数据是Svelte 略逊于Vue, 但好于 React。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NIQc9ClkUrwYEvsJiaJPHNKfflMicDwHZO5YyrLDqw35jImyZtfgFmWWQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>是不是很惊奇？另外一个前端框架性能对比的项目也给出了同样的答案：<a href="https://github.com/krausest/js-framework-benchmark%E3%80%82">https://github.com/krausest/js-framework-benchmark。</a></p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NSm9icTgdLOv9VOKLR4Rg1rlbia18M5ZOp1wvpdPxnZDic48tPibLxDZIXQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>为什么 Svelte 性能还不错，至少没有我们预期的那么糟糕？我们接下来会在原理那一小结来介绍。</p>
+<h2 id="Svelte-劣势"><a href="#Svelte-劣势" class="headerlink" title="Svelte 劣势"></a>Svelte 劣势</h2><p>说完了<code>Svelte</code>的优势，我们也要考虑到<code>Svelte</code>的劣势。</p>
+<h3 id="和Vue，-React框架的对比"><a href="#和Vue，-React框架的对比" class="headerlink" title="和Vue， React框架的对比"></a>和Vue， React框架的对比</h3><p>在构建大型前端项目时，我们在选择框架的时候就需要考虑更多的事情。<code>Svelte</code>目前尚处在起步阶段，对于大型项目必要的单元测试并没有完整的方案。目前在大型应用中使用<code>Svelte</code>, 需要谨慎评。</p>
+<table>
+<thead>
+<tr>
+<th>类目</th>
+<th>Svelte</th>
+<th>Vue</th>
+<th>React</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>UI组件库</td>
+<td><code>Material design ( 坦率的说，不好用 )</code></td>
+<td><code>Element UI / AntD</code></td>
+<td><code>AntD / Material design</code>｜</td>
+</tr>
+<tr>
+<td>状态管理</td>
+<td>官网自带</td>
+<td>Vuex</td>
+<td>Redux/MobX</td>
+</tr>
+<tr>
+<td>路由</td>
+<td>Svelte-router</td>
+<td>Vue-router</td>
+<td>React-router</td>
+</tr>
+<tr>
+<td>服务端渲染</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>测试工具</td>
+<td>官方网站没有相关内容</td>
+<td>@vue/test-utils</td>
+<td>Jest</td>
+</tr>
+</tbody></table>
+<p>我们在用 Svelte 开发公司级别中大型项目时，也发现了其他的一些主要注意的点</p>
+<p>没有像AntD那样成熟的UI库。比如说需求方想加一个toast提示，或者弹窗，pm：”很简单的，不用出UI稿，就直接用之前的样式好啦~“<br>但是 Svelte 需要从0开始 ”抄“ 出来一个toast或者弹窗组件出来，可能会带来额外的开发量和做好加班的准备。</p>
+<ul>
+<li><p>Svelte 原生不支持预处理器，比如说less/scss，需要自己单独的配置 webpack loader。</p>
+</li>
+<li><p>Svelte 原生脚手架没有目录划分</p>
+</li>
+<li><p>暂时不支持typescript，虽然官方说了会支持, 但是不知道什么时候.</p>
+</li>
+</ul>
+<p>还需要注意的一点是，React / Vue等框架自带的runtime虽然会增加首屏加载的bundle.js，可是当项目变得越来越大的时候，框架的runtime在bundle.js里面占据的比例也会越来越小，这个时候我们就得考虑一下是不是存在一个Svelte生成的代码大于React和Vue生成的代码的阈值了。</p>
+<h2 id="原理篇"><a href="#原理篇" class="headerlink" title="原理篇"></a>原理篇</h2><p><code>Svelte</code>原理相对于<code>React</code> 和 <code>Vue</code> 来说，相对比较简单，大家可以放心的往下看。</p>
+<p>首先，我们从一个问题出发：</p>
+<h3 id="Virtual-Dom-真的高效吗"><a href="#Virtual-Dom-真的高效吗" class="headerlink" title="Virtual Dom 真的高效吗"></a>Virtual Dom 真的高效吗</h3><p>Rich Harris 在设计 Svelte 的时候没有采用 Virtual DOM 是因为觉得Virtual DOM Diff 的过程是非常低效的。</p>
+<p>在他的一文《Virtual DOM is pure overhead》原文连接：<a href="https://www.sveltejs.cn/blog/virtual-dom-is-pure-overhead%EF%BC%8C%E6%84%9F%E5%85%B4%E8%B6%A3%E7%9A%84%E5%90%8C%E5%AD%A6%E5%8F%AF%E4%BB%A5%E7%BF%BB%E4%B8%80%E4%B8%8B%E3%80%82">https://www.sveltejs.cn/blog/virtual-dom-is-pure-overhead，感兴趣的同学可以翻一下。</a></p>
+<p>人们觉得 Virtual DOM高效的一个理由，就是它不会直接操作原生的DOM节点。在浏览器当中，JavaScript的运算在现代的引擎中非常快，但DOM本身是非常缓慢的东西。当你调用原生DOM API的时候，浏览器需要在JavaScript引擎的语境下去接触原生的DOM的实现，这个过程有相当的性能损耗。</p>
+<p>但其实 Virtual DOM 有时候会做很多无用功，这体现在很多组件会被“无缘无故”进行重渲染（re-render）。</p>
+<p>比如说，下面的例子中，React 为了更新掉message 对应的DOM 节点，需要做n多次遍历，才能找到具体要更新哪些节点。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NbwnB9KtXobRxibFF2PbK5iarvCMDWe59hsZaEPDsmiaaia4OYgNWSPCiaSQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>为了解决这个问题，React 提供pureComponent,shouldComponentUpdate，useMemo,useCallback让开发者来操心哪些subtree是需要重新渲染的，哪些是不需要重新渲染的。究其本质，是因为 React 采用 jsx 语法过于灵活，不理解开发者写出代码所代表的意义，没有办法做出优化。</p>
+<p>所以，React 为了解决这个问题，在 v16.0 带来了全新的 Fiber 架构，Fiber 思路是不减少渲染工作量，把渲染工作拆分成小任务思路是不减少渲染工作量。渲染过程中，留出时间来处理用户响应，让用户感觉起来变快了。这样会带来额外的问题，不得不加载额外的代码，用于处理复杂的运行时调度工作</p>
+<h4 id="那么-Svelte-是如何解决这个问题的？"><a href="#那么-Svelte-是如何解决这个问题的？" class="headerlink" title="那么 Svelte 是如何解决这个问题的？"></a>那么 Svelte 是如何解决这个问题的？</h4><p>React 采用 jsx 语法本质不理解数据代表的意义，没有办法做出优化。Svelte 采用了Templates语法（类似于 Vue 的写法），更加严格和具有语义性，可以在编译的过程中就进行优化操作。</p>
+<p>那么，为什么Templates语法可以解决这个问题呢？</p>
+<h4 id="Template-带来的优势"><a href="#Template-带来的优势" class="headerlink" title="Template 带来的优势"></a>Template 带来的优势</h4><p>关于 <code>JSX</code> 与 <code>Templates</code> ，可以看成是两种不同的前端框架渲染机制，有兴趣的同学可以翻一下尤雨溪的演讲《在框架设计中寻求平衡》：<a href="https://www.bilibili.com/video/av80042358/%E3%80%82">https://www.bilibili.com/video/av80042358/。</a></p>
+<p>一方面， <code>JSX</code> 的代表框架有 <code>React</code> 以及所有 <code>react-like</code> 库，比如 <code>preact</code>、 <code>stencil</code>, <code>infernal</code> 等；另一方面， <code>Templates</code> 代表性的解决方案有 <code>Vue</code>、<code>Svelte</code>、 <code>ember</code>，各有优缺点。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NrzkOWN338lgV4S76ktGa5HNgG8Sq6iciaTD1ib0x2TdYcMokaKUibfKGZA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<h3 id="JSX-优缺点"><a href="#JSX-优缺点" class="headerlink" title="JSX 优缺点"></a>JSX 优缺点</h3><p><code>jsx</code> 具有 <code>JavaScript</code> 的完整表现力，非常具有表现力，可以构建非常复杂的组件。</p>
+<p>但是灵活的语法，也意味着引擎难以理解，无法预判开发者的用户意图，从而难以优化性能。你很可能会写出下面的代码：</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NluVx7jA7HNlH9Z9BkBUceEicPGKV3MkBZeG8NKGDhfAfJx21cOiaPtnQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>在使用 <code>JavaScript</code> 的时候，编译器不可能<code>hold</code>住所有可能发生的事情，因为 <code>JavaScript</code> 太过于动态化。也有人对这块做了很多尝试，但从本质上来说很难提供安全的优化。</p>
+<h4 id="Template优缺点"><a href="#Template优缺点" class="headerlink" title="Template优缺点"></a>Template优缺点</h4><p><code>Template</code>模板是一种非常有约束的语言，你只能以某种方式去编写模板。</p>
+<p>例如，当你写出这样的代码的时候，编译器可以立刻明白：”哦！这些 <code>p</code> 标签的顺序是不会变的，这个 <code>id</code> 是不会变的，这些 class 也不会变的，唯一会变的就是这个“。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8N3bv2SlsUlk4E5uiacia2nLRzLW2YRqH6AAkHLqO30m2789kTurJia6d6A/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>在编译时，编译器对你的意图可以做更多的预判，从而给它更多的空间去做执行优化。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NVMqor3nVUCBpxiarOp1kyW91shgDY77h4OicZtgzeazH2mHRGociams2w/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NVMqor3nVUCBpxiarOp1kyW91shgDY77h4OicZtgzeazH2mHRGociams2w/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>左侧 <code>template</code> 中，其他所有内容都是静态的，只有 <code>name</code> 可能会发生改变。</p>
+<p>右侧 <code>p</code> 函数是编译生成的最终的产物，是原生的<code>js</code>可以直接运行在浏览器里，会在有脏数据时被调用。<code>p</code> 函数唯一做的事情就是，当 <code>name</code> 发生变更的时候，调用原生方法把 <code>t1</code> 这个原生<code>DOM</code>节点更新。这里的 <code>set_data</code> 可不是 <code>React</code> 的 <code>setState</code> 或者小程序的 <code>setData</code> ，这里的<code>set_data</code> 就是封装的原生的 <code>javascript</code> 操作<code>DOM</code> 节点的方法。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8N0pkNYR4jgICa5O9PDoxzGfqX9gvJJhy9oxZsqDpu3y0GPL0KcicX7qA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>如果我们仔细观察上面的代码，发现问题的关键在于 <code>if</code>语句的判断条件——<code>changed.name</code>， 表示有哪些变量被更新了，这些被更新的变量被称为脏数据。</p>
+<p>任何一个现代前端框架，都需要记住哪些数据更新了，根据更新后的数据渲染出最新的<code>DOM</code>.</p>
+<h4 id="Svelte-记录脏数据的方式：位掩码（bitMask）"><a href="#Svelte-记录脏数据的方式：位掩码（bitMask）" class="headerlink" title="Svelte 记录脏数据的方式：位掩码（bitMask）"></a>Svelte 记录脏数据的方式：位掩码（bitMask）</h4><p>Svelte使用位掩码（bitMask） 的技术来跟踪哪些值是脏的，即自组件最后一次更新以来，哪些数据发生了哪些更改。</p>
+<p>位掩码是一种将多个布尔值存储在单个整数中的技术，一个比特位存放一个数据是否变化，一般<code>1</code>表示脏数据，<code>0</code>表示是干净数据。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NgeoibaUmYnKMmCKWzh5It4DJ8Cia1nYIucPSXrnxOkBYFH4BskherFNQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>用大白话来讲，你有<code>A</code>、<code>B</code>、<code>C</code>、<code>D</code> 四个值，那么二进制<code>0000 0001</code>表示第一个值A发生了改变，<code>0000 0010</code>表示第二个值<code>B</code>发生了改变，<code>0000 0100</code>表示第三个值<code>C</code>发生了改变，<code>0000 1000</code>表示第四个<code>D</code>发生了改变。</p>
+<p>这种表示法，可以最大程度的利用空间。为啥这么说呢？</p>
+<p>比如说，十进制数字<code>3</code>就可以表示 <code>A</code>、<code>B</code>是脏数据。先把十进制数字<code>3</code>， 转变为二进制<code>0000 0011</code>。从左边数第一位、第二位是<code>1</code>，意味着第一个值<code>A</code> 和第二个值<code>B</code>是脏数据；其余位都是<code>0</code>，意味着其余数据都是干净的。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NQZI7DRusiaao72jz3Wzwx1KGnYwpwfZKyDhT1ibZHvth2okiaiaS8Jv7ibA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<h4 id="JS-的限制"><a href="#JS-的限制" class="headerlink" title="JS 的限制"></a>JS 的限制</h4><p>那么，是不是用二进制比特位就可以记录各种无穷无尽的变化了呢？</p>
+<p><code>JS</code> 的二进制有<code>31</code>位限制，<code>number</code> 类型最长是<code>32</code>位，减去<code>1</code>位用来存放符号。也就是说，如果 <code>Svelte</code> 采用二进制位存储的方法，那么只能存 <code>31</code>个数据。</p>
+<p>但肯定不能这样，对吧？</p>
+<p><code>Svelte</code> 采用数组来存放，数组中一项是二进制<code>31</code>位的比特位。假如超出<code>31</code>个数据了，超出的部分放到数组中的下一项。</p>
+<p>这个数组就是<code>component.$.dirty</code>数组，二进制的<code>1</code>位表示该对应的数据发生了变化，是脏数据，需要更新；二进制的<code>0</code>位表示该对应的数据没有发生变化，是干净的。</p>
+<h4 id="一探究竟component-dirty"><a href="#一探究竟component-dirty" class="headerlink" title="一探究竟component.$.dirty"></a>一探究竟component.$.dirty</h4><p>上文中，我们说到<code>component.$.dirty</code>是数组，具体这个数组长什么样呢？</p>
+<p>我们模拟一个 <code>Svelte</code> 组件，这个 <code>Svelte</code> 组件会修改33个数据。</p>
+<p>我们打印出每一次<code>make_dirty</code>之后的<code>component.$.dirty</code>， 为了方便演示，转化为二进制打印出来，如下面所示：</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NmZhjTgruicxq83Y5qzDMhIt8gvOKtO0amyDbWt31nYsMTgmrcTN6GsA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>上面数组中的每一项中的每一个比特位，如果是1，则代表着该数据是否是脏数据。如果是脏数据，则意味着更新。</p>
+<p>第一行<code>[&quot;0000000000000000000000000000001&quot;, &quot;0000000000000000000000000000000&quot;]</code>, 表示第一个数据脏了，需要更新第一个数据对应的<code>dom</code>节点</p>
+<p>第二行<code>[&quot;0000000000000000000000000000011&quot;, &quot;0000000000000000000000000000000&quot;]</code>, 表示第一个、第二个数据都脏了，需要更新第一个，第二个数据对应的<code>dom</code>节点。</p>
+<p>……</p>
+<p>当一个组件内，数据的个数，超出了<code>31</code>的数量限制，就数组新增一项来表示。</p>
+<p>这样，我们就可以通过<code>component.$.dirty</code>这个数组，清楚的知道有哪些数据发生了变化。那么具体应该更新哪些DOM 节点呢？</p>
+<h4 id="数据和DOM节点之间的对应关系"><a href="#数据和DOM节点之间的对应关系" class="headerlink" title="数据和DOM节点之间的对应关系"></a>数据和DOM节点之间的对应关系</h4><p>我们都知道， React 和 Vue 是通过 Virtual Dom 进行 diff 来算出来更新哪些 DOM 节点效率最高。Svelte 是在编译时候，就记录了数据 和 DOM 节点之间的对应关系，并且保存在 p 函数中。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8Nbmvp9xd7GszgEaaLrlRecCYD0WqicibAQR9jSJVucZfJgybB3hxQXWzw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>这里说的<code>p</code>函数，就是 <code>Svelte</code> 的更新方法，本质上就是一大堆<code>if</code>判断，逻辑非常简单.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> ( A 数据变了 ) &#123;</span><br><span class="line">  更新A对应的DOM节点</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> ( B 数据变了 ) &#123;</span><br><span class="line">  更新B对应的DOM节点</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>为了更加直观的理解，我们模拟更新一下<code>33</code>个数据的组件，编译得到的<code>p 函数</code>打印出来，如：</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8N8UR7yOcbFI8oSpsSvPjhFico414TXHSGo1L5galup6hzqMXUeTGy5kg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>我们会发现，里面就是一大堆if判断，但是if判断条件比较有意思，我们从上面摘取一行仔细观察一下：</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8Ntict8FQKUw94371broDNoNd7ODTDozymzMrIUoscZ2HwMlShkbzCwZg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>首先要注意，<code>&amp;</code>不是逻辑与，而是按位与，会把两边数值转为二进制后进行比较，只有相同的二进制位都为<code>1</code> 才会为真。</p>
+<p>这里的<code>if</code>判断条件是：拿<code>compoenent.$.dirty[0]</code>(<code>00000000000000000000000000000100</code>)和<code>4</code>（<code>4</code> 转变为二进制是<code>0000 0100</code>）做按位并操作。那么我们可以思考一下了，这个按位并操作什么时候会返回1呢？</p>
+<p><code>4</code>是一个常量，转变为二进制是<code>0000 0100</code>， 第三位是<code>1</code>。那么也就是，只有<code>dirty[0]</code>的二进制的第三位也是<code>1</code>时, 表达式才会返回真。换句话来说，只有第三个数据是脏数据，才会走入到这个if判断中，执行<code>set_data(t5, ctx[2])</code>， 更新<code>t5</code>这个 <code>DOM</code> 节点。</p>
+<p>当我们分析到这里，已经看出了一些眉目，让我们站在更高的一个层次去看待这 <code>30</code>多行代码：它们其实是保存了这<code>33</code>个变量 和 真实<code>DOM</code> 节点之间的对应关系，哪些变量脏了，<code>Svelte </code>会走入不同的if体内直接更新对应的<code>DOM</code>节点，而不需要复杂 <code>Virtual DOM DIFF</code> 算出更新哪些<code>DOM</code>节点；</p>
+<p>这 <code>30</code>多行代码，是<code>Svelte </code>编译了我们写的<code>Svelte </code>组件之后的产物，在<code>Svelte</code> 编译时，就已经分析好了，数据 和 <code>DOM </code>节点之间的对应关系，在数据发生变化时，可以非常高效的来更新DOM节点。</p>
+<p><code>Vue</code> 曾经也是想采取这样的思路，但是<code>Vue</code>觉得保存每一个脏数据太消耗内存了，于是没有采用那么细颗粒度，而是以组件级别的中等颗粒度，只监听到组件的数据更新，组件内部再通过 <code>DIFF </code>算法计算出更新哪些 <code>DOM</code> 节点。<code>Svelte</code> 采用了比特位的存储方式，解决了保存脏数据会消耗内存的问题。</p>
+<h4 id="整体流程"><a href="#整体流程" class="headerlink" title="整体流程"></a>整体流程</h4><p>上面就是Svelte 最核心更新DOM机制，下面我们串起来整个的流程。</p>
+<p>下面是非常简单的一个 Svelte 组件，点击<code>&lt;button&gt;</code>会触发onClick事件，从而改变name 变量。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NibXhvWXRFuXiau4bcj0GS3b8ADRf8mtNuvebCABRia020PqbhwPF7qv1g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>上面代码背后的整体流程如下图所示，我们一步一步来看：</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8N4iaM9ARybGDDc9lMTgGu8UR8ayCzfO8s4S1Rb7ouJCAuQeGujsNQP1g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>第一步，<code>Svelte</code> 会编译我们的代码，下图中左边是我们的源码，右边是 <code>Svelte</code> 编译生成的。<code>Svelte</code> 在编译过程中发现，『咦，这里有一行代码 <code>name</code> 被重新赋值了，我要插入一条<code>make_dirty</code>的调用』，于是当我们改写 <code>name </code>变量的时候，就会调用<code>make_dirty</code>方法把 <code>name</code> 记为脏数据。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NdO3icl4nBibIcZ4spqZt9jZJZVZUMg2iaCxia4N0icuuf5XEKduKNicJqvoQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>第二步，我们来看make_diry方法究竟做了什么事情：</p>
+<ol>
+<li><p>把对应数据的二进制改为1</p>
+</li>
+<li><p>把对应组件记为脏组件，推入到 dirty_components 数组中</p>
+</li>
+<li><p>调用<code>schedule_update()</code>方法把<code>flush</code>方法推入到一帧中的微任务阶段执行。因为这样既可以做频繁更新 的截流，又避免了阻塞一帧中的 <code>layout</code>， <code>repaint</code> 阶段的渲染。</p>
+</li>
+</ol>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NX988VvPpXn83ZWVsl8XQs0AxiaWHTsdmSecrtRudhMA6zaRaYlzbkcg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p><code>schedule_update</code> 方法其实就是一个<code>promise.then()</code>，</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8Nk2twlQHFX4faEdmVmeQGpiaS59w0icXQlkibc7t3eJDRtr4lK97S9QZ7Q/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>一帧大概有 <code>16ms</code>, 大概会经历 <code>layout</code>, <code>repaint</code>的阶段后，就可以开始执行微任务的回调了。</p>
+<p><code>flush</code> 方法做的事情也比较简单，就是遍历脏组件，依次调用<code>update</code>方法去更新对应的组件。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NriaibrBWr2GHAvDdZIliaWUpibDGKMjrCIWfXnLIjb2NK0TKEhlJfxXxMg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p><code>update</code>方法除了执行一些生命周期的方法外，最核心的一行代码是调用<code>p</code>方法，<code>p</code>方法我们已经在上文中介绍过很熟悉了。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NXwl3BUopoV16kVhdhx1UD3RoA2iaHZOUl07ct63EQ7Duia1qFsQicMujA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p><code>p</code> 方法的本质就是走入到不同的<code>if</code> 判断里面，调用<code>set_data</code>原生的 <code>javascript</code> 方法更新对应的 <code>DOM</code>节点。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8NibnC0ZP1G6cQevhTud00QGf9UGHk1YFRKrXVq24ZSMia1BZQY0GyPkWA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"></p>
+<p>至此，我们的页面的DOM节点就已经更新好了。</p>
+<blockquote>
+<p>上面的代码均是剔除了分支逻辑的伪代码。<br>Svelte 在处理子节点列表的时候，还是有优化的算法在的。比如说[a,b,c,d] 变成 [d, a, b, c] ，但是只是非常简单的优化，简单来说，是比较节点移动距离的绝对值，绝对值最小的节点被移动。<br>所以，严格意义上来说，Svelte 并不是100%无运行时，还是会引入额外的算法逻辑，只是量很少罢了。</p>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>一个前端框架，不管是<code>vue</code>还是<code>react</code>更新了数据之后，需要考虑更新哪个<code>dom</code>节点，也就是，需要知道，脏数据和待更新的真实<code>dom</code>之间的映射。<code>vue</code>, <code>react</code> 是通过 <code>virtualDom</code> 来 <code>diff</code> 计算出更新哪些<code>dom</code>节点更划算，而<code>sveltedom </code>是把数据和真实<code>dom</code>之间的映射关系，在编译的时候就通过<code>AST</code>等算出来，保存在<code>p</code>函数中。</p>
+<p><code>Svelte</code> 作为新兴的前端框架，采用了和 <code>React</code>， <code>Vue</code> 不同的设计思路，其独特的特性在某些场景下还是很值得尝试的。</p>
+<blockquote>
+<p>免责声明：本文章来自转载，不会有任何盈利部分，如有侵权，请联系<code>jadeface.scholar@gmail.com</code>删除，遵循<code>开放知识共享协议--GNU</code>。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>转载</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+</search>
