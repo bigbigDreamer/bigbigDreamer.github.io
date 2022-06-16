@@ -1,0 +1,245 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Redux-thunk原理探析 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,Redux的作用这里就不做过多赘述，简单看下Redux原理：
+
+小tip：纯函数的核心理念在于：出参始终依赖于入参，不受外部的任何影响，也就是不会因为何时、何处调用而影响。
+可以很直观的看到，用户从,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">Redux-thunk原理探析</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">Redux-thunk原理探析</h1>
+        <div class="stuff">
+            <span>十一月 06, 2020</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             591 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               2分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/React/" rel="tag">React</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p><code>Redux</code>的作用这里就不做过多赘述，简单看下<code>Redux</code>原理：</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/98236642-a34da280-1f9e-11eb-84fd-e1429548e424.png" alt="image"></p>
+<p><code>小tip：纯函数的核心理念在于：出参始终依赖于入参，不受外部的任何影响，也就是不会因为何时、何处调用而影响</code>。</p>
+<p>可以很直观的看到，<code>用户</code>从<code>UI</code>层面触发一系列的<code>DOM</code>事件，进而去<code>dispatch</code> <code>action</code>，将<code>dispatch</code>这个动作的处理交给<code>reducer（纯函数）</code>去做进一步处理。</p>
+<p><code>Redux-thunk</code>做了什么？</p>
+<p>它是为了处理异步<code>action</code>的，因为在项目中难免会有<code>异步请求数据，往redux中塞入获取的数据</code>这样的动作。</p>
+<h2 id="但是，它究竟做了什么呢？"><a href="#但是，它究竟做了什么呢？" class="headerlink" title="但是，它究竟做了什么呢？"></a>但是，它究竟做了什么呢？</h2><p>可以看看源码，一窥究竟：</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建thunk-middleware</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createThunkMiddleware</span>(<span class="params">extraArgument</span>) </span>{</span><br><span class="line">    <span class="comment">// 拦截action </span></span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">{ dispatch, getState }</span>) =&gt;</span> <span class="function">(<span class="params">next</span>) =&gt;</span> <span class="function">(<span class="params">action</span>) =&gt;</span> {</span><br><span class="line">      <span class="comment">// 如果action为一个函数，那么就调用action，并且传入 dispatch、getState、extraArguement</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> action === <span class="string">'function'</span>) {</span><br><span class="line">       <span class="comment">// 传入dispatch的目的是为了可以在action中去处理异步，在合适的时机dispatch</span></span><br><span class="line">      <span class="keyword">return</span> action(dispatch, getState, extraArgument);</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// 否则透传action</span></span><br><span class="line">    <span class="keyword">return</span> next(action);</span><br><span class="line">  };</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> thunk = createThunkMiddleware();</span><br><span class="line">thunk.withExtraArgument = createThunkMiddleware;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> thunk;</span><br></pre></td></tr></tbody></table></figure>
+<p>在<code>action</code>的时候处理异步任务，在结束时，<code>dispatch</code>对应的<code>reducer  case</code>。</p>
+<h2 id="store组织"><a href="#store组织" class="headerlink" title="store组织"></a><code>store</code>组织</h2><figure class="highlight ts"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { createStore, applyMiddleware }  <span class="keyword">from</span> <span class="string">'redux'</span>;</span><br><span class="line"><span class="keyword">import</span> thunk <span class="keyword">from</span> <span class="string">'redux-thunk'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> asyncAdd = <span class="function">() =&gt;</span> {</span><br><span class="line">    <span class="keyword">return</span> (dispatch: <span class="function">(<span class="params">args: {<span class="keyword">type</span>: <span class="built_in">any</span>; payload?: <span class="built_in">any</span>}</span>) =&gt;</span> <span class="built_in">void</span>) =&gt; {</span><br><span class="line">        <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">            dispatch({ <span class="keyword">type</span>: <span class="string">'AsyncAdd'</span>, payload: <span class="number">9</span>})</span><br><span class="line">        }, <span class="number">1000</span>);</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> syncAdd = <span class="function">(<span class="params">payload: <span class="built_in">any</span></span>) =&gt;</span> {</span><br><span class="line">    <span class="keyword">return</span> {</span><br><span class="line">        <span class="keyword">type</span>: <span class="string">'ADD'</span>,</span><br><span class="line">        payload</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">reducers</span> (<span class="params">state = { num: 1 }, action: <span class="built_in">any</span></span>): <span class="title">any</span> </span>{</span><br><span class="line">    <span class="keyword">switch</span> (action.type) {</span><br><span class="line">        <span class="keyword">case</span> <span class="string">'ADD'</span>:</span><br><span class="line">            <span class="keyword">return</span> { ...state, num: action.payload } ;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">'AsyncAdd'</span>:</span><br><span class="line">            <span class="keyword">return</span> { ...state, num: action.payload } ;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">return</span> state;</span><br><span class="line"></span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> store = createStore(reducers, applyMiddleware(thunk))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> store;</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="End"><a href="#End" class="headerlink" title="End"></a>End</h2><p>与<code>thunk</code>相似的工具还有<code>saga</code>，但是<code>saga</code>的设计更像是<code>vuex</code>中那样，把异步<code>action</code>剖离出来。利用了<code>generator</code>的写法，单独的<code>saga</code>文件去将异步同步化。</p>
+<p>简单赘述一下<code>Redux-saga</code>处理流程：</p>
+<p>先说明下<code>Redux-MiddleWare</code>的处理流程；</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/98340671-b1f09400-2048-11eb-8c24-56fafb8de3f9.png" alt="image"></p>
+<p><code>saga</code>提供的<code>effets</code>会在处理完毕异步任务后，重新<code>dispatch</code> <code>reducer</code>中的<code>action</code>去更新<code>store</code>。监听用户<code>action</code>，将<code>saga</code>处理的异步<code>action</code>独立出来。</p>
+<blockquote>
+<p><code>小Tip：</code>什么是中间件？中间件是介于系统某几个部分的<code>衔接应用</code>，它可能只是简单地做一些数据交换任务，不处理业务逻辑，不处理底层硬件逻辑。</p>
+</blockquote>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="https://sharefs.yun.kugou.com/202010071528/5be5c9a1f34a2adb97afe6de21aa366a/G230/M0A/0C/09/hocBAF7i60OANQPYADrO3cH2a_M572.mp3">
+            </audio>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+<script src="/bundle.js"></script></body></html>

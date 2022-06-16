@@ -1,0 +1,299 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JS深入系列之作用域 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,近期做了一个比较有意义的决定，深入学习总结前端知识的每一个系列，然后形成知识树。
+希望也能为正在阅读的你带来一定的温习或者提升～
+作用域什么是作用域？
+
+作用域是一套规则，用于确定在何处以及如何查找,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">JS深入系列之作用域</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">JS深入系列之作用域</h1>
+        <div class="stuff">
+            <span>五月 18, 2021</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             679 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               2分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E4%BD%9C%E7%94%A8%E5%9F%9F/" rel="tag">作用域</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p>近期做了一个比较有意义的决定，深入学习总结前端知识的每一个系列，然后形成知识树。</p>
+<p>希望也能为正在阅读的你带来一定的温习或者提升～</p>
+<h2 id="作用域"><a href="#作用域" class="headerlink" title="作用域"></a>作用域</h2><p>什么是作用域？</p>
+<blockquote>
+<p>作用域是一套规则，用于确定在何处以及如何查找变量（标识符）。<br>                  ——   《你不知道的JavaScript》（上卷）p12</p>
+</blockquote>
+<h2 id="从引擎、编译器、作用域三个纬度认识作用域"><a href="#从引擎、编译器、作用域三个纬度认识作用域" class="headerlink" title="从引擎、编译器、作用域三个纬度认识作用域"></a>从引擎、编译器、作用域三个纬度认识作用域</h2><figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> args = <span class="string">'scope'</span>;</span><br></pre></td></tr></tbody></table></figure>
+
+<ol>
+<li><p>引擎拿到这段代码后开始编译；</p>
+</li>
+<li><p>引擎借助编译器开始编译，在编译时，编译器会在当前所在的作用域内（全局作用域）声明一个<code>args</code>的变量（从未声明过）；</p>
+</li>
+<li><p>引擎开始执行代码，在当前作用域中继续寻找这个变量，如果找到了，那么就进行赋值操作；</p>
+</li>
+</ol>
+<hr>
+<p>以上用步骤拆分就是：先编译后执行;</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Step 1</span></span><br><span class="line">var args = undefined;</span><br><span class="line"></span><br><span class="line"><span class="comment"># Step 2</span></span><br><span class="line"></span><br><span class="line">args = <span class="string">'scope'</span>;</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<p><strong>从编译运行维度来讲：</strong></p>
+<p>作用域分类：词法作用域 &amp; 动态作用域</p>
+<p><strong>从空间范围来讲：</strong></p>
+<p>作用域分类：</p>
+<ul>
+<li>全局作用域</li>
+<li>函数作用域</li>
+<li>块作用域</li>
+<li>模块作用域（ES6 Module &amp; CommonJS Module）</li>
+</ul>
+<h4 id="什么是词法作用域？"><a href="#什么是词法作用域？" class="headerlink" title="什么是词法作用域？"></a>什么是词法作用域？</h4><p>以下示例分析来自于：<a target="_blank" rel="noopener" href="https://github.com/mqyqingfeng/Blog/issues/3">https://github.com/mqyqingfeng/Blog/issues/3</a></p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> value = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>{</span><br><span class="line">    <span class="built_in">console</span>.log(value);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>) </span>{</span><br><span class="line">    <span class="keyword">var</span> value = <span class="number">2</span>;</span><br><span class="line">    foo();</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">bar();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 结果是 ???</span></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>假设JavaScript采用静态作用域，让我们分析下执行过程：</p>
+<ol>
+<li><p>执行 foo 函数，先从 foo 函数内部查找是否有局部变量 value，如果没有，就根据书写的位置，查找上面一层的代码，也就是 value 等于 1，所以结果会打印 1。</p>
+</li>
+<li><p>假设JavaScript采用动态作用域，让我们分析下执行过程：</p>
+</li>
+<li><p>执行 foo 函数，依然是从 foo 函数内部查找是否有局部变量 value。如果没有，就从调用函数的作用域，也就是 bar 函数内部查找 value 变量，所以结果会打印 2。</p>
+</li>
+</ol>
+<p>前面我们已经说了，JavaScript采用的是静态作用域，所以这个例子的结果是 1。</p>
+<h4 id="我们可以欺骗词法吗？"><a href="#我们可以欺骗词法吗？" class="headerlink" title="我们可以欺骗词法吗？"></a>我们可以欺骗词法吗？</h4><blockquote>
+<p>答案：可以！</p>
+</blockquote>
+<p>可以借助<code>eval</code>&amp;<code>with</code>，可以看<code>demo</code>:</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">str</span>) </span>{</span><br><span class="line">    <span class="built_in">eval</span>(str);</span><br><span class="line">    <span class="built_in">console</span>.log(a);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">foo(<span class="string">"var a = 2"</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这里的欺骗词法也可以理解为<code>动态的作用域</code>。</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = { <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">2</span> };</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> (obj) {</span><br><span class="line">    a = <span class="number">3</span>;</span><br><span class="line">    b = <span class="number">4</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line"></span><br><span class="line"><span class="comment">// { a: 3, b: 4 }</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>with</code>可以为<code>obj</code>开辟一片新的词法空间去修改，但是会有<code>隐式声明</code>的诟病（泄漏变量到全局）；</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = {};</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> (obj) {</span><br><span class="line">    a = <span class="number">123</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line"></span><br><span class="line"><span class="comment">//{}</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 123 </span></span><br></pre></td></tr></tbody></table></figure>
+
+
+
+
+
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+<script src="/bundle.js"></script></body></html>

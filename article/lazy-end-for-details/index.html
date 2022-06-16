@@ -1,0 +1,515 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>懒渲染背后有多细节？ - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,这片文章可能略微有些标题狗了，不过，大致差不多～
+引子最近在做一个东西，因为后端同学比较忙的缘故+跟他关系好，所以答应了对于某个接口的数据的查询做全量数据返回，前端做滚动懒渲染+模糊查询。
+听起来可,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">懒渲染背后有多细节？</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">懒渲染背后有多细节？</h1>
+        <div class="stuff">
+            <span>十月 24, 2021</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             1.6k 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               6分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p>这片文章可能略微有些标题狗了，不过，大致差不多～</p>
+<h2 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h2><p>最近在做一个东西，因为后端同学比较忙的缘故<code>+</code>跟他关系好，所以答应了对于某个接口的数据的查询做全量数据返回，前端做滚动懒渲染<code>+</code>模糊查询。</p>
+<p>听起来可能比较高大上，但是实际上想明白了就很简单了。</p>
+<h2 id="正题"><a href="#正题" class="headerlink" title="正题"></a>正题</h2><p>首先说明下，这个数据量有多大？预计<code>8000+</code>左右，也就是如果不做懒渲染的话，前端界面的某一个部分一次性要渲染<code>8000+</code>个<code>DOM</code>。</p>
+<p><strong>1. 这一定会很卡的！</strong>（至少我听到后的第一反应是这个）</p>
+<p><strong>2. 没有一个正常人会在<code>8000+</code>条数据中找某一条数据的，眼睛都看花了，但是不排除有，大概定级为使用场景出现频率低</strong></p>
+<h4 id="How-to-do-it？"><a href="#How-to-do-it？" class="headerlink" title="How to do it？"></a>How to do it？</h4><p>怎么做呢？我们来理一下思路：</p>
+<p><strong>正常渲染</strong></p>
+<ul>
+<li>收集数据</li>
+<li>切割数据</li>
+<li>滚动渲染</li>
+</ul>
+<p><strong>模糊搜索</strong></p>
+<ul>
+<li>模糊搜索</li>
+<li>切割数据</li>
+<li>滚动渲染</li>
+</ul>
+<p>思路理清楚了，我们做一下代码展示和代码分析吧～</p>
+<h2 id="代码演示"><a href="#代码演示" class="headerlink" title="代码演示"></a>代码演示</h2><pre class="line-numbers language-tsx" data-language="tsx"><code class="language-tsx"><span class="token keyword">import</span> <span class="token punctuation">{</span> filter <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'lodash-es'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">type</span> <span class="token class-name">DataShape</span> <span class="token operator">=</span> <span class="token builtin">Array</span><span class="token operator">&lt;</span>
+    <span class="token punctuation">{</span>
+        id<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span>
+        name<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token operator">&amp;</span> Record<span class="token operator">&lt;</span><span class="token builtin">string</span><span class="token punctuation">,</span> <span class="token builtin">unknown</span><span class="token operator">&gt;</span>
+<span class="token operator">&gt;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">DataEngine</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">// 分割 chunk 片的阈值</span>
+    <span class="token keyword">static</span> <span class="token constant">SPLIT_CHUNK_UNIT</span> <span class="token operator">=</span> <span class="token number">40</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 并发时间范围的阈值, 10 毫秒</span>
+    <span class="token keyword">static</span> <span class="token constant">CONCURRENT_TIME_DELAY</span> <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 初始化数据，一般指代的是全量数据</span>
+    <span class="token keyword">private</span> _dataList<span class="token operator">:</span> DataShape<span class="token punctuation">;</span>
+    <span class="token comment">// 分片_chunkData数据</span>
+    <span class="token keyword">private</span> _chunkDataList<span class="token operator">:</span> DataShape<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token comment">// 记录分割的 chunk 数目</span>
+    <span class="token keyword">private</span> _recordGetChunkCount<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span>
+    <span class="token comment">// 工作区数据（常规状态 + 模糊搜索态）</span>
+    <span class="token keyword">private</span> _WIPDataList<span class="token operator">:</span> DataShape<span class="token punctuation">;</span>
+    <span class="token comment">// 是否处于模糊搜索态</span>
+    <span class="token keyword">private</span> _isWIP<span class="token operator">:</span> <span class="token builtin">boolean</span><span class="token punctuation">;</span>
+    <span class="token comment">// 时间阈值</span>
+    <span class="token keyword">private</span> _actionTime<span class="token operator">:</span> <span class="token builtin">number</span> <span class="token operator">|</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+    <span class="token comment">// 单例 chunkData，应付在一定时间阈值内的并发调用获取</span>
+    <span class="token keyword">private</span> _singleChunkDataList<span class="token operator">:</span> DataShape<span class="token punctuation">;</span>
+
+    <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_dataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_recordGetChunkCount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_isWIP <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_actionTime <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_singleChunkDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">setData</span><span class="token punctuation">(</span><span class="token parameter">data<span class="token operator">:</span> DataShape</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_dataList <span class="token operator">=</span> data<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList <span class="token operator">=</span> data<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * @desc 模糊搜索值，且不区分到底是哪个属性
+     */</span>
+    <span class="token function">fuzzySearch</span><span class="token punctuation">(</span><span class="token parameter">keyword<span class="token operator">:</span> string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList <span class="token operator">=</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>_dataList<span class="token punctuation">,</span> <span class="token parameter">obj</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+            <span class="token keyword">const</span> idList <span class="token operator">=</span> <span class="token function">String</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>orgId<span class="token punctuation">)</span><span class="token operator">?.</span>includes<span class="token operator">?.</span><span class="token punctuation">(</span>keyword<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">const</span> nameList <span class="token operator">=</span> obj<span class="token punctuation">.</span>orgName<span class="token operator">?.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">?.</span>includes<span class="token operator">?.</span><span class="token punctuation">(</span>keyword<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">return</span> idList <span class="token operator">||</span> nameList<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * @desc 数据 chunk 分割
+     */</span>
+    <span class="token function">splitChunk</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>_isWIP<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_dataList<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">/** 重置 chunk 切割索引 */</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_recordGetChunkCount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> Math<span class="token punctuation">.</span><span class="token function">ceil</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList<span class="token operator">?.</span>length <span class="token operator">/</span> DataEngine<span class="token punctuation">.</span><span class="token constant">SPLIT_CHUNK_UNIT</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList<span class="token operator">?.</span><span class="token function">slice</span><span class="token punctuation">(</span>i <span class="token operator">*</span> DataEngine<span class="token punctuation">.</span><span class="token constant">SPLIT_CHUNK_UNIT</span><span class="token punctuation">,</span> DataEngine<span class="token punctuation">.</span><span class="token constant">SPLIT_CHUNK_UNIT</span> <span class="token operator">*</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * @desc 获取分片数据
+     */</span>
+    <span class="token function">getChunk</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> DataShape <span class="token punctuation">{</span>
+        <span class="token comment">// 优先判断有没有设置时间值（其实就是第一次获取），其次判断时间阈值的范围</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>_actionTime <span class="token operator">||</span> Date<span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_actionTime <span class="token operator">&gt;</span> DataEngine<span class="token punctuation">.</span><span class="token constant">CONCURRENT_TIME_DELAY</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>_singleChunkDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList<span class="token punctuation">.</span>length <span class="token operator">&gt;=</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span>_singleChunkDataList <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList<span class="token operator">?.</span><span class="token punctuation">[</span><span class="token keyword">this</span><span class="token punctuation">.</span>_recordGetChunkCount<span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList<span class="token punctuation">.</span><span class="token function">unshift</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>_recordGetChunkCount <span class="token operator">+=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>_actionTime <span class="token operator">=</span> Date<span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_singleChunkDataList<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * @desc 及时销毁内存，避免浪费或者内存溢出
+     */</span>
+    <span class="token function">destroy</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_dataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_recordGetChunkCount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_isWIP <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_actionTime <span class="token operator">=</span> Date<span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/**
+     * @desc 检测 chunk 片区是否为空
+     */</span>
+    <span class="token keyword">get</span> <span class="token function">chunkIsEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/** 最直观的方式是检测，它的记录长度是否等于分割长度，分割长度取天花板 */</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_recordGetChunkCount <span class="token operator">===</span> Math<span class="token punctuation">.</span><span class="token function">ceil</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList<span class="token operator">?.</span>length <span class="token operator">/</span> DataEngine<span class="token punctuation">.</span><span class="token constant">SPLIT_CHUNK_UNIT</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">get</span> <span class="token function">cacheData</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">get</span> <span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_dataList<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">set</span> <span class="token constant">WIP</span><span class="token punctuation">(</span><span class="token parameter">flag<span class="token operator">:</span> boolean</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_isWIP <span class="token operator">=</span> flag<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>这一大段可能看着有些累，没事，我们从头开始分析～</p>
+<p>先解释下一些堆栈<code>list</code>的含义：</p>
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">// 分割 chunk 片的阈值</span>
+<span class="token keyword">static</span> <span class="token constant">SPLIT_CHUNK_UNIT</span> <span class="token operator">=</span> <span class="token number">40</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">// 并发时间范围的阈值, 10 毫秒</span>
+<span class="token keyword">static</span> <span class="token constant">CONCURRENT_TIME_DELAY</span> <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">// 初始化数据，一般指代的是全量数据</span>
+<span class="token keyword">private</span> _dataList<span class="token operator">:</span> DataShape<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">// 分片_chunkData数据</span>
+<span class="token keyword">private</span> _chunkDataList<span class="token operator">:</span> DataShape<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">// 记录分割的 chunk 数目</span>
+<span class="token keyword">private</span> _recordGetChunkCount<span class="token operator">:</span> <span class="token builtin">number</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">// 工作区数据（常规状态 + 模糊搜索态）</span>
+<span class="token keyword">private</span> _WIPDataList<span class="token operator">:</span> DataShape<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">// 是否处于模糊搜索态</span>
+<span class="token keyword">private</span> _isWIP<span class="token operator">:</span> <span class="token builtin">boolean</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">// 时间阈值</span>
+<span class="token keyword">private</span> _actionTime<span class="token operator">:</span> <span class="token builtin">number</span> <span class="token operator">|</span> <span class="token keyword">null</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">// 单例 chunkData，应付在一定时间阈值内的并发调用获取</span>
+<span class="token keyword">private</span> _singleChunkDataList<span class="token operator">:</span> DataShape<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><strong>首先是数据收集：</strong></p>
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token function">setData</span><span class="token punctuation">(</span>data<span class="token operator">:</span> DataShape<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_dataList <span class="token operator">=</span> data<span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList <span class="token operator">=</span> data<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>这里的数据收集，主要是保存在<code>_dataList</code>和<code>_WIPDataList</code>中，其中<code>_dataList</code>单纯是做全量数据缓存，而<code>_WIPDataList</code>是做工作态的数据收集，其中初始态也属于工作态。</p>
+<p>这里解释下<strong>工作态</strong></p>
+<ul>
+<li>初始化的状态</li>
+<li>模糊搜索时的状态</li>
+<li>销毁时的状态</li>
+</ul>
+<p><strong>其次是切割数据</strong></p>
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">/**
+ * @desc 数据 chunk 分割
+ */</span>
+<span class="token function">splitChunk</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>_isWIP<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_dataList<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/** 重置 chunk 切割索引 */</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_recordGetChunkCount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> Math<span class="token punctuation">.</span><span class="token function">ceil</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList<span class="token operator">?.</span>length <span class="token operator">/</span> DataEngine<span class="token punctuation">.</span><span class="token constant">SPLIT_CHUNK_UNIT</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList<span class="token operator">?.</span><span class="token function">slice</span><span class="token punctuation">(</span>i <span class="token operator">*</span> DataEngine<span class="token punctuation">.</span><span class="token constant">SPLIT_CHUNK_UNIT</span><span class="token punctuation">,</span> DataEngine<span class="token punctuation">.</span><span class="token constant">SPLIT_CHUNK_UNIT</span> <span class="token operator">*</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>每一次的数据切割都是对全量数据的操作，所以我们大可每次都初始化<code>_chunkDataList</code>、<code>_recordGetChunkCount</code></p>
+<p><code>WIP</code>态的含义是：</p>
+<ul>
+<li>全量数据态一定是<code>false</code><ul>
+<li>初始态全量</li>
+<li>模糊搜索，搜索条件为空是全量</li>
+</ul>
+</li>
+<li>搜索条件不为空时，一定是<code>true</code></li>
+</ul>
+<p>数据分割的<code>chunk</code>范围是：<code>i*DataEngine.SPLIT_CHUNK_UNIT</code> ~ <code>DataEngine.SPLIT_CHUNK_UNIT * (i + 1)</code>.这样可能不好理解，大白话叙述一下：</p>
+<blockquote>
+<p>假如有90条数据，数据固定按照40条分割，那么可以分3块。</p>
+<p>第一块：<code>0*40～40*1  === 0 ～ 40</code>（不包含40）</p>
+<p>第二块：<code>1*40～40*2  === 40 ～ 80</code>（不包含80）</p>
+<p>第三块：<code>2*40～40*3  === 80 ～ 120</code>（总共90条，一定可以拿全的）</p>
+</blockquote>
+<p><strong>模糊搜索</strong></p>
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">/**
+ * @desc 模糊搜索值，且不区分到底是哪个属性
+ */</span>
+<span class="token function">fuzzySearch</span><span class="token punctuation">(</span>keyword<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList <span class="token operator">=</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>_dataList<span class="token punctuation">,</span> obj <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        <span class="token keyword">const</span> idList <span class="token operator">=</span> <span class="token function">String</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>id<span class="token punctuation">)</span><span class="token operator">?.</span>includes<span class="token operator">?.</span><span class="token punctuation">(</span>keyword<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">const</span> nameList <span class="token operator">=</span> obj<span class="token punctuation">.</span>name<span class="token operator">?.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">?.</span>includes<span class="token operator">?.</span><span class="token punctuation">(</span>keyword<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">return</span> idList <span class="token operator">||</span> nameList<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>获取chunk</strong></p>
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">/**
+ * @desc 获取分片数据
+ */</span>
+<span class="token function">getChunk</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> DataShape <span class="token punctuation">{</span>
+    <span class="token comment">// 优先判断有没有设置时间值（其实就是第一次获取），其次判断时间阈值的范围</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>_actionTime <span class="token operator">||</span> Date<span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_actionTime <span class="token operator">&gt;</span> DataEngine<span class="token punctuation">.</span><span class="token constant">CONCURRENT_TIME_DELAY</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_singleChunkDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList<span class="token punctuation">.</span>length <span class="token operator">&gt;=</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>_singleChunkDataList <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList<span class="token operator">?.</span><span class="token punctuation">[</span><span class="token keyword">this</span><span class="token punctuation">.</span>_recordGetChunkCount<span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList<span class="token punctuation">.</span><span class="token function">unshift</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_recordGetChunkCount <span class="token operator">+=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_actionTime <span class="token operator">=</span> Date<span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_singleChunkDataList<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>获取<code>chunk</code>这个方法其实还是值得推敲的，因为每次一调用就会触发分割。那么我们在调试时候的打印，也会触发分割，其实还是不希望的。</p>
+<p>所以，这里做了一个时间为<code>10</code>ms的数据分割阈值控制，做一个阀门控制住分割的并发数，在并发的时间内，返回同一个<code>chunk</code>单例。</p>
+<p><strong>最后，销毁重置所有数据态</strong></p>
+<pre class="line-numbers language-ts" data-language="ts"><code class="language-ts"><span class="token comment">/**
+ * @desc 及时销毁内存，避免浪费或者内存溢出
+ */</span>
+<span class="token function">destroy</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_dataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_WIPDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_chunkDataList <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_recordGetChunkCount <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_isWIP <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_actionTime <span class="token operator">=</span> Date<span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="演示"><a href="#演示" class="headerlink" title="演示"></a>演示</h2><p>说了那么多，其实我们并没有看到实际的效果，可以大致观摩下～</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2110/Kapture%202021-10-25%20at%2023.37.30.gif"></p>
+<p>模糊搜索</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2110/Kapture%202021-10-25%20at%2023.40.58.gif"></p>
+<p>怎么样，还不错吧，这个效果，对于我们的数据加载，甚至性能都有很大的优化～</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+</body></html>

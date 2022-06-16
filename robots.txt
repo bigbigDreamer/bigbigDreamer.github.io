@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Allow: /categories/
+Allow: /archives/
+Allow: /tags/
+Allow: /about/
+Allow: /copyright/
+Allow: /friends/
+Allow: /space/
+
+Disallow: /js/
+Disallow: /css/
+Disallow: /fonts/
+
+Sitemap: https://www.bigdreamer.cc/sitemap.xml

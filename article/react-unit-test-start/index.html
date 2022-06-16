@@ -1,0 +1,321 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>如何开始测试，怎么写好测试？ - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,怎么开始测试呢？编写测试之前，请先深呼吸，气沉丹田，想想自己即将要攀登到代码质量之巅。
+感受着和煦的微风微凉的空调风夹杂着氟利昂的气息，抚过脸颊，默默拿起手边的Mojito温热的白开水伴随着野菊花的,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">如何开始测试，怎么写好测试？</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">如何开始测试，怎么写好测试？</h1>
+        <div class="stuff">
+            <span>十一月 21, 2020</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             2k 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               8分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/React/" rel="tag">React</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/unit-test/" rel="tag">unit test</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h1 id="怎么开始测试呢？"><a href="#怎么开始测试呢？" class="headerlink" title="怎么开始测试呢？"></a>怎么开始测试呢？</h1><p>编写测试之前，请先<code>深呼吸</code>，<code>气沉丹田</code>，想想自己即将要攀登到<code>代码质量之巅</code>。</p>
+<p>感受着和煦的微风<del>微凉的空调风夹杂着氟利昂的气息</del>，抚过脸颊，默默拿起手边的<code>Mojito</code><del>温热的白开水伴随着野菊花的芬芳</del>。</p>
+<p>默念心法<code>given-when-then</code>，<code>不要去关注内部逻辑怎么实现的</code>。</p>
+<p>缓缓开始敲击着键盘：<br><code>describe(xxx, () =&gt; {})</code>……</p>
+<hr>
+<p>正经开始吧，先从<code>TDD</code>测试模式开始起步吧。</p>
+<ul>
+<li>这里我们接了一个需求，需要写一个过滤出URL地址中的端口号工具函数。</li>
+</ul>
+<p>首先我们可能会有这样一个<code>敏捷</code>的思维，这个工具函数就是<code>1. 拿到 url</code> =&gt; <code>2. 匹配 端口号</code> =&gt; <code>3. 返回端口号</code>。</p>
+<p>于是这样一个用例出来了。这里按照预期测试完，确实返回了<code>8080</code>这个端口号</p>
+<figure class="highlight ts"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { filterPort } <span class="keyword">from</span> <span class="string">'utils'</span>;</span><br><span class="line"><span class="keyword">import</span> assert <span class="keyword">from</span> <span class="string">'assert'</span>;</span><br><span class="line"></span><br><span class="line">describe(<span class="string">'Util'</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> {</span><br><span class="line">    test(<span class="string">'返回端口号'</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> {</span><br><span class="line">        <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">'http://localhost:8080'</span>;</span><br><span class="line">        <span class="keyword">const</span> res = filterPort(url);</span><br><span class="line"></span><br><span class="line">        assert(res === <span class="string">'8080'</span>);</span><br><span class="line">    })</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/39019913/96442449-b988fe00-123d-11eb-8f86-326e6628029e.png" alt="image"></p>
+<p>按照<code>TDD</code>开发的顺序，先跟着<code>feel</code>盲写一波测试用例，然后开始简要的开发，让测试用例通过。</p>
+<figure class="highlight ts"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义函数模板</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> FilterPortProps {</span><br><span class="line">    (url: <span class="built_in">string</span>): <span class="built_in">string</span> | <span class="literal">undefined</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight ts"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 编写最基本的函数</span></span><br><span class="line"><span class="keyword">import</span> { FilterPortProps } <span class="keyword">from</span> <span class="string">'../lib/interface/utils'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> filterPort: FilterPortProps = <span class="function">(<span class="params">url</span>) =&gt;</span> {</span><br><span class="line">    <span class="keyword">return</span> url.match(<span class="regexp">/(?&lt;=:)\d+/g</span>)?.[<span class="number">0</span>];</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>接下来就是紧张而又自豪的时刻了：</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/96444809-8a748b80-1241-11eb-994b-d5bab299b8f9.png" alt="image"></p>
+<p>按照<code>TDD</code>的规则，我们继续编写测试（<code>未实现的测试</code>）；</p>
+<figure class="highlight ts"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">test(<span class="string">'返回 null'</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> {</span><br><span class="line">     <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">'http://localhost'</span>;</span><br><span class="line">     <span class="keyword">const</span> res = filterPort(url);</span><br><span class="line">     <span class="built_in">console</span>.log(res)</span><br><span class="line">     assert(res === <span class="literal">null</span>);</span><br><span class="line"> });</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/39019913/96448545-21dbdd80-1246-11eb-811f-66932f79fcea.png" alt="image"></p>
+<p>这里的行为，应该是返回<code>null</code>，所以源代码应该修改为这样：</p>
+<figure class="highlight ts"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { FilterPortProps } <span class="keyword">from</span> <span class="string">'../lib/interface/utils'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> filterPort: FilterPortProps = <span class="function">(<span class="params">url</span>) =&gt;</span> {</span><br><span class="line">    <span class="keyword">return</span> url.match(<span class="regexp">/(?&lt;=:)\d+/g</span>)?.[<span class="number">0</span>] || <span class="literal">null</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/39019913/96449112-f4dbfa80-1246-11eb-9765-1b26f056e346.png" alt="image"></p>
+<p>我们再次完成了一个 由<code>红</code>变<code>绿</code>的过程，但是这时候的设计并不完美。</p>
+<p>再从<code>BDD</code>深扣实现细节出发，返回出一个正确的结果，我们需要两个步骤：</p>
+<ol>
+<li><code>url</code>确实存在；</li>
+<li><code>正则匹配</code>返回结果；</li>
+</ol>
+<p>我们思考的是，在什么情况下，会有什么表现，代码层面会有什么体现。</p>
+<p>所以针对这个工具函数，我们应该遵循<code>黑盒测试用例</code>设计方案，设计有效/无效等价类；</p>
+<ul>
+<li><p>有效等价类</p>
+<ol>
+<li>url存在，且只有一个</li>
+</ol>
+</li>
+<li><p>无效等价类</p>
+<ol>
+<li>url 不存在</li>
+<li>url 存在，但是数目大于一个</li>
+</ol>
+</li>
+</ul>
+<p>场景一：在后端数据存在问题时，我们的程序应该爆出合适的错误去引导开发者最快速度的定位到错误；</p>
+<p>场景二：在别的开发者使用错误的时候，但是并不阻碍程序正常运行，应该适当地爆出<code>warning</code>去引导且告诉使用者，这样做是违反我工具的使用规则的；</p>
+<p>接下来，我们的测试用例又会新增两条用例去覆盖我们的<code>无效等价类</code>或者<code>BDD场景 </code>；</p>
+<figure class="highlight ts"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 源代码</span></span><br><span class="line"><span class="keyword">import</span> { FilterPortProps } <span class="keyword">from</span> <span class="string">'../lib/interface/utils'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> filterPort: FilterPortProps = <span class="function"><span class="keyword">function</span> (<span class="params">url</span>) </span>{</span><br><span class="line">    <span class="comment">// if url is undefined \ null \ ''</span></span><br><span class="line">    <span class="keyword">if</span>(!url) { <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Function expect a param at least'</span>); }</span><br><span class="line"></span><br><span class="line">    <span class="comment">// if arguements's length 大于 1</span></span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">arguments</span>.length &gt; <span class="number">1</span>) {</span><br><span class="line">        <span class="built_in">console</span>.warn(<span class="string">`</span></span><br><span class="line"><span class="string">        Function only handle one param, if you want to handle one group params: </span></span><br><span class="line"><span class="string">            you can use example as follow: </span></span><br><span class="line"><span class="string">              [param1, param2, ...].reduce(a, b =&gt; a.concat(filterPort(item)), [])</span></span><br><span class="line"><span class="string">        `</span>)</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> url.match(<span class="regexp">/(?&lt;=:)\d+/g</span>)?.[<span class="number">0</span>] || <span class="literal">null</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight ts"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { filterPort } <span class="keyword">from</span> <span class="string">'../../../utils'</span>;</span><br><span class="line"><span class="keyword">import</span> assert <span class="keyword">from</span> <span class="string">'assert'</span>;</span><br><span class="line"></span><br><span class="line">describe(<span class="string">'Util'</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> {</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'当调用工具函数后，且传入正确的 url 并且匹配到正确结果'</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> {</span><br><span class="line">        <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">'http://localhost:8080'</span>;</span><br><span class="line">        <span class="keyword">const</span> res = filterPort(url);</span><br><span class="line"></span><br><span class="line">        assert(res === <span class="string">'8080'</span>);</span><br><span class="line">    });</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'当调用工具函数后，且传入正确的 url，但没有匹配到结果应该返回null'</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> {</span><br><span class="line">        <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">'http://localhost'</span>;</span><br><span class="line">        <span class="keyword">const</span> res = filterPort(url);</span><br><span class="line"></span><br><span class="line">        assert(res === <span class="literal">null</span>);</span><br><span class="line">    });</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'当调用工具函数后，接收入参为null的情况下，程序应该反馈出正确的信息'</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> {</span><br><span class="line">        <span class="keyword">const</span> url = <span class="string">''</span>;</span><br><span class="line">        <span class="keyword">try</span> {</span><br><span class="line">            filterPort(url);</span><br><span class="line">        } <span class="keyword">catch</span> (e) {</span><br><span class="line">            assert(e.toString().length &gt; <span class="number">1</span>);</span><br><span class="line">        }</span><br><span class="line">    });</span><br><span class="line"></span><br><span class="line">    it(<span class="string">'当调用工具函数后，接收参数超过一个的时候，只匹配第一个参数的结果，并且程序应该给出warning提示'</span>, (): <span class="function"><span class="params">void</span> =&gt;</span> {</span><br><span class="line">        <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">'http://localhost:8080'</span>;</span><br><span class="line">        <span class="built_in">global</span>.console.warn = jest.fn();</span><br><span class="line">        <span class="keyword">const</span> res = filterPort(url, url);</span><br><span class="line">        assert(res === <span class="string">'8080'</span>);</span><br><span class="line">        expect(<span class="built_in">global</span>.console.warn).toBeCalledTimes(<span class="number">1</span>);</span><br><span class="line">    });</span><br><span class="line">});</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>最后：</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/96456695-6caf2280-1251-11eb-84b4-5469f70e4483.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/39019913/96457170-04ad0c00-1252-11eb-8fec-00e919b9559a.png" alt="image"></p>
+<p>相信你已经对于如何去设计一个完美的测试用例有了一个大体的认识，也了解了从<code>UTDD</code>和<code>ATDD</code>层级去驱动设计测试进而驱动开发。最后，始终去关注测试原则：<br>保证<code>given-when-then</code>细则；</p>
+<p><code>只考虑</code></p>
+<p>名词解释：<br><code>ATDD(“Acceptance Test Driven Development)</code>: 验收测试驱动，所有的产品（代码产出）都应该符合验收细则，而不是虚拟的指标；（应该出现的时间节点在 需求分析时）<br><code>UTDD(Unit Test Driven Development)</code>: 单元测试驱动开发；（应该出现的时间节点在于：代码开发之前）</p>
+<p>然后可以聊聊重构？</p>
+<p>什么是重构，重构是重构代码细节，但是重构后的应用的表现形态是不该不破坏的。</p>
+<p>依旧拿上面的示例来讲，有一天我接到了一个需求，要重构上面的函数，实现方案是不允许用正则去处理：</p>
+<p>A同学，使用了一些<code>奇淫巧技</code>实现了这个功能，完了之后去跑我们的测试用例；用例应该是正常运行的。</p>
+<p>这样的测试用例才算是健壮的，利于重构代码的，可以为重构代码提供导向性作用；</p>
+<h2 id="可能你对于上面的表述会显得有些意识模糊"><a href="#可能你对于上面的表述会显得有些意识模糊" class="headerlink" title="可能你对于上面的表述会显得有些意识模糊"></a>可能你对于上面的表述会显得有些意识模糊</h2><p>那么我们开始一个简单的 todo list 开发；</p>
+<p>需求：请完成一个<code>todolist</code>，纯新增：支持回车新增与按钮点击新增；</p>
+<p>从（<code>UTDD</code>）角度出发：</p>
+<p>分三个组件：</p>
+<ul>
+<li><code>Operate-Panel</code>用于操作；</li>
+<li><code>List</code>用于展示<code>todo item</code>组；</li>
+</ul>
+<h5 id="operate-panel"><a href="#operate-panel" class="headerlink" title="operate-panel"></a><code>operate-panel</code></h5><p>先大致建好文件，分析测试：</p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">describe('Operate-Panel', (): void =&gt; {</span><br><span class="line"></span><br><span class="line">    let wrapper: ShallowWrapper;</span><br><span class="line">    const dispatch = jest.fn();</span><br><span class="line"></span><br><span class="line">    beforeEach(() =&gt; {</span><br><span class="line">        wrapper = shallow(&lt;OperatePanel dispatch={dispatch}/&gt;)</span><br><span class="line">    });</span><br><span class="line">    afterEach(() =&gt; {</span><br><span class="line">       wrapper.unmount();</span><br><span class="line">       jest.clearAllMocks();</span><br><span class="line">    });</span><br><span class="line"></span><br><span class="line">   test('输入内容后，回车调用外层的 dispatch', () =&gt; {</span><br><span class="line">        const todoContent = '今天需要读书';</span><br><span class="line">        wrapper.find('input').simulate('input', { target: { value: todoContent } });</span><br><span class="line">        wrapper.find('input').simulate('keyup', { key: 'Enter' });</span><br><span class="line">        expect(dispatch).toBeCalledTimes(1);</span><br><span class="line">        // expect(dispatch).toHaveBeenCalledWith(todoContent);</span><br><span class="line">   });</span><br><span class="line"></span><br><span class="line">   test('input 内容为空时，什么都不做，不触发 dispatch', () =&gt; {</span><br><span class="line">       const todoContent = '今天需要读书';</span><br><span class="line">       wrapper.find('input').simulate('input', { target: { value: todoContent } });</span><br><span class="line">       expect(dispatch).toBeCalledTimes(0);</span><br><span class="line">   });</span><br><span class="line"></span><br><span class="line">    test('输入内容后，不回车，不会触发 dispatch', () =&gt; {</span><br><span class="line">        const todoContent = '今天需要读书';</span><br><span class="line">        wrapper.find('input').simulate('input', { target: { value: todoContent } });</span><br><span class="line">        wrapper.find('input').simulate('keyup', { key: 'Tab' });</span><br><span class="line">        expect(dispatch).toBeCalledTimes(0);</span><br><span class="line">    });</span><br><span class="line"></span><br><span class="line">});</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/39019913/96727154-5934c080-13e5-11eb-810c-906f1cb6bfd0.png" alt="image"></p>
+<p>然后按照这个思路完善与这个测试相关的业务代码，不要多写与当前测试用例无关的业务代码；</p>
+<p>根据<code>TDD</code>测试模式，测试覆盖率通常可以达到<code>90%-100%</code>之间。<br><code>（小tip：在进行测试用例的设计中，可以依照白盒测试设计：路径覆盖、逻辑覆盖）</code><br><img src="https://user-images.githubusercontent.com/39019913/96736447-34454b00-13ef-11eb-85e8-ec3b3bd60e7b.png" alt="image"></p>
+<h3 id="那么其实与TDD相互配合的还有BDD测试模式"><a href="#那么其实与TDD相互配合的还有BDD测试模式" class="headerlink" title="那么其实与TDD相互配合的还有BDD测试模式"></a>那么其实与<code>TDD</code>相互配合的还有<code>BDD</code>测试模式</h3><p><code>BDD</code>的行为细则属于怎样的呢？</p>
+<p>全称：<code>Behavior Driven Development</code>行为驱动开发。说的直白一点，更多的应该是，需求驱动开发，也就是当前组件的测试是面向需求的，需求满足则测试通过。<br>但是不好的一点是失去了单测目的，非需求部分的逻辑代码得不到测试覆盖，无法谈及质量观。</p>
+<p>测试模式宏观的方案就是写完业务代码后，针对需求进行编撰测试。</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+<script src="/bundle.js"></script></body></html>

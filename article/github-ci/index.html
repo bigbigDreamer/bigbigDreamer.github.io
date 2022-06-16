@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>记一次Github Actions自动化部署实践 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,写在前面的话，事情应该发生在去年我换电脑的时候，因为博客使用hexo搭建的，所以源代码也就都遗留在了本地，每次发布的时候只提交generator之后剩余的静态资源文件。
+但是换完电脑忘记拷贝源代码了,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">记一次Github Actions自动化部署实践</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">记一次Github Actions自动化部署实践</h1>
+        <div class="stuff">
+            <span>十月 05, 2020</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             783 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               3分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E5%AD%A6%E4%B9%A0/" rel="tag">学习</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E7%BB%8F%E9%AA%8C/" rel="tag">经验</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p>写在前面的话，事情应该发生在去年我换电脑的时候，因为博客使用<code>hexo</code>搭建的，所以源代码也就都遗留在了本地，每次发布的时候只提交<code>generator</code>之后剩余的静态资源文件。</p>
+<p>但是换完电脑忘记拷贝源代码了，所以给自己埋的坑就是原来写的博客源文件全部遗失。不过没关系，正好我有重头开始的准备。</p>
+<p>这不，<code>Github Action</code>出现了，从根本上解决了我的痛点。</p>
+<h2 id="认知储备"><a href="#认知储备" class="headerlink" title="认知储备"></a>认知储备</h2><h4 id="什么是Github-Actions？"><a href="#什么是Github-Actions？" class="headerlink" title="什么是Github Actions？"></a>什么是<code>Github Actions</code>？</h4><p><img src="https://user-images.githubusercontent.com/39019913/95061791-a7339e00-072e-11eb-96f9-2521d83105f0.png" alt="alt"></p>
+<p>直接点击传送门，看看阮一峰大佬的<a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2019/09/getting-started-with-github-actions.html">Github Actions 入门教程</a>;</p>
+<h4 id="git公钥、私钥的理解"><a href="#git公钥、私钥的理解" class="headerlink" title="git公钥、私钥的理解"></a><code>git</code>公钥、私钥的理解</h4><p><code>git</code>的公钥与私钥好比钥匙与锁的关系，一个公钥对应一个私钥。</p>
+<p>如何生成？</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C <span class="string">'your email'</span></span><br></pre></td></tr></tbody></table></figure>
+<p>会有两个文件，一个文件是<code>xxx.pub</code>是公钥，<code>xxx</code>是私钥与之对应。</p>
+<p>具体解释，参见<a target="_blank" rel="noopener" href="https://git-scm.com/book/zh/v2/%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84-Git-%E7%94%9F%E6%88%90-SSH-%E5%85%AC%E9%92%A5"> 服务器上的 Git - 生成 SSH 公钥</a></p>
+<h4 id="怎么理解Hexo博客自动部署？"><a href="#怎么理解Hexo博客自动部署？" class="headerlink" title="怎么理解Hexo博客自动部署？"></a>怎么理解<code>Hexo</code>博客自动部署？</h4><p>简单来讲就是借助<code>Github Actions</code>所提供的虚拟机环境，读取<code>博客源仓库</code>所携带的私钥，写入虚拟机环境的<code>~/.ssh/id_rsa</code>，保证正常<code>push</code>可以有权限进行。而对应的公钥则是保留在目标仓库里面。</p>
+<p>其实核心操作还是<code>Hexo</code>提供的<code>deploy commond</code>;</p>
+<blockquote>
+<p>当执行 <code>hexo deploy</code> 时，<code>Hexo</code> 会将 <code>public</code> 目录中的文件和目录推送至 <code>_config.yml</code> 中指定的远端仓库和分支中，并且完全覆盖该分支下的已有内容。</p>
+</blockquote>
+<iframe width="100%" height="450" src="https://www.youtube.com/embed/B0yVJ46CTR8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>参见<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/one-command-deployment.html">hexo官方文档-部署</a></p>
+<h2 id="开始部署"><a href="#开始部署" class="headerlink" title="开始部署"></a>开始部署</h2><p>文章假设你已经准备好了两个仓库<code>blog（应该设置为私有仓库，毕竟一些隐私密码都会存在这里）</code>and<code>xxx.github.io</code>。前者用于存放hexo博客源代码，后者用于自动部署的仓库。</p>
+<p>绑定公钥与私钥，<code>公钥</code>—–&gt;<code>xxx.github.io</code>，<code>私钥</code>—–&gt;<code>blog</code>；</p>
+<p>下图应该详细阐述了怎么绑定公钥与私钥~<br><img src="https://user-images.githubusercontent.com/39019913/95065127-3478f180-0733-11eb-935e-52a5c21df7d6.png"></p>
+<h2 id="编写Github-Actions-workflow-file"><a href="#编写Github-Actions-workflow-file" class="headerlink" title="编写Github Actions workflow file"></a>编写<code>Github Actions workflow file</code></h2><figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">Blog</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span> [<span class="string">push</span>] <span class="comment"># 当有新push时运行</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build-and-deploy:</span> <span class="comment"># 创建job</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span> <span class="comment"># 在最新版的Ubuntu系统下运行</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span> <span class="comment"># 将仓库内master分支的内容下载到工作目录</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">actions/checkout@v1</span> <span class="comment"># 脚本来自 https://github.com/actions/checkout</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Use</span> <span class="string">Node.js</span> <span class="number">10.</span><span class="string">x</span> <span class="comment"># 配置Node环境</span></span><br><span class="line">      <span class="attr">uses:</span> <span class="string">actions/setup-node@v1</span> <span class="comment"># 配置脚本来自 https://github.com/actions/setup-node</span></span><br><span class="line">      <span class="attr">with:</span></span><br><span class="line">        <span class="attr">node-version:</span> <span class="string">"10.x"</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">Hexo</span> <span class="string">Env</span></span><br><span class="line">      <span class="attr">env:</span></span><br><span class="line">        <span class="attr">ACTION_DEPLOY_KEY:</span> <span class="string">${{</span> <span class="string">secrets.HEXO_DEPLOY_KEY</span> <span class="string">}}</span> <span class="comment"># 拿到仓库配置的私钥：HEXO_DEPLOY_KEY</span></span><br><span class="line">      <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line">        <span class="comment"># set up private key for push code</span></span><br><span class="line">        <span class="string">mkdir</span> <span class="string">-p</span> <span class="string">~/.ssh/</span></span><br><span class="line">        <span class="string">echo</span> <span class="string">"$ACTION_DEPLOY_KEY"</span> <span class="string">&gt;</span> <span class="string">~/.ssh/id_rsa</span> <span class="comment"># 配置秘钥</span></span><br><span class="line">        <span class="string">chmod</span> <span class="number">700</span> <span class="string">~/.ssh</span></span><br><span class="line">        <span class="string">chmod</span> <span class="number">600</span> <span class="string">~/.ssh/id_rsa</span></span><br><span class="line">        <span class="string">ssh-keyscan</span> <span class="string">github.com</span> <span class="string">&gt;&gt;</span> <span class="string">~/.ssh/known_hosts</span></span><br><span class="line">        <span class="comment"># set git config</span></span><br><span class="line">        <span class="string">git</span> <span class="string">config</span> <span class="string">--global</span> <span class="string">user.name</span> <span class="string">"your name"</span></span><br><span class="line">        <span class="string">git</span> <span class="string">config</span> <span class="string">--global</span> <span class="string">user.email</span> <span class="string">"your email"</span></span><br><span class="line">        <span class="comment"># install dependencies</span></span><br><span class="line">        <span class="string">npm</span> <span class="string">i</span> <span class="string">-g</span> <span class="string">hexo-cli</span> <span class="comment"># 安装hexo</span></span><br><span class="line">        <span class="string">npm</span> <span class="string">i</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Hexo</span> <span class="string">Deploy</span></span><br><span class="line">      <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line">        <span class="comment"># deploy and automatic push code</span></span><br><span class="line">        <span class="string">hexo</span> <span class="string">generate</span> <span class="string">&amp;&amp;</span> <span class="string">hexo</span> <span class="string">deploy</span> <span class="comment"># 执行部署程序</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><em>温馨提示：</em> 别懵了啊，这个文件是在<code>blog</code>仓库下建立的。</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/95066240-b74e7c00-0734-11eb-8d97-25a9746f4d8f.png" alt="alt"></p>
+<h2 id="The-End"><a href="#The-End" class="headerlink" title="The End"></a>The End</h2><p>最后，来看看我们的成果吧~</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/95066453-04cae900-0735-11eb-8238-94a83b699c47.png" alt="alt"></p>
+<p><img src="https://user-images.githubusercontent.com/39019913/95066607-3479f100-0735-11eb-9c79-e7669cadeac3.png" alt="alt"></p>
+<p>有没有视觉疲劳呢？来放松一下吧~</p>
+<p><img src="https://user-images.githubusercontent.com/39019913/95066764-6ab77080-0735-11eb-90c9-2c840a70f51d.png" alt="alt"></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="https://sharefs.yun.kugou.com/202010051653/aec60928a2fdd0df418f9cf0163bb7f2/G244/M06/14/10/NA4DAF9nJiaAZomRAEhRSpcHVUQ336.mp3">
+            </audio>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+<script src="/bundle.js"></script></body></html>

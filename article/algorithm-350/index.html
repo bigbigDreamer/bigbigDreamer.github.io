@@ -1,0 +1,289 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>每日一记之21413 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,算法进阶题目123456789101112131415第350题：两个数组的交集给定两个数组，编写一个函数来计算它们的交集。# 示例一输入: nums1 = [1,2,2,1], nums2 = [,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">每日一记之21413</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">每日一记之21413</h1>
+        <div class="stuff">
+            <span>四月 12, 2021</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             908 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               4分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E6%AD%A3%E5%88%99/" rel="tag">正则</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h2 id="算法进阶"><a href="#算法进阶" class="headerlink" title="算法进阶"></a>算法进阶</h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">第350题：两个数组的交集</span><br><span class="line">给定两个数组，编写一个函数来计算它们的交集。</span><br><span class="line"></span><br><span class="line"><span class="comment"># 示例一</span></span><br><span class="line"></span><br><span class="line">输入: nums1 = [1,2,2,1], nums2 = [2,2]</span><br><span class="line"></span><br><span class="line">输出: [2,2]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 示例二</span></span><br><span class="line"></span><br><span class="line">输入: nums1 = [4,9,5], nums2 = [9,4,9,8,4]</span><br><span class="line"></span><br><span class="line">输出: [4,9]</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>废话不多说，直接上最优解！</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> nums1 = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">1</span>, <span class="number">2</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">2</span>];</span><br><span class="line"><span class="keyword">const</span> nums2 = [<span class="number">2</span>,<span class="number">2</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> queryOmit = <span class="function">(<span class="params">nums1, nums2</span>) =&gt;</span> {</span><br><span class="line">    nums1 = nums1.sort(<span class="function">(<span class="params">a, b</span>) =&gt;</span> a-b)</span><br><span class="line">    nums2 = nums2.sort(<span class="function">(<span class="params">a, b</span>) =&gt;</span> a-b)</span><br><span class="line">    <span class="keyword">let</span> point1 = <span class="number">0</span>, point2 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">const</span> res = []</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; nums1.length &gt; nums2.length ? nums1.length : nums2.length; i ++) {</span><br><span class="line">        <span class="keyword">if</span> (nums1[point1] === nums2[point2]) {</span><br><span class="line">            res.push(nums1[point1]);</span><br><span class="line">            point1++;</span><br><span class="line">            point2++;</span><br><span class="line">        } <span class="keyword">else</span> {</span><br><span class="line">            <span class="keyword">if</span> (nums1[point1] &gt; nums2[point2]) {</span><br><span class="line">                point2++;</span><br><span class="line">            } <span class="keyword">else</span> {</span><br><span class="line">                point1++;</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (point1 === nums1.length || point2 === nums2.length) {</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(queryOmit(nums1, nums2));</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="正则玩法"><a href="#正则玩法" class="headerlink" title="正则玩法"></a>正则玩法</h2><p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_Expressions">权威参考</a></p>
+<h3 id="前瞻后瞩"><a href="#前瞻后瞩" class="headerlink" title="前瞻后瞩"></a>前瞻后瞩</h3><p><code>?=</code>前瞻，就是匹配<code>xxx</code>之前的串，<code>?&lt;=</code>后瞩，就是匹配<code>xxx</code>之后的串。</p>
+<p><code>example，这里只展示前瞻，后瞩暂不做演示</code></p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">给定字符串<span class="string">'你好，李焕英！'</span>，匹配<span class="string">'！'</span>之前的字符串；</span><br></pre></td></tr></tbody></table></figure>
+<p><code>we can do as follow!</code></p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> str = <span class="string">'你好，李焕英！'</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(str.match(<span class="regexp">/.*(?=！)/</span>))</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// <span class="built_in">printf</span> </span><br><span class="line"></span><br><span class="line">[ <span class="string">'你好，李焕英'</span>, index: 0, input: <span class="string">'你好，李焕英！'</span>, groups: undefined ]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="分组匹配"><a href="#分组匹配" class="headerlink" title="分组匹配"></a>分组匹配</h3><p>以一道题目入门分组匹配（题目来源于：热心网友 <code>单女士</code>）：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">题目：[1,2,2,2,3,1,4] 变成 1，222，3，1，4</span><br></pre></td></tr></tbody></table></figure>
+
+<p>乍一看，肯定有小可爱想上去就是一梭子遍历了吧！</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 一行代码搞定</span></span><br><span class="line"><span class="keyword">const</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>];</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(arr.join(<span class="string">''</span>).match(<span class="regexp">/(\d)\1*/g</span>))</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// <span class="built_in">printf</span> </span><br><span class="line"></span><br><span class="line">[ <span class="string">'1'</span>, <span class="string">'222'</span>, <span class="string">'3'</span>, <span class="string">'1'</span>, <span class="string">'4'</span> ]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>perfect</code>，完美解决！</p>
+<p>另外一种解法，来源于<code>圈圈</code>的朋友；</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sameItem</span> (<span class="params">arr</span>) </span>{</span><br><span class="line">  <span class="keyword">if</span> (!arr) <span class="keyword">return</span> arr</span><br><span class="line">  <span class="keyword">let</span> i = <span class="number">0</span></span><br><span class="line">  <span class="keyword">let</span> j = <span class="number">1</span></span><br><span class="line">  <span class="keyword">let</span> item = arr[i]</span><br><span class="line">  <span class="keyword">const</span> res = []</span><br><span class="line">  <span class="keyword">while</span>(j &lt; arr.length) {</span><br><span class="line">    <span class="keyword">if</span> (arr[j] === arr[i]) {</span><br><span class="line">      item = item + arr[i] * <span class="built_in">Math</span>.pow(<span class="number">10</span>, (j - i))</span><br><span class="line">      j++</span><br><span class="line">    } <span class="keyword">else</span> {</span><br><span class="line">      res.push(item)</span><br><span class="line">      i = j</span><br><span class="line">      item = arr[i]</span><br><span class="line">      j ++</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line">  res.push(item)</span><br><span class="line">  <span class="keyword">return</span> res</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>时间复杂度<code>T(n)</code>，空间复杂度<code>O(2n + 1)</code></p>
+<h3 id="零宽断言"><a href="#零宽断言" class="headerlink" title="零宽断言"></a>零宽断言</h3><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/onepixel/articles/7717789.html">权威参考</a></p>
+<p>一听这么高大上的名字，肯定被吓到了吧！其实<code>零宽断言</code>就是所谓的<code>前瞻</code>.</p>
+<p>以一道题目开始（来源：<code>单女士</code>）：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// const arr = [1,2,3, 1,2,3,4,6, 4, 5, 6,7,8]</span><br><span class="line"></span><br><span class="line">// 输出： [<span class="string">"1-3"</span>, <span class="string">"1-4"</span>, <span class="string">"6"</span>, <span class="string">"4-8"</span>]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>看到这个题目，我的第一直觉是，零宽断言可以实现！</p>
+<p>直接上代码:</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> a = <span class="string">'1235679'</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a.match(<span class="regexp">/(0(?=1)|1(?=2)|2(?=3)|3(?=4)|4(?=5)|5(?=6)|6(?=7)|7(?=8)|8(?=9))*\d/g</span>))</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// <span class="built_in">printf</span> </span><br><span class="line"></span><br><span class="line">[ <span class="string">'123'</span>, <span class="string">'567'</span>, <span class="string">'9'</span> ]</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>简明扼要的叙述下上述正则：</p>
+<ul>
+<li><code>?=</code>就不说了吧，上文有介绍</li>
+<li><code>(0(?=1)|1(?=2)|2(?=3)|3(?=4)|4(?=5)|5(?=6)|6(?=7)|7(?=8)|8(?=9))*</code>，匹配<code>0-9</code>的任意连续数字，并以此为一个组，匹配<code>0</code>次或多次，其实换<code>+</code>也<code>ok</code>。</li>
+<li><code>\d</code>的效果，就是约束匹配组后面的东西，说到这里你可能不太理解，继续往下看！</li>
+</ul>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 随便加了任意字母，结尾匹配以 .</span></span><br><span class="line"><span class="keyword">const</span> a = <span class="string">'123sssss5679zsss'</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(a.match(<span class="regexp">/(0(?=1)|1(?=2)|2(?=3)|3(?=4)|4(?=5)|5(?=6)|6(?=7)|7(?=8)|8(?=9))*./g</span>))</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">  <span class="string">'123'</span>, <span class="string">'s'</span>, <span class="string">'s'</span>,</span><br><span class="line">  <span class="string">'s'</span>,   <span class="string">'s'</span>, <span class="string">'s'</span>,</span><br><span class="line">  <span class="string">'567'</span>, <span class="string">'9'</span>, <span class="string">'z'</span>,</span><br><span class="line">  <span class="string">'s'</span>,   <span class="string">'s'</span>, <span class="string">'s'</span></span><br><span class="line">]</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>然后再对比加了数字约束的消效果，其实就是每次匹配到子串之后的串的格式约束。</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/fenbaobaos.webp?x-oss-process=image/quality,q_80"></p>
+<p>最后：</p>
+<p>清风明月，几分轻狂几分傲，我也想拥有自己的一人之下！</p>
+<p>莫念语，清，夙命！</p>
+<p>狂。</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+<script src="/bundle.js"></script></body></html>

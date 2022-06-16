@@ -1,0 +1,313 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>从页面死循环“命案”，探究React边界错误 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,事故现场前夕不妨先来看看子组件发生异常后，没有捕获错误的情况：
+12# 第一步：程序正常运行，自组件计时器开始运行# 第二步：计时器开始计数到3，子组件抛出异常
+
+
+可以比较清晰的看到，页面是挂掉了,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">从页面死循环“命案”，探究React边界错误</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">从页面死循环“命案”，探究React边界错误</h1>
+        <div class="stuff">
+            <span>五月 07, 2021</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             1.4k 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               5分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/React/" rel="tag">React</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h2 id="事故现场前夕"><a href="#事故现场前夕" class="headerlink" title="事故现场前夕"></a>事故现场前夕</h2><p>不妨先来看看<code>子组件</code>发生异常后，没有捕获错误的情况：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 第一步：程序正常运行，自组件计时器开始运行</span></span><br><span class="line"><span class="comment"># 第二步：计时器开始计数到3，子组件抛出异常</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/react_error1.gif" alt="alt"></p>
+<p>可以比较清晰的看到，页面是挂掉了，但是对于正常情况下，这样的情况是很不友好的，当页面组件足够多的时候，可能只是某一块内容挂掉而导致把全局全部挂掉，不是特别理想。</p>
+<h2 id="事故现场"><a href="#事故现场" class="headerlink" title="事故现场"></a>事故现场</h2><p>为什么会死循环？什么导致的死循环？怎么避免呢？</p>
+<hr>
+<p>划重点：<strong>当父组件使用了<code>getDerivedStateFromError</code>去处理捕获异常的时候，这时候没有后备渲染，就会导致异常无效，进而陷入死循环，更新&lt;===&gt;报错的往复</strong></p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ErrorBoundary</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span></span>{</span><br><span class="line"></span><br><span class="line"> 	 <span class="comment">// 稍加打印，但不启动后备渲染</span></span><br><span class="line">    <span class="keyword">static</span> getDerivedStateFromError(err) {</span><br><span class="line">        <span class="built_in">console</span>.log(err)</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    render() {</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.props.children;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/react_error2.gif" alt="alt"></p>
+<h2 id="事故溯源"><a href="#事故溯源" class="headerlink" title="事故溯源"></a>事故溯源</h2><ul>
+<li><p>什么是错误边界？</p>
+<blockquote>
+<p>部分 UI 的 JavaScript 错误不应该导致整个应用崩溃，为了解决这个问题，React 16 引入了一个新的概念 —— 错误边界。</p>
+<p>错误边界是一种 React 组件，这种组件<strong>可以捕获并打印发生在其子组件树任何位置的 JavaScript 错误，并且，它会渲染出备用 UI</strong>，而不是渲染那些崩溃了的子组件树。错误边界在渲染期间、生命周期方法和整个组件树的构造函数中捕获错误。</p>
+</blockquote>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://react.docschina.org/docs/error-boundaries.html">React 官网传送门</a></p>
+<ul>
+<li><p>异常分类</p>
+<p>先介绍下<code>React 16之后的两个核心调度阶段</code>：<code>render</code>&amp;<code>commit</code>阶段：</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/react-life-cycle.png?x-oss-process=image/quality,q_80" alt="alt"></p>
+<p>图片来源于：<a target="_blank" rel="noopener" href="https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/">https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/</a></p>
+<p>而异常分类也发生在这两个阶段，且会有不同的表现：</p>
+<h4 id="Render阶段的异常捕获流程"><a href="#Render阶段的异常捕获流程" class="headerlink" title="Render阶段的异常捕获流程"></a><code>Render</code>阶段的异常捕获流程</h4><p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/fiber-error-render.png?x-oss-process=image/quality,q_80" alt="alt"></p>
+<p>有必要释疑上面无备用渲染时的场景，先上代码，后上动图。</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Child 组件模拟 render 阶段异常</span></span><br><span class="line"><span class="keyword">const</span> BugCounter = <span class="function">() =&gt;</span> {</span><br><span class="line">    <span class="keyword">const</span> [state, setState] = useState(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    useEffect(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="comment">// setInterval(() =&gt; {</span></span><br><span class="line">        <span class="comment">//     setState(pre =&gt; pre += 1);</span></span><br><span class="line">        <span class="comment">// }, 1000);</span></span><br><span class="line">    }, []);</span><br><span class="line"></span><br><span class="line">    useEffect(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="built_in">console</span>.log(state, <span class="string">"commit 阶段"</span>)</span><br><span class="line">    })</span><br><span class="line"></span><br><span class="line">    <span class="comment">// if (state === 3) {</span></span><br><span class="line">    <span class="comment">//     // Simulate a JS error</span></span><br><span class="line">    <span class="comment">//     throw new Error('I crashed!');</span></span><br><span class="line">    <span class="comment">// }</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'I crashed!'</span>);</span><br><span class="line">    }, <span class="number">1000</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">        &lt;span&gt;{state}&lt;/span&gt;</span><br><span class="line">    );</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/react_error3.gif" alt="alt"></p>
+<p>可以很明显看到，整个视图界面不会崩溃ℳ</p>
+<h4 id="Commit阶段的异常捕获流程"><a href="#Commit阶段的异常捕获流程" class="headerlink" title="Commit阶段的异常捕获流程"></a><code>Commit</code>阶段的异常捕获流程</h4><p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/fiber-error-in-commit.jpg?x-oss-process=image/quality,q_80" alt="alt"></p>
+</li>
+</ul>
+<p><strong>CARE：</strong></p>
+<ul>
+<li><p><code>Render</code>阶段注意点：</p>
+<blockquote>
+<p>父组件同时定义 getDerivedStateFromError 和 componentDidCatch，如果使用 getDerivedStateFromError 处理异常信息时，没有启用备用渲染， componentDidCatch 不会触发， 异常处理无效，最后还是使用  console.error 打印异常信息。</p>
+<p>这一点作一下特别解释：</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BugCounter 组件（也即我们的子组件）</span></span><br><span class="line"><span class="keyword">const</span> BugCounter = <span class="function">() =&gt;</span> {</span><br><span class="line">    <span class="keyword">const</span> [state, setState] = useState(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    useEffect(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="comment">// setInterval(() =&gt; {</span></span><br><span class="line">        <span class="comment">//     setState(pre =&gt; pre += 1);</span></span><br><span class="line">        <span class="comment">// }, 1000);</span></span><br><span class="line">    }, []);</span><br><span class="line"></span><br><span class="line">    useEffect(<span class="function">() =&gt;</span> {</span><br><span class="line">        <span class="built_in">console</span>.log(state, <span class="string">"commit 阶段"</span>)</span><br><span class="line">    })</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// if (state === 3) {</span></span><br><span class="line">    <span class="comment">//     // Simulate a JS error</span></span><br><span class="line">    <span class="comment">//     throw new Error('I crashed!');</span></span><br><span class="line">    <span class="comment">// }</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'I crashed!'</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">        &lt;span&gt;{state}&lt;/span&gt;</span><br><span class="line">    );</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ErrorBoundary (异常捕获组件，注意：这里并没有开启“备用渲染”)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ErrorBoundary</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span></span>{</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> getDerivedStateFromError(err) {</span><br><span class="line">        <span class="built_in">console</span>.log(err, <span class="string">'getDerivedStateFromError'</span>)</span><br><span class="line">        <span class="keyword">return</span> {err};</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    componentDidCatch(error: <span class="built_in">Error</span>, <span class="attr">errorInfo</span>: React.ErrorInfo) {</span><br><span class="line">        <span class="built_in">console</span>.log(error, errorInfo, <span class="string">"didCatch"</span>)</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    render() {</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.props.children;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/react_error4.gif" alt="alt"></p>
+</blockquote>
+<blockquote>
+<p>使用 getDerivedStateFromError 处理子组件异常信息时，要启用备用渲染，否则异常处理无效，最后还是使用 console.error 打印异常信息。</p>
+</blockquote>
+</li>
+<li><p><code>Commit</code>阶段注意点：</p>
+<blockquote>
+<p>子组件 commit 阶段发生异常，如果父组件定义 getDerivedStateFromError 且没有启用备用渲染，会导致异常处理无效，而且会陷入死循环。</p>
+</blockquote>
+</li>
+<li><p><code>Commit &amp; Render</code>阶段注意点：</p>
+<blockquote>
+<p>子组件发生异常，react 会寻找离它最近的且定义getDerivedStateFromError、componentDidCatch 的父组件进行异常处理。</p>
+</blockquote>
+<blockquote>
+<p>子组件发生异常，如果父组件没有捕获措施，react 会使用 console.error 打印异常信息。</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="事故补救"><a href="#事故补救" class="headerlink" title="事故补救"></a>事故补救</h2><p><strong>当同一种异常在ErrorTimeLimit秒内出现次数大于ErrorNumLimit次时显示错误页面，中断页面显示</strong></p>
+<p>大白话讲就是不想让页面一报错就崩掉。</p>
+<p><strong>但是，如果错误的异常请求是 XHR，且时间各为一秒，就会几率性绕过补救</strong></p>
+<hr>
+<p>最合适的方案：<strong>给页面内的组件最小粒度化添加错误边界</strong></p>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">import React, { FC } from 'react';</span><br><span class="line">import { ErrorBoundary } from '@sentry/react';</span><br><span class="line">import { ErrorBoundaryProps, FallbackRender } from '@sentry/react/esm/errorboundary';</span><br><span class="line">import CareIcon from './care-icon.png';</span><br><span class="line"></span><br><span class="line">import './index.less';</span><br><span class="line"></span><br><span class="line">export type TooCatchErrorPropsExportForUser = 'fallback' | 'onError' | 'onMount' | 'onUnmount';</span><br><span class="line">export type ToolCatchErrorProps = Pick&lt;ErrorBoundaryProps, TooCatchErrorPropsExportForUser&gt;;</span><br><span class="line"></span><br><span class="line">const t = (txt): string =&gt; {</span><br><span class="line">    if (window.I18N_T &amp;&amp; typeof txt === 'string') {</span><br><span class="line">        return window.I18N_T(txt);</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    return txt;</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line">const DefaultFullback: FallbackRender = ({ componentStack }) =&gt; {</span><br><span class="line"></span><br><span class="line">    const modulePos = componentStack?.split?.('\n')?.[1];</span><br><span class="line"></span><br><span class="line">    return (</span><br><span class="line">        &lt;div className="tool-catch-error-default-fullback"&gt;</span><br><span class="line">            &lt;img src={CareIcon} alt="care-icon"/&gt;</span><br><span class="line">            &lt;span className="text"&gt;{`${t('模块渲染出错！')}${modulePos ? '(' + modulePos + ')' : ''}`}&lt;/span&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    );</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line">const ToolCatchError: FC&lt;ToolCatchErrorProps&gt; = ({ children, ...rest }) =&gt; {</span><br><span class="line">    const props: ToolCatchErrorProps = {</span><br><span class="line">        fallback: DefaultFullback,</span><br><span class="line">        ...rest,</span><br><span class="line">    };</span><br><span class="line"></span><br><span class="line">    return (</span><br><span class="line">        &lt;ErrorBoundary {...props}&gt;</span><br><span class="line">            { children }</span><br><span class="line">        &lt;/ErrorBoundary&gt;</span><br><span class="line">    );</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line">export default ToolCatchError;</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>这里直接用了 <code>Sentry</code>封装好的针对于 <code>React</code>错误边界的组件；</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/react_error_5.gif" alt="alt"></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+<script src="/bundle.js"></script></body></html>

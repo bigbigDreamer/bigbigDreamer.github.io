@@ -1,0 +1,385 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>《重构》---- 读书笔记 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,读《重构》（第二版）有感开篇一些好的语录软件不死，重构不歇。----—余晟，《代码整洁之道：程序员的职业素养》译者重构的最终目的始终是为了减少重构。重构的先决条件是：测试先行。第一章手札重构手法
+
+,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">《重构》---- 读书笔记</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">《重构》---- 读书笔记</h1>
+        <div class="stuff">
+            <span>三月 09, 2021</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             3.4k 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               11分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E3%80%8A%E9%87%8D%E6%9E%84%E3%80%8B/" rel="tag">《重构》</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <div><span><h1>读《重构》（第二版）有感</h1><h2><b>开篇一些好的语录</b></h2><ul><li><div>软件不死，重构不歇。----—余晟，《代码整洁之道：程序员的职业素养》译者</div></li><li><div>重构的最终目的始终是为了减少重构。</div></li><li><div>重构的先决条件是：测试先行。</div></li></ul><h3>第一章手札</h3><ul><li><div>重构手法</div></li></ul>
+<img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Image.png">
+  <div>我觉的最有感慨的还是对于多态取代条件表达式；</div><div>先来补一补，什么是<b>多态</b>？</div><div style="--en-callout:true;"><div>多态：一个事物的多种形态，例如动物中，小猫可以“喵喵喵”，小狗可以“汪汪汪”。</div></div><div style="--en-callout:true;"><div>为什么需要多态？</div><div>究其最终原因还是为了实现代码重用。</div></div>
+
+  <figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">Movie</span> </span>{</span><br><span class="line">    <span class="keyword">constructor</span>(name, price) {</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.price = price;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">get</span> <span class="title">movieName</span>() {</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.name;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="keyword">get</span> <span class="title">moviePrice</span>() {</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.price;</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@desc </span>恐怖电影</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HorrorMovie</span> <span class="keyword">extends</span> <span class="title">Movie</span></span>{</span><br><span class="line">    <span class="keyword">get</span> <span class="title">movieName</span>() {</span><br><span class="line">        <span class="keyword">return</span> <span class="string">`恐怖片片名：<span class="subst">${<span class="built_in">super</span>.movieName}</span>`</span></span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ComedyMovie</span> <span class="keyword">extends</span> <span class="title">Movie</span></span>{</span><br><span class="line">    <span class="keyword">get</span> <span class="title">movieName</span>() {</span><br><span class="line">        <span class="keyword">return</span> <span class="string">`喜剧片片名：<span class="subst">${<span class="built_in">super</span>.movieName}</span>`</span></span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> horrorMovie = <span class="keyword">new</span> HorrorMovie(<span class="string">'惊悚乐园'</span>, <span class="number">18</span>);</span><br><span class="line"><span class="keyword">const</span> comedyMovie = <span class="keyword">new</span> ComedyMovie(<span class="string">'小鬼当家'</span>, <span class="number">27</span>);</span><br><span class="line"><span class="built_in">console</span>.log(horrorMovie.movieName, comedyMovie.movieName)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>以上就是多态的展现手法之一，重写。</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20210220213524.png?x-oss-process=image/quality,q_80"></p>
+<p>当然。还可以通过方法重载去实现，不过<code>js</code>通常需要借助<code>arguements</code>去实现，利用<code>typescript</code>去强化实现则更佳。</p>
+<p>个人观点：我觉的重构是什么？当读完第一章后，我觉的跟我之前理解的重构相差不大。</p>
+<p>我们在每一次迭代中，尽量不去动那些运转正常的代码，当迭代或者需求变更时，那些“不该动”的代码，不得不动的时候，这个时候就需要警惕，我们需要重构了。</p>
+<p>然而，重构需要遵循以下原则：</p>
+<ul>
+<li>不破坏以往的需求点</li>
+<li>重构之前有完整的测试用例支撑现有功能点正常运行，保证我们写的重构代码是“可以被信任的”，可以用于“生产环境的”。</li>
+<li>重构的目的是更好的维护与添加现有功能，而不是仅仅是当前迭代的重构，重构应该本着不需要再次重构的方向去靠拢。</li>
+</ul>
+<h2 id="第二章手札"><a href="#第二章手札" class="headerlink" title="第二章手札"></a>第二章手札</h2><p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-02-22_20-18-12.png?x-oss-process=image/quality,q_80"></p>
+<p>带着下面的疑问，我们继续探索书籍的第二章：</p>
+<ul>
+<li>什么时候应该重构，什么时候不应该重构？</li>
+<li>重构势必会增加工作量，我们应该如何应对？</li>
+<li>好的代码需要被重构吗？</li>
+</ul>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-02-22_20-23-00.png?x-oss-process=image/quality,q_80"></p>
+<p>好的设计方法：</p>
+<ul>
+<li>简单设计</li>
+<li>增量式设计 </li>
+<li>YAGNI[mf-yagni] ——“你不会需要它”（you arenʼt going to need it）的缩写</li>
+</ul>
+<p><em>重构与性能</em></p>
+<blockquote>
+<p>克莱斯勒综合薪资系统的支付过程太慢了。虽然我们的开发还没结束，这个问题却已经开始困扰<br>我们，因为它已经拖累了测试速度。</p>
+<p>Kent Beck、Martin Fowler和我决定解决这个问题。等待大伙儿会合的时间里，凭着对这个系统的<br>全盘了解，我开始推测：到底是什么让系统变慢了？我想到数种可能，然后和伙伴们谈了几种可能的<br>修改方案。最后，我们就“如何让这个系统运行更快”，提出了一些真正的好点子。<br>然后，我们拿Kent的工具度量了系统性能。我一开始所想的可能性竟然全都不是问题肇因。我们<br>发现：系统把一半时间用来创建“日期”实例（instance）。更有趣的是，所有这些实例都有相同的几个<br>值。</p>
+<p>于是我们观察日期对象的创建逻辑，发现有机会将它优化。这些日期对象在创建时都经过了一个<br>字符串转换过程，然而这里并没有任何外部数据输入。之所以使用字符串转换方式，完全只是因为代<br>码写起来简单。好，也许我们可以优化它。</p>
+<p>然后，我们观察这些日期对象是如何被使用的。我们发现，很多日期对象都被用来产生“日期区<br>间”实例——由一个起始日期和一个结束日期组成的对象。仔细追踪下去，我们发现绝大多数日期区间<br>是空的！</p>
+<p>处理日期区间时我们遵循这样一个规则：如果结束日期在起始日期之前，这个日期区间就该是空<br>的。这是一条很好的规则，完全符合这个类的需要。采用此规则后不久，我们意识到，创建一个“起始<br>日期在结束日期之后”的日期区间，仍然不算是清晰的代码，于是我们把这个行为提炼成一个工厂函<br>数，由它专门创建“空的日期区间”。</p>
+<p>我们做了上述修改，使代码更加清晰，也意外得到了一个惊喜：可以创建一个固定不变的“空日期<br>区间”对象，并让上述调整后的工厂函数始终返回该对象，而不再每次都创建新对象。这一修改把系统<br>速度提升了几乎一倍，足以让测试速度达到可接受的程度。这只花了我们大约五分钟。<br>我和团队成员（Kent和Martin谢绝参加）认真推测过：我们了若指掌的这个程序中可能有什么错<br>误？我们甚至凭空做了些改进设计，却没有先对系统的真实情况进行度量。</p>
+<p>我们完全错了。除了一场很有趣的交谈，我们什么好事都没做。</p>
+<p>教训是：哪怕你完全了解系统，也请实际度量它的性能，不要臆测。臆测会让你学到一些东西，<br>但十有八九你是错的。</p>
+<pre><code>                                       ——Ron Jeffries</code></pre>
+</blockquote>
+<p>上面的故事，其实也从反面思维告诉了我们一个道理，<em>写好每一行代码</em>是要义，还记得以前看过一句话<em>一个优秀的程序员并不是满天飞的架构，而是他写的每一行代码</em>。</p>
+<p>看完了一整章的内容，有必要回答刚开始的三个问题：</p>
+<ul>
+<li>什么时候应该重构，什么时候不应该重构？<ul>
+<li>当一大堆“丑陋”的代码工作正常，但是不影响你正常开发下，我们并不需要重构它，因为可能会显式的增加你的工作量。那么，什么时候应该重构呢？当你的需求要求你不得不改动<br>原有的“丑陋的代码”的时候，这个时候你就需要考虑重构了。</li>
+</ul>
+</li>
+<li>重构势必会增加工作量，我们应该如何应对？<ul>
+<li>提前做好预算是必须的，特别是时间预算，务必准备好你的“健全”的测试用例。</li>
+</ul>
+</li>
+<li>好的代码需要被重构吗？<ul>
+<li>答案是很显著的，好的代码的也需要被重构，随着每次迭代的进行，好的代码终将会有“不好”的那一面，始终记得我们一开始说过的“软件不死，重构不歇”。</li>
+</ul>
+</li>
+</ul>
+<h2 id="第三章-手札"><a href="#第三章-手札" class="headerlink" title="第三章 手札"></a>第三章 手札</h2><p><strong>无论是重构还是设计代码，我们的起点始终是写好每一行代码。</strong></p>
+<p>好的代码的基本素养：</p>
+<ul>
+<li>好的命名：函数声明（124）（用于给函数改名）、变<br>量改名（137）、字段改名（244）等，其实有经验的程序员都明白一个东西就是，好的命名是不需要加注释的。</li>
+<li>避免重复代码：简洁代码的要义的“抽象”，抽象一切可复用逻辑；</li>
+<li>过长函数的优化：短小精悍的函数，更容易阐释其意思。（这里的过长函数指的是函数体内容过长，而不是函数命名）；</li>
+<li>过长参数列表的优化：对象序列化参数；</li>
+<li>抽离全局变量，添加作用域，避免污染全局；</li>
+<li>注释，一些注释是必须的，但是在写注释之前，请先考虑重构是否可以解决添加注释的必要；</li>
+</ul>
+<blockquote>
+<p>当你感觉需要撰写注释时，请先尝试重构，试着让所有注释都变得多余。</p>
+</blockquote>
+<p>小结：其实这一章节的内容主要还是阐述了如何去写好每一行代码，如何约束程序员去书写健壮的代码；’</p>
+<h2 id="第四章-手札"><a href="#第四章-手札" class="headerlink" title="第四章 手札"></a>第四章 手札</h2><p>这一章节，其实重点的笔墨应该在如何准备“健全”的测试用例上。</p>
+<blockquote>
+<p>编写未臻完善的测试并经常运行，好过对完美测试的无尽等待。</p>
+</blockquote>
+<blockquote>
+<p>不要因为测试无法捕捉所有的bug就不写测试，因为测试的确可以捕<br>捉到大多数bug。</p>
+</blockquote>
+<blockquote>
+<p>每当你收到bug报告，请先写一个单元测试来暴露这个bug。</p>
+</blockquote>
+<p>其实，我个人属于<code>敏捷开发爱好者</code>，也就是<code>TDD</code>驱动者，不过常常因为<code>工时</code>制约了<code>TDD</code>的路途，<br>因为<code>TDD</code>的要义是：<code>测试先行，由红变绿</code>；</p>
+<p>至于应该进行什么测试<code>黑盒测试</code>或者<code>白盒测试</code>，取决于你的场景。</p>
+<p>适当的补全一些<code>BDD</code>行为测试的用例，方便<code>产品</code>、<code>测试</code>或者其他人员，像读短文一样读你的测试用例，在读懂测试用例的前提下，理解既有需求。</p>
+<p>其实我觉得白盒测试更加适用于<code>TDD</code>敏捷开发思维，适用于<code>单元测试</code>层面。而<code>黑盒测试</code>更加适用于<code>BDD</code>思维，以行为驱动测试，以行为阐释需求。</p>
+<blockquote>
+<p>End：关于解释“黑匣子”和“白匣子”，我觉得这里有一篇qs问答说的比较准确，也值得推敲。<a target="_blank" rel="noopener" href="https://qastack.cn/software/27491/black-box-or-white-box-testing-which-do-you-do-first">https://qastack.cn/software/27491/black-box-or-white-box-testing-which-do-you-do-first</a></p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://qastack.cn/software/27491/black-box-or-white-box-testing-which-do-you-do-first">web端qsstack传送门</a></p>
+<h2 id="第五章-手札"><a href="#第五章-手札" class="headerlink" title="第五章 手札"></a>第五章 手札</h2><p>重构手法之<code>核心要义</code>：</p>
+<ul>
+<li>首先是名称（name）。要建造一个重构词汇表，名称是很重要的。</li>
+<li>名称之后是一个简单的速写（sketch）。这部分可以帮助你更快找到你所需要<br>的重构手法。</li>
+<li>动机（motivation）为你介绍“为什么需要做这个重构”和“什么情况下不该做这<br>个重构”。</li>
+<li>做法（mechanics）简明扼要地一步一步介绍如何进行此重构。</li>
+<li>范例（examples）以一个十分简单的例子说明此重构手法如何运作。</li>
+</ul>
+<p>貌似第五章仅仅是作者的介绍重构的<code>前戏</code>，欲听<code>后戏</code>如何，请见下章内容。</p>
+<h2 id="第六章-重构名录"><a href="#第六章-重构名录" class="headerlink" title="第六章 重构名录"></a>第六章 重构名录</h2><blockquote>
+<p>低层级代码重构的精髓—形成函数并给函数命名。</p>
+</blockquote>
+<h3 id="提炼函数法则"><a href="#提炼函数法则" class="headerlink" title="提炼函数法则"></a>提炼函数法则</h3><p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-02_23-55-22.png?x-oss-process=image/quality,q_80" alt="alt"></p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-03_00-09-37.png?x-oss-process=image/quality,q_80" alt="alt"></p>
+<p>核心观点阐释了：应该将“意图与实现分开”，“函数不要过长”；</p>
+<p>做法：</p>
+<ul>
+<li>创造一个新函数，根据这个函数的意图来对它命名（以它“做什么”来命名，而<br>不是以它“怎样做”命名）</li>
+<li>将待提炼的代码从源函数复制到新建的目标函数中。</li>
+<li>仔细检查提炼出的代码，看看其中是否引用了作用域限于源函数、在提炼出的<br>新函数中访问不到的变量。若是，以参数的形式将它们传递给新函数。</li>
+<li>所有变量都处理完之后，编译。</li>
+<li>在源函数中，将被提炼代码段替换为对目标函数的调用。</li>
+<li>测试。</li>
+<li>查看其他代码是否有与被提炼的代码段相同或相似之处。如果有，考虑使用以<br>函数调用取代内联代码（222）令其调用提炼出的新函数。</li>
+</ul>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-03_00-30-57.png?x-oss-process=image/quality,q_80" alt="alt"></p>
+<h3 id="内联函数"><a href="#内联函数" class="headerlink" title="内联函数"></a>内联函数</h3><p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-03_00-47-20.png?x-oss-process=image/quality,q_80" alt="alt"></p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-03-03_00-47-20.png?x-oss-process=image/quality,q_80" alt="ALT"></p>
+<p>核心观点：属于函数内部的代码就尽量去内敛它。</p>
+<p>做法：</p>
+<ul>
+<li>检查函数，确定它不具多态性。</li>
+<li>找出这个函数的所有调用点。</li>
+<li>将这个函数的所有调用点都替换为函数本体。</li>
+<li>每次替换之后，执行测试。</li>
+<li>删除该函数的定义。</li>
+</ul>
+<h3 id="提炼变量"><a href="#提炼变量" class="headerlink" title="提炼变量"></a>提炼变量</h3><p>提炼变量的法则其实很简单，就是将返回变量作为行内表达式，避免多声明一堆不必要的变量。</p>
+<ul>
+<li>检查确认变量赋值语句的右侧表达式没有副作用。</li>
+<li>如果变量没有被声明为不可修改，先将其变为不可修改，并执行测试。<blockquote>
+<p>这是为了确保该变量只被赋值一次。</p>
+</blockquote>
+</li>
+<li>找到第一处使用该变量的地方，将其替换为直接使用赋值语句的右侧表达式。<br>测试。</li>
+<li>重复前面两步，逐一替换其他所有使用该变量的地方。</li>
+<li>删除该变量的声明点和赋值语句。</li>
+<li>测试。</li>
+</ul>
+<p><code>摘录来自: 马丁·福勒(Martin Fowler). “重构：改善既有代码的设计（第2版）。” Apple Books. </code></p>
+<h3 id="改变函数声明"><a href="#改变函数声明" class="headerlink" title="改变函数声明"></a>改变函数声明</h3><p>通常的手法就是给函数换一个名字，或者去除不必要的函数，以这个函数<code>做了</code>什么去描述，而不是<code>如何去做</code>命名。</p>
+<h3 id="封装变量"><a href="#封装变量" class="headerlink" title="封装变量"></a>封装变量</h3><p>动机：<code>数据不可变性</code>；</p>
+<p>做法：提供 <code>get</code> |  <code>set</code>方法给使用者使用。</p>
+<h3 id="变量改名"><a href="#变量改名" class="headerlink" title="变量改名"></a>变量改名</h3><p>好的变量是代码阅读的基石；</p>
+<h3 id="函数组合成类"><a href="#函数组合成类" class="headerlink" title="函数组合成类"></a>函数组合成类</h3><p>当一组函数形影不离的操作一段数据，那么就可以利用函数组合成类；</p>
+<h3 id="代码拆分"><a href="#代码拆分" class="headerlink" title="代码拆分"></a>代码拆分</h3><p>将耦合代码拆分；</p>
+<h2 id="第七章-封装"><a href="#第七章-封装" class="headerlink" title="第七章 封装"></a>第七章 封装</h2><p>封装是面向对象的编程思想，好的封装手法可以更好的杜绝一些不必要的失误，也是扩展性的阐释。</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </span></div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+</div><script src="/bundle.js"></script></body></html>

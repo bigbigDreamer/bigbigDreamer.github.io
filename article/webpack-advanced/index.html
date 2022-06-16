@@ -1,0 +1,336 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>打通webpack任督二脉 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,
+一、基础梳理（上帝视角de灵魂拷问）1.1 webpack是什么？
+webpack就是一个js的翻译器
+它只认识import 这样的语句，其他高级js语法，一概不认。
+
+
+
+核心定义：模块打包工具,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">打通webpack任督二脉</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">打通webpack任督二脉</h1>
+        <div class="stuff">
+            <span>十二月 02, 2020</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             1.3k 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               5分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E6%80%BB%E7%BB%93/" rel="tag">总结</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E6%96%B0%E5%BE%97%E6%84%9F%E6%82%9F/" rel="tag">新得感悟</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p><img src="https://user-images.githubusercontent.com/39019913/92306504-2c0d8980-efc2-11ea-80c7-bec809bc72e7.png" alt="image"></p>
+<h2 id="一、基础梳理（上帝视角de灵魂拷问）"><a href="#一、基础梳理（上帝视角de灵魂拷问）" class="headerlink" title="一、基础梳理（上帝视角de灵魂拷问）"></a>一、基础梳理（上帝视角de灵魂拷问）</h2><h3 id="1-1-webpack是什么？"><a href="#1-1-webpack是什么？" class="headerlink" title="1.1 webpack是什么？"></a>1.1 webpack是什么？</h3><ul>
+<li><del>webpack就是一个js的翻译器</del><ul>
+<li>它只认识<code>import</code> 这样的语句，其他高级<code>js</code>语法，一概不认。</li>
+</ul>
+</li>
+</ul>
+<p><strong>核心定义</strong>：模块打包工具 👏👏👏</p>
+<ul>
+<li>识别<code>import</code>，引入<code>import</code>模块，打包生成最终的模块。</li>
+</ul>
+<p><img src="https://user-images.githubusercontent.com/39019913/92325392-e3ff6d00-f07c-11ea-8f89-97ee4eaa5570.png" alt="image"></p>
+<h3 id="1-2-什么是webpack模块"><a href="#1-2-什么是webpack模块" class="headerlink" title="1.2 什么是webpack模块"></a>1.2 什么是webpack模块</h3><p><img src="https://user-images.githubusercontent.com/39019913/92325431-4d7f7b80-f07d-11ea-9e37-2eef765bc862.png" alt="image"></p>
+<h3 id="1-3-webpack-config-js的作用是什么？"><a href="#1-3-webpack-config-js的作用是什么？" class="headerlink" title="1.3 webpack.config.js的作用是什么？"></a>1.3 webpack.config.js的作用是什么？</h3><p>扩展<code>webpack</code>的能力，提供给<code>webpack</code>使用，<code>webpack</code>会默认读取<code>webpack.config.js</code>的信息。</p>
+<h3 id="1-4-Loader是什么？"><a href="#1-4-Loader是什么？" class="headerlink" title="1.4 Loader是什么？"></a>1.4 Loader是什么？</h3><p>我的理解：它就是一个对于特定文件所提供给<code>webpack</code>打包的一种打包方案。</p>
+<p><strong>stackoverflow Reference</strong> <a target="_blank" rel="noopener" href="https://stackoverflow.com/a/46176755/7552246">https://stackoverflow.com/a/46176755/7552246</a></p>
+<h4 id="Loaders"><a href="#Loaders" class="headerlink" title="Loaders"></a>Loaders</h4><p>Loaders work at the individual file level during or before the bundle is generated.<br><em>在<code>bundle</code>生成期间或之前，<code>loader</code>在单个文件级别工作。</em></p>
+<h4 id="Plugins"><a href="#Plugins" class="headerlink" title="Plugins"></a>Plugins</h4><p>Plugins work at bundle or chunk level and usually work at the end of the bundle generation process. Plugins can also modify how the bundles themselves are created. Plugins have more powerful control than loaders.<br><code>plugin</code>在<code>bundle</code>或<code>chunk</code>级别工作，通常在<code>bundle</code>生成结束时工作。插件还可以修改<code>bundle</code>本身的创建方式。<code>plugin</code>具有比<code>loader</code>更强大的控制功能。</p>
+<p><img src="https://i.stack.imgur.com/P7hTM.png" alt="image"></p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><ol>
+<li>什么是AST？</li>
+</ol>
+<p>AST(Abstract Syntax Tree)，</p>
+<ol start="2">
+<li>AST在JS代码执行的那个阶段产生？</li>
+</ol>
+<p>词法分析–&gt;语法分析(生成AST)–&gt;预编译–&gt;解释执行</p>
+<ol start="3">
+<li>AST语法树</li>
+</ol>
+<figure class="highlight plain"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">type:         描述该语句的类型  --&gt; 变量声明的语句</span><br><span class="line">kind:         变量声明的关键字  </span><br><span class="line">declaration:  声明内容的数组，里面每一项也是一个对象</span><br><span class="line">            type: 描述该语句的类型</span><br><span class="line">            id:   描述变量名称的对象</span><br><span class="line">                type: 定义</span><br><span class="line">                name: 变量的名字</span><br><span class="line">            init: 初始化变量值的对象</span><br><span class="line">                type:   类型</span><br><span class="line">                value:  值 </span><br><span class="line">                row:    值，判别是否 带引号</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="基础配置优化"><a href="#基础配置优化" class="headerlink" title="基础配置优化"></a>基础配置优化</h2><ol>
+<li><p>利用好<code>webpack.config.js</code>配置中的<code>resolve</code>，主动告诉<code>webpack</code>，我们需要对于哪些文件进行一个打包查找：（这里优先介绍常用的）</p>
+<p>1&gt; <code>extensions</code>，告诉<code>webpack</code>，我们需要优先查找哪些没有后缀名但是拥有<code>前缀名</code>的文件，列在数组首位的后缀名优先。</p>
+<p>2&gt; <code>alias</code>设置别名路径，当路径过长的时候，可以使用<code>alias</code>设置短链接指向。</p>
+</li>
+<li><p>在<code>合适</code>的<code>场景</code>，利用好<code>合适</code>的<code>loader</code>去处理<code>合适</code>的<code>文件</code>，例如可以利用<code>url-loader</code>去处理图片文件，将图片适当的<code>base64</code>化。</p>
+</li>
+<li><p>在<code>loader</code>中配置<code>exclude</code> &amp; <code>include</code>，缩小<code>complier</code>范围。</p>
+</li>
+<li><p>利用<code>cache-loader</code> &amp; <code>cache-plugin</code>缓存大体量的<code>loader</code> OR <code>plugin</code>，实现提效。</p>
+</li>
+</ol>
+<h2 id="分割打包策略"><a href="#分割打包策略" class="headerlink" title="分割打包策略"></a>分割打包策略</h2><p>为什么要分包？分什么包？怎么分包？分包可以达到什么效果？</p>
+<ul>
+<li>为什么要分包？<ul>
+<li>原始的打包会将<code>node_modules</code>与<code>需要打包的(src)</code>文件打包进一个<code>bundle</code>，在<code>client</code>进行缓存的时候，重新打包请求，耗费时间，导致首页白屏时间较长，可以选择将<code>需要稳定版本的node_modules</code>持久缓存起来，经常变化的<code>lib</code>/<code>src</code>待编译文件打包进核心的<code>bundle</code>。</li>
+</ul>
+</li>
+<li>分什么包？<ul>
+<li>可以将稳定版本的<code>node_modules</code>分包进一个<code>stable vendor</code>；可以将需要<code>latest</code>版本的<code>node_modules</code>分包进一个<code>lazy vendor</code>；可以将核心待编译文件分包进<code>main bundle</code>；可以将测试文件分包进<code>test vendor</code>，注意需要在<code>main bundle</code>中<code>exclude</code>出<code>测试文件</code>；</li>
+</ul>
+</li>
+<li>怎么分包？<ul>
+<li><code>webpack 4</code>之前利用的是<code>SplitChunksPlugin</code>这个插件，但是<code>4</code>版本中已被废弃，可以直接在内部通过<code>optimization</code>进行配置。<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = {</span><br><span class="line">         optimization: {</span><br><span class="line">             runtimeChunk: <span class="string">'single'</span>,</span><br><span class="line">             splitChunks: {</span><br><span class="line">                 chunks: <span class="string">'all'</span>,</span><br><span class="line">                 maxInitialRequests: <span class="literal">Infinity</span>,</span><br><span class="line">                 minSize: <span class="number">0</span>,</span><br><span class="line">                 cacheGroups: {</span><br><span class="line">                     <span class="keyword">default</span>: {</span><br><span class="line">                         name: <span class="string">'common'</span>,</span><br><span class="line">                         chunks: <span class="string">'initial'</span>,</span><br><span class="line">                         minChunks: <span class="number">5</span>,  <span class="comment">//模块被引用5次以上的才抽离</span></span><br><span class="line">                         <span class="comment">// priority: -1 // 设置优先级</span></span><br><span class="line">                     },</span><br><span class="line">                     vendor: {</span><br><span class="line">                         test: <span class="regexp">/[\\/]node_modules[\\/]/</span>,</span><br><span class="line">                         name(<span class="built_in">module</span>) {</span><br><span class="line">                             <span class="keyword">const</span> packageName = <span class="built_in">module</span>.context.match(<span class="regexp">/[\\/]node_modules[\\/](.*?)([\\/]|$)/</span>)[<span class="number">1</span>];</span><br><span class="line">                             <span class="comment">// 部分模块是以 @ 开头的，直接在分包命名中过滤掉</span></span><br><span class="line">                             <span class="keyword">return</span> <span class="string">`npm.vendor.<span class="subst">${packageName.replace(<span class="string">'@'</span>, <span class="string">''</span>)}</span>`</span>;</span><br><span class="line">                         },</span><br><span class="line">                     },</span><br><span class="line">                     testModule: {</span><br><span class="line">                         chunks: <span class="string">'all'</span>,</span><br><span class="line">                         test: <span class="regexp">/__test__\/*/</span>,</span><br><span class="line">                         name: <span class="string">'test.vendor'</span> ,</span><br><span class="line">                     }</span><br><span class="line">                 },</span><br><span class="line">             }</span><br><span class="line">         },</span><br><span class="line"> }</span><br></pre></td></tr></tbody></table></figure></li>
+</ul>
+</li>
+<li>分包可以达到什么效果？<ul>
+<li><img src="https://user-images.githubusercontent.com/39019913/100823073-823d7c00-348e-11eb-8954-1d76f1ae1add.png" alt="image"></li>
+</ul>
+</li>
+</ul>
+<h2 id="缓存优化构建策略"><a href="#缓存优化构建策略" class="headerlink" title="缓存优化构建策略"></a>缓存优化构建策略</h2><ol>
+<li><p><code>happypack</code>，之前有提到这个工具，但是其作者已经不维护了，另外多进程打包考验<code>cpu</code>能力，核数越高，打包越快，所以一般可能很难见成效；</p>
+</li>
+<li><p><code>cache-loader</code>、<code>cache-plugin</code>可以很好的缓存那些大体量的<code>loader</code>或者<code>plugin</code>编译的结果在<code>disk</code>内存中，下次编译的时候可以直接从<code>disk</code>中拿。如果在服务端也可以在放置在<code>redis</code>中。</p>
+</li>
+<li><p><code>HardSourceWebpackPlugin</code>可以实现持久缓存，第一次构建可能效果不明显，第一次之后，效果可以实现提升。</p>
+</li>
+</ol>
+<h2 id="怎么理解chunk、bundle？"><a href="#怎么理解chunk、bundle？" class="headerlink" title="怎么理解chunk、bundle？"></a>怎么理解<code>chunk</code>、<code>bundle</code>？</h2><p><img src="https://user-images.githubusercontent.com/39019913/100825341-c468bc80-3492-11eb-878a-5fae3529e211.png" alt="image"></p>
+<p>如上图，其实还是很好理解的：</p>
+<p><code>module</code>是打包前的引入文件，<code>chunk</code>是打包时的处理文件，<code>bundle</code>是<code>webpack</code>处理<code>chunk</code>的产物。</p>
+<p><code>chunk</code>的数目怎么计算？很好识别的：一个入口文件一个<code>chunk</code>，一个分包策略一个<code>chunk</code>。</p>
+<h2 id="webpack的构建流程是怎样的呢？"><a href="#webpack的构建流程是怎样的呢？" class="headerlink" title="webpack的构建流程是怎样的呢？"></a><code>webpack</code>的构建流程是怎样的呢？</h2><ol>
+<li><p>合并<code>shell</code>参数与<code>webpack.config.js</code>中的配置。</p>
+</li>
+<li><p>在<code>config</code>配置文件中去确定<code>entry</code>入口。</p>
+</li>
+<li><p>开始执行<code>run</code>编译，对应文件使用对应<code>file-loader</code>，递归处理模块。</p>
+</li>
+<li><p>根据入口与代码分割方案生成<code>chunk</code>。</p>
+</li>
+<li><p>处理<code>chunk</code>，生成最终的 <code>bundle</code>。</p>
+</li>
+<li><p>输出完成。</p>
+</li>
+</ol>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@rajaraodv/webpack-the-confusing-parts-58712f8fcad9#.5fxzupi03">Webpack — The Confusing Parts</a></li>
+<li><a target="_blank" rel="noopener" href="https://webpack.js.org/contribute/writing-a-loader/">Write A Loader | Webpack</a></li>
+<li><a target="_blank" rel="noopener" href="https://cheogo.github.io/learn-javascript/201709/runtime.html">JavaScript 语法解析、AST、V8、JIT</a></li>
+</ul>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+<script src="/bundle.js"></script></body></html>

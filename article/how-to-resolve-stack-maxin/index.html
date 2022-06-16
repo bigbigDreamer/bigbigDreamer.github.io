@@ -1,0 +1,281 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Node打包堆栈溢出？慌什么！淡定！ - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,今天是周五，可是为什么我却一点也感受不到周五的快乐呢？可能是明天需要再补班的缘故吧！hhhhh
+问题不大，牢骚话暂时略过，今天主要记录下工作上碰到的问题，以及我是怎么解决的。
+起因我还是像往常一样，,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">Node打包堆栈溢出？慌什么！淡定！</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">Node打包堆栈溢出？慌什么！淡定！</h1>
+        <div class="stuff">
+            <span>九月 16, 2021</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             555 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               2分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E6%89%93%E5%8C%85/" rel="tag">打包</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E6%9E%84%E5%BB%BA/" rel="tag">构建</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p>今天是周五，可是为什么我却一点也感受不到周五的快乐呢？可能是明天需要再补班的缘故吧！<code>hhhhh</code></p>
+<p>问题不大，牢骚话暂时略过，今天主要记录下工作上碰到的问题，以及我是怎么解决的。</p>
+<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>我还是像往常一样，帮同事在<code>jekins</code>上构建代码，我在等待着我的机器人通知我，构建完成的消息，等了<code>10</code>分钟、<code>20</code>分钟…..，终于，耐不住一看界面，<strong>打包失败！</strong></p>
+<p>我直呼一个好家伙！立马<code>clone</code>项目，本地打包，本地打包是<code>ok</code>的。</p>
+<p>然后询问同事，是不是加了新代码：”确实是引入了一个新的包”。</p>
+<p>打开了<code>analyze</code>分析工具一看：<code>3.5M</code>未压缩，<strong>够大！</strong></p>
+<h2 id="经过"><a href="#经过" class="headerlink" title="经过"></a>经过</h2><p>好奇的我，打开了<code>jekins</code>构建日志：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token operator">&lt;</span>--- Last few GCs ---<span class="token operator">&gt;</span>
+
+<span class="token punctuation">[</span><span class="token number">103099</span>:0x310aab0<span class="token punctuation">]</span>   <span class="token number">392901</span> ms: Scavenge <span class="token number">1343.8</span> <span class="token punctuation">(</span><span class="token number">1424.1</span><span class="token punctuation">)</span> -<span class="token operator">&gt;</span> <span class="token number">1342.9</span> <span class="token punctuation">(</span><span class="token number">1424.6</span><span class="token punctuation">)</span> MB, <span class="token number">16.4</span> / <span class="token number">0.0</span> ms  <span class="token punctuation">(</span>average mu <span class="token operator">=</span> <span class="token number">0.117</span>, current mu <span class="token operator">=</span> <span class="token number">0.025</span><span class="token punctuation">)</span> allocation failure 
+<span class="token punctuation">[</span><span class="token number">103099</span>:0x310aab0<span class="token punctuation">]</span>   <span class="token number">394779</span> ms: Mark-sweep <span class="token number">1344.0</span> <span class="token punctuation">(</span><span class="token number">1424.6</span><span class="token punctuation">)</span> -<span class="token operator">&gt;</span> <span class="token number">1343.1</span> <span class="token punctuation">(</span><span class="token number">1424.1</span><span class="token punctuation">)</span> MB, <span class="token number">1853.9</span> / <span class="token number">0.0</span> ms  <span class="token punctuation">(</span>average mu <span class="token operator">=</span> <span class="token number">0.078</span>, current mu <span class="token operator">=</span> <span class="token number">0.037</span><span class="token punctuation">)</span> allocation failure scavenge might not succeed
+
+
+<span class="token operator">&lt;</span>--- JS stacktrace ---<span class="token operator">&gt;</span>
+
+<span class="token operator">==</span><span class="token operator">==</span> JS stack trace <span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">==</span><span class="token operator">=</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>哟嚯，<code>GC</code>内存不够了，怎么解决呢？</p>
+<p>当然是上<code>google</code>咯！</p>
+<p><strong>可以是：直接执行</strong></p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2109/Snipaste_2021-09-18_00-44-14.png"></p>
+<p><strong>也可以是：设置系统的环境变量</strong></p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2109/Snipaste_2021-09-18_00-54-24.png"></p>
+<p><strong>也可以是：设置执行时环境变量</strong></p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2109/Snipaste_2021-09-18_00-57-06.png"></p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory">stackoverflow回答地址</a> : <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory">https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory</a></p>
+<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p>最终，当然是生效啦，但是你以为这就结束了吗？</p>
+<p><code>No</code>、<code>No</code>、<code>No</code>，才刚开始！</p>
+<p>为什么会内存不够呢？</p>
+<p>我打开了<code>v8</code>查询那个设置参数：</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2109/Snipaste_2021-09-18_01-23-15.png"></p>
+<p>其实这个搜索关键字也是观察<code>jekins</code>日志发现的：</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2109/Snipaste_2021-09-18_01-28-04.png"></p>
+<p>哟嚯，是不是，惊人的相似，请把<strong>可能二字</strong>去掉。</p>
+<p>然后，我们去命令行看下这个鬼东西：</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2109/Snipaste_2021-09-18_01-43-07.png"></p>
+<p>然后注意下箭头标注的，然后计算下最终的内存大小，以<code>G</code>为单位：</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2109/Snipaste_2021-09-18_01-43-52.png"></p>
+<p>再回过头来看下，<code>Node</code>官文中的说明：</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2109/Snipaste_2021-09-18_01-47-56.png"></p>
+<p>老的<code>Node</code>版本，基本在<code>1.5~1.7G</code>左右，一旦打包时候的空闲内存少了，就会这样。</p>
+<hr>
+<p>到此为止，这个问题的<strong>根</strong>已经被小王拔起了，期待下次分享～</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+</body></html>

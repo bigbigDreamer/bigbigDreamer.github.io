@@ -1,0 +1,305 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>从业务思考再次邂逅加密算法 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,在介绍骚操作的时候，先：
+着重介绍下常见的加密摘要函数：
+首先可以先介绍下盐的用途。
+
+盐（Salt），在密码学中，是指在散列之前将散列内容（例如：密码）的任意固定位置插入特定的字符串。这个在散列中,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">从业务思考再次邂逅加密算法</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">从业务思考再次邂逅加密算法</h1>
+        <div class="stuff">
+            <span>七月 17, 2021</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             1.4k 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               5分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/md5/" rel="tag">md5</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/sha1/" rel="tag">sha1</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/sha256/" rel="tag">sha256</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p>在介绍骚操作的时候，先：</p>
+<p>着重介绍下常见的加密摘要函数：</p>
+<p>首先可以先介绍下盐的用途。</p>
+<blockquote>
+<p>盐（Salt），在密码学中，是指在散列之前将散列内容（例如：密码）的任意固定位置插入特定的字符串。这个在散列中加入字符串的方式称为“加盐”。其作用是让加盐后的散列结果和没有加盐的结果不相同，在不同的应用情景中，这个处理可以增加额外的安全性。</p>
+</blockquote>
+<p>为什么要加盐？</p>
+<blockquote>
+<p>通常情况下，当字段经过散列处理（如SHA-1），会生成一段散列值，而散列后的值一般是无法通过特定算法得到原始字段的。但是某些情况，比如一个大型的彩虹表，通过在表中搜索该SHA-1值，很有可能在极短的时间内找到该散列值对应的真实字段内容。</p>
+</blockquote>
+<blockquote>
+<p>加盐后的散列值，可以极大的降低由于用户数据被盗而带来的密码泄漏风险，即使通过彩虹表寻找到了散列后的数值所对应的原始内容，但是由于经过了加盐，插入的字符串扰乱了真正的密码，使得获得真实密码的概率大大降低。</p>
+</blockquote>
+<h2 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a><code>MD5</code></h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/191446610">下面的解释来自知乎</a> : <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/191446610">https://zhuanlan.zhihu.com/p/191446610</a></p>
+<blockquote>
+<p>MD5（信息-摘要算法5）：MD5将任意长度的“字节串”映射为一个128bit的大整数。MD5以512位分组来处理输入的信息，且每一分组又被划分为16个32位子分组，经过了一系列的处理后，算法的输出由四个32位分组组成，将这四个32位分组级联后将生成一个128位散列值。</p>
+</blockquote>
+<h2 id="SHA"><a href="#SHA" class="headerlink" title="SHA"></a><code>SHA</code></h2><blockquote>
+<p>SHA（安全哈希算法）：该算法的思想是接收一段明文，然后以一种不可逆的方式将它转换成一段（通常更小）密文，也可以简单的理解为取一串输入码（称为预映射或信息），并把它们转化为长度较短、位数固定的输出序列即散列值（也称为信息摘要或信息认证代码）的过程。可以对任意长度的数据运算生成一个160位的数值。SHA将输入流按照每块512位（64个字节）进行分块，并产生20个字节的被称为信息认证代码或信息摘要的输出。SHA-1是不可逆的、防冲突，并具有良好的雪崩效应。</p>
+</blockquote>
+<h2 id="数据传输加密算法流程"><a href="#数据传输加密算法流程" class="headerlink" title="数据传输加密算法流程"></a>数据传输加密算法流程</h2><p>前后端约定加密算法，在后端生成<strong>公钥</strong>&amp;<strong>私钥</strong></p>
+<p>前端请求接口拿到<strong>公钥</strong>｜<strong>盐</strong>加密后，给后端：</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加盐加密</span></span><br><span class="line"><span class="keyword">import</span> JsSha <span class="keyword">from</span> <span class="string">'jssha'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> encryptPwdWithSalt = <span class="function">(<span class="params">pwd, salt</span>) =&gt;</span> {</span><br><span class="line">    <span class="keyword">const</span> JsShaObj  = <span class="keyword">new</span> JsSha(<span class="string">'SHA_256'</span>, <span class="string">'TEXT'</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 加密加盐，必要时可以二次加密再加盐</span></span><br><span class="line">    JsShaObj.update(<span class="string">`<span class="subst">${pwd}</span><span class="subst">${salt}</span>`</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 返回 16 进制的 hash 散列值</span></span><br><span class="line">    <span class="keyword">return</span> JsShaObj.getHash(<span class="string">'HEX'</span>);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 公钥再次加密</span></span><br><span class="line"><span class="keyword">import</span> JsEncrypt <span class="keyword">from</span> <span class="string">'jsencrypt'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> setRSAPKAndEncrypt = <span class="function">(<span class="params">publicKey, pwd, salt</span>) =&gt;</span> {</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">const</span> encrypt = <span class="keyword">new</span> JSEncrypt();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置RSA公钥</span></span><br><span class="line">    encrypt.setPublicKey(publicKey);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> JsEncrypt.encrypt(encryptPwdWithSalt(pwd, salt))</span><br><span class="line">}</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>后端拿到前端的加密结果后，根据服务端存储的<strong>私钥</strong>解密。</p>
+<p>对比数据库密文，判断<code>hash</code>是否一致。</p>
+<p><strong>Case：需要注意的几点</strong></p>
+<ul>
+<li>盐通常加在前面，不过也无所谓</li>
+<li>在使用<code>客户端请求盐</code>这种操作的时候，一定要注意不要直接用<strong>用户名</strong>去做请求，因为，恶意攻击者可能会通过脚本拿我们的有效用户名。</li>
+</ul>
+<h2 id="另外的用途"><a href="#另外的用途" class="headerlink" title="另外的用途"></a>另外的用途</h2><h4 id="需求盘点"><a href="#需求盘点" class="headerlink" title="需求盘点"></a>需求盘点</h4><p>在修改数据流图时，且切换所在<code>tab</code>时，检测是否有改动，弹出二次确认弹窗。</p>
+<h4 id="拆分逻辑"><a href="#拆分逻辑" class="headerlink" title="拆分逻辑"></a>拆分逻辑</h4><ul>
+<li>切换 <code>tab</code> 拦截</li>
+<li>改动校验</li>
+</ul>
+<h4 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h4><ul>
+<li><code>tab</code>切换使用<code>Antd  tabs</code>组件的受控模式（注入<code>onChange</code>属性与<code>activeKey</code>）</li>
+<li>改动校验，使用<code>MD5</code>加密序列化字符串做对比</li>
+</ul>
+<h4 id="开发过程中的坑"><a href="#开发过程中的坑" class="headerlink" title="开发过程中的坑"></a>开发过程中的坑</h4><ul>
+<li>组件封装独立性过高，借助<code>PubSub</code>消息通知，唤起二次确认，与确认完毕后，<code>tab</code>切换操作续命。</li>
+<li><code>MD5</code>相同的内容，但是多一个空格，<code>hash</code>值都会不同，加密前先过滤空格</li>
+<li>存储初始<code>MD5</code><ul>
+<li>考虑多个<code>tab</code>打开相同的页面</li>
+<li>生命周期</li>
+</ul>
+</li>
+</ul>
+<p>解决多<code>tab</code>问题</p>
+<figure class="highlight ts"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { nanoid } <span class="keyword">from</span> <span class="string">'nanoid'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> pageM: Partial&lt;Record&lt;<span class="built_in">string</span>, <span class="built_in">any</span>&gt;&gt; = {};</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> gNanoId = <span class="function">(<span class="params">key: <span class="built_in">string</span></span>) =&gt;</span> {</span><br><span class="line">    <span class="keyword">if</span> (!pageModal[key]) {</span><br><span class="line">        pageModal[key] = nanoid();</span><br><span class="line">    }</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">plantStore</span>(<span class="params">key: <span class="built_in">string</span>, value: <span class="built_in">string</span></span>): <span class="title">boolean</span> </span>{</span><br><span class="line">    gNanoId(key);</span><br><span class="line">    sessionStorage.setItem(<span class="string">`<span class="subst">${pageModal[key]}</span>_<span class="subst">${key}</span>`</span>, value);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getStore</span>(<span class="params">key: <span class="built_in">string</span></span>): <span class="title">string</span> </span>{</span><br><span class="line">    <span class="keyword">return</span> sessionStorage.getItem(<span class="string">`<span class="subst">${pageModal[key]}</span>_<span class="subst">${key}</span>`</span>);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">rmStore</span>(<span class="params">key: <span class="built_in">string</span></span>): <span class="title">string</span> </span>{</span><br><span class="line">    sessionStorage.removeItem(<span class="string">`<span class="subst">${pageModal.id}</span>_<span class="subst">${key}</span>`</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`<span class="subst">${pageModal.id}</span>_<span class="subst">${key}</span>`</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">clearStore</span>(<span class="params">key: <span class="built_in">string</span></span>) </span>{</span><br><span class="line">    <span class="built_in">Object</span>.keys(sessionStorage).forEach(<span class="function"><span class="params">item</span> =&gt;</span> {</span><br><span class="line">        <span class="keyword">if</span> (item.includes(key)) {</span><br><span class="line">            sessionStorage.removeItem(item);</span><br><span class="line">        }</span><br><span class="line">    });</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> {</span><br><span class="line">    plantStore,</span><br><span class="line">    rmStore,</span><br><span class="line">    getStore,</span><br><span class="line">    clearStore</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="End"><a href="#End" class="headerlink" title="End"></a>End</h2><p>在最后提到的，脚本伪造请求的时候，其实我们目前的请求都有<code>Referer</code>,但是要在 <code>Nginx</code> 层配置请求:</p>
+<p>这里暂时列举图片请求的<code>防盗规则</code>：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"> location ~* \.(gif|jpg|png)$ {</span><br><span class="line">    valid_referers none blocked *.phptest.com;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$invalid_referer</span>) {</span><br><span class="line">        <span class="built_in">return</span> 403;</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>最后</p>
+<ul>
+<li>感谢我的现任同事龙哥（<code>javaer</code>）给予的耐心解释～</li>
+<li>感谢我的现任同事圈圈(<code>jser</code>)在周会过程中分享的<code>nanoid</code></li>
+</ul>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://wooyun.js.org/drops/%E5%8A%A0%E7%9B%90hash%E4%BF%9D%E5%AD%98%E5%AF%86%E7%A0%81%E7%9A%84%E6%AD%A3%E7%A1%AE%E6%96%B9%E5%BC%8F.html">加盐hash保存密码的正确方式</a></li>
+</ul>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+<script src="/bundle.js"></script></body></html>

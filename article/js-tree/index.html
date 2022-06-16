@@ -1,0 +1,270 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>树 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,树是什么？
+JS中没有树，但是可以用Object和Array构建树；
+树的常用操作
+深度优先遍历
+广度优先遍历
+先、中、后序遍历
+
+
+
+深度优先遍历：尽可能深的搜索树的分支。(DFS)
+武功心法：访,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">树</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">树</h1>
+        <div class="stuff">
+            <span>十月 07, 2020</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             498 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               2分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E5%AD%A6%E4%B9%A0/" rel="tag">学习</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h2 id="树是什么？"><a href="#树是什么？" class="headerlink" title="树是什么？"></a>树是什么？</h2><ul>
+<li><code>JS</code>中没有树，但是可以用<code>Object</code>和<code>Array</code>构建树；</li>
+<li>树的常用操作<ul>
+<li>深度优先遍历</li>
+<li>广度优先遍历</li>
+<li>先、中、后序遍历</li>
+</ul>
+</li>
+</ul>
+<h2 id="深度优先遍历：尽可能深的搜索树的分支。-DFS"><a href="#深度优先遍历：尽可能深的搜索树的分支。-DFS" class="headerlink" title="深度优先遍历：尽可能深的搜索树的分支。(DFS)"></a>深度优先遍历：尽可能深的搜索树的分支。(<code>DFS</code>)</h2><p><img src="https://user-images.githubusercontent.com/39019913/95301390-20f49480-08b3-11eb-9bee-89a5929bb3cf.png" alt="alt"></p>
+<p>武功心法：访问根节点—对根节点的<code>children</code>挨个进行深度优先遍历。</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> tree = {</span><br><span class="line">    val: <span class="string">'a'</span>,</span><br><span class="line">    children: [</span><br><span class="line">        {</span><br><span class="line">            val: <span class="string">'1'</span>,</span><br><span class="line">            children: [</span><br><span class="line">                {</span><br><span class="line">                    val: <span class="string">'b'</span>,</span><br><span class="line">                    children: [</span><br><span class="line">                        {</span><br><span class="line">                            val: <span class="string">'1'</span>,</span><br><span class="line">                            children: []</span><br><span class="line">                        }, {</span><br><span class="line">                            val: <span class="string">'2'</span>,</span><br><span class="line">                            children: []</span><br><span class="line">                        },</span><br><span class="line">                    ],</span><br><span class="line">                }</span><br><span class="line">            ]</span><br><span class="line">        }, {</span><br><span class="line">            val: <span class="string">'2'</span>,</span><br><span class="line">            children: []</span><br><span class="line">        },</span><br><span class="line">    ],</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> dfs = <span class="function"><span class="params">root</span> =&gt;</span> {</span><br><span class="line">    <span class="built_in">console</span>.log(root.val)</span><br><span class="line">    root.children.forEach(dfs)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">dfs(tree)</span><br><span class="line"><span class="comment">// console</span></span><br><span class="line"><span class="comment">/* a</span></span><br><span class="line"><span class="comment">   1</span></span><br><span class="line"><span class="comment">   b</span></span><br><span class="line"><span class="comment">   1</span></span><br><span class="line"><span class="comment">   2</span></span><br><span class="line"><span class="comment">   2 */</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="广度优先遍历：先访问距离根节点最近的节点。-BFS"><a href="#广度优先遍历：先访问距离根节点最近的节点。-BFS" class="headerlink" title="广度优先遍历：先访问距离根节点最近的节点。(BFS)"></a>广度优先遍历：先访问距离根节点最近的节点。(<code>BFS</code>)</h2><p><img src="https://user-images.githubusercontent.com/39019913/95301390-20f49480-08b3-11eb-9bee-89a5929bb3cf.png" alt="alt"></p>
+<p>武功心法：<br>    - 新建一个队列，根节点入队<br>    - 队头出队并访问<br>    - 队头的children挨个入队<br>    - 重复第二、三步，直到队列为空</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> bfs = <span class="function"><span class="params">root</span> =&gt;</span> {</span><br><span class="line">    <span class="keyword">const</span> q = [root];</span><br><span class="line">    <span class="keyword">while</span> (q.length &gt;<span class="number">0</span>) {</span><br><span class="line">        <span class="keyword">const</span> n = q.shift();</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'bfs'</span>,n.val);</span><br><span class="line">        n.children.forEach(<span class="function"><span class="params">child</span> =&gt;</span> {</span><br><span class="line">            q.push(child);</span><br><span class="line">        })</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">bfs(tree)</span><br><span class="line"></span><br><span class="line"><span class="comment">// console</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    bfs a</span></span><br><span class="line"><span class="comment">    bfs 1</span></span><br><span class="line"><span class="comment">    bfs 2</span></span><br><span class="line"><span class="comment">    bfs b</span></span><br><span class="line"><span class="comment">    bfs 1</span></span><br><span class="line"><span class="comment">    bfs 2</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></tbody></table></figure>
+<h2 id="二叉树的先、中、后序遍历"><a href="#二叉树的先、中、后序遍历" class="headerlink" title="二叉树的先、中、后序遍历"></a>二叉树的先、中、后序遍历</h2><p>什么是二叉树？</p>
+<p>树种每个节点最多只能由两个子节点。</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Binary_tree.svg"></p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 二叉树</span></span><br><span class="line"><span class="keyword">const</span> BTree = {</span><br><span class="line">    val: <span class="number">2</span>,</span><br><span class="line">    left: {</span><br><span class="line">        val: <span class="number">7</span>,</span><br><span class="line">        left: {</span><br><span class="line">            val: <span class="number">2</span>,</span><br><span class="line">            left: <span class="literal">null</span>,</span><br><span class="line">            right: <span class="literal">null</span></span><br><span class="line">        },</span><br><span class="line">        right: {</span><br><span class="line">            val: <span class="number">6</span>,</span><br><span class="line">            left: {</span><br><span class="line">                val: <span class="number">5</span>,</span><br><span class="line">                left: <span class="literal">null</span>,</span><br><span class="line">                right: <span class="literal">null</span></span><br><span class="line">            },</span><br><span class="line">            right: {</span><br><span class="line">                val: <span class="number">11</span>,</span><br><span class="line">                left: <span class="literal">null</span>,</span><br><span class="line">                right: <span class="literal">null</span></span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">    },</span><br><span class="line">    right: {</span><br><span class="line">        val: <span class="number">5</span>,</span><br><span class="line">        left: <span class="literal">null</span>,</span><br><span class="line">        right: {</span><br><span class="line">            val: <span class="number">9</span>,</span><br><span class="line">            left: {</span><br><span class="line">                val: <span class="number">4</span>,</span><br><span class="line">                left: <span class="literal">null</span>,</span><br><span class="line">                right: <span class="literal">null</span></span><br><span class="line">            },</span><br><span class="line">            right: <span class="literal">null</span></span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="先序遍历内功心法"><a href="#先序遍历内功心法" class="headerlink" title="先序遍历内功心法"></a>先序遍历内功心法</h3><ul>
+<li>根左右</li>
+</ul>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> POrder = <span class="function"><span class="params">tree</span> =&gt;</span> {</span><br><span class="line">    <span class="keyword">if</span>(!tree) { <span class="keyword">return</span> }</span><br><span class="line">    <span class="built_in">console</span>.log(tree.val);</span><br><span class="line">    POrder(tree.left)</span><br><span class="line">    POrder(tree.right)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">POrder(BTree)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2 7 2 6 5 11 5 9 4 </span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="中序遍历内功心法"><a href="#中序遍历内功心法" class="headerlink" title="中序遍历内功心法"></a>中序遍历内功心法</h3><ul>
+<li>左根右</li>
+</ul>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> POrder = <span class="function"><span class="params">tree</span> =&gt;</span> {</span><br><span class="line">    <span class="keyword">if</span>(!tree) { <span class="keyword">return</span> }</span><br><span class="line">    POrder(tree.left)</span><br><span class="line">    <span class="built_in">console</span>.log(tree.val);</span><br><span class="line">    POrder(tree.right)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">POrder(BTree)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2 7 5 6 11 2 5 4 9</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="后续遍历内功心法"><a href="#后续遍历内功心法" class="headerlink" title="后续遍历内功心法"></a>后续遍历内功心法</h3><ul>
+<li><p>左右根</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> POrder = <span class="function"><span class="params">tree</span> =&gt;</span> {</span><br><span class="line">    <span class="keyword">if</span>(!tree) { <span class="keyword">return</span> }</span><br><span class="line">    POrder(tree.left)</span><br><span class="line">    POrder(tree.right)</span><br><span class="line">    <span class="built_in">console</span>.log(tree.val);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">POrder(BTree)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2 5 11 6 7 4 9 5 2</span></span><br></pre></td></tr></tbody></table></figure>
+
+</li>
+</ul>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="https://sharefs.yun.kugou.com/202010071528/5be5c9a1f34a2adb97afe6de21aa366a/G230/M0A/0C/09/hocBAF7i60OANQPYADrO3cH2a_M572.mp3">
+            </audio>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+<script src="/bundle.js"></script></body></html>

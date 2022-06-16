@@ -1,0 +1,418 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>新兴前端框架 Svelte 从入门到原理 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,以下文章来源于字节前端 ByteFE ，作者雾豹
+
+在这篇文章中，我们将会介绍 Svelte 框架的特性、优缺点和底层原理。
+
+本文尽量不会涉及 Svelte 的语法，大家可以放心食用。因为 Sve,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">新兴前端框架 Svelte 从入门到原理</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">新兴前端框架 Svelte 从入门到原理</h1>
+        <div class="stuff">
+            <span>三月 11, 2021</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             5.4k 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               19分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E8%BD%AC%E8%BD%BD/" rel="tag">转载</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p><strong>以下文章来源于字节前端 ByteFE ，作者雾豹</strong></p>
+<hr>
+<p>在这篇文章中，我们将会介绍 Svelte 框架的特性、优缺点和底层原理。</p>
+<blockquote>
+<p>本文尽量不会涉及 Svelte 的语法，大家可以放心食用。因为 Svelte 的语法极其简单，而且官方教程学习曲线平缓<a target="_blank" rel="noopener" href="https://www.sveltejs.cn/%EF%BC%8C%E7%9B%B8%E4%BF%A1%E5%A4%A7%E5%AE%B6%E5%BE%88%E5%BF%AB%E5%B0%B1%E4%BC%9A%E4%B8%8A%E6%89%8B%E8%AF%AD%E6%B3%95%E7%9A%84%EF%BC%8C%E8%BF%99%E9%87%8C%E5%B0%B1%E4%B8%8D%E5%81%9A%E5%AE%98%E7%BD%91%E6%90%AC%E8%BF%90%E5%B7%A5%E4%BA%86%E3%80%82">https://www.sveltejs.cn/，相信大家很快就会上手语法的，这里就不做官网搬运工了。</a></p>
+</blockquote>
+<p>前端领域是发展迅速，各种轮子层出不穷的行业。最近这些年，随着三大框架<code>React</code>、<code>Vue</code>、<code>Angular</code>版本逐渐稳定，前端技术栈的迭代似乎缓慢下来，<code>React 16</code>版本推出了 <code>Fiber</code>， <code>Vue 3.0</code> 也已经在襁褓之中。</p>
+<p>如果我们把目光拉伸到未来十年的视角，前端行业会出现哪些框架有可能会挑战<code>React</code>或者<code>Vue</code>呢？我们认为，崭露头角的 <code>Svelte</code> 应该是其中的选项之一。</p>
+<h2 id="Svelte-简介"><a href="#Svelte-简介" class="headerlink" title="Svelte 简介"></a>Svelte 简介</h2><p><code>Svelte</code>叫法是<code>[Svelte]</code>, 本意是苗条纤瘦的，是一个新兴热门的前端框架.</p>
+<p>在最新的<code>《State of JS survey of 2020》</code>中，它被预测为未来十年可能取代React和Vue等其他框架的新兴技术。如果你不确定自己是否该了解 <code>Svelte</code>，可以先看一下 <code>Svelte</code> 的一些发展趋势。</p>
+<h3 id="开发者满意度"><a href="#开发者满意度" class="headerlink" title="开发者满意度"></a>开发者满意度</h3><p>从<code>2019</code>年开始, <code>Svelte</code>出现在榜单中。刚刚过去的<code>2020</code>年，<code>Svelte</code>在满意度排行榜中超越了<code>react</code>，跃升到了第一位。</p>
+<h3 id="开发者兴趣度"><a href="#开发者兴趣度" class="headerlink" title="开发者兴趣度"></a>开发者兴趣度</h3><p>在开发者兴趣度方面，Svelte 蝉联了第一。</p>
+<h3 id="市场占有率"><a href="#市场占有率" class="headerlink" title="市场占有率"></a>市场占有率</h3><p>如果你在19年还没有听说过Svelte，不用紧张，因为svelte 当时仍是小众的开发框架，在社区里仍然没有流行开来.</p>
+<p>2020年，Svelte 的市场占有率从第6名跃升到第4名，仅次于 React、Angular、Vue 老牌前端框架。</p>
+<h2 id="svelte作者——Rich-Harris"><a href="#svelte作者——Rich-Harris" class="headerlink" title="svelte作者——Rich Harris"></a>svelte作者——Rich Harris</h2><p><code>Svelte</code>作者是前端轮子哥 <code>Rich Harris</code>，同时也是<code>Rollup</code> 的作者。<code>Rich Harris</code> 作者本人在介绍 <code>Svelte</code> 时，有一个非常精彩的演讲<code>《Rethinking reactivity》</code>，<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=AdNJ3fydeao&amp;t=1900s">油管连接</a>，感兴趣的同学不要错过。</p>
+<p>他设计<code>Svelte</code>的核心思想在于『通过静态编译减少框架运行时的代码量』，也就是说，<code>vue</code> 和 <code>react</code> 这类传统的框架，都必须引入运行时 <code>(runtime)</code> 代码，用于虚拟<code>dom</code>、<code>diff</code> 算法。<code>Svelted</code>完全溶入<code>JavaScript</code>，应用所有需要的运行时代码都包含在<code>bundle.js</code>里面了，除了引入这个组件本身，你不需要再额外引入一个运行代码。</p>
+<h2 id="Svelte-优势有哪些"><a href="#Svelte-优势有哪些" class="headerlink" title="Svelte 优势有哪些"></a>Svelte 优势有哪些</h2><p>我们先来看一下 <code>Svelte</code> 和<code>React</code>，<code>Vue</code> 相比，有哪些优势。</p>
+<h3 id="No-Runtime-——-无运行时代码"><a href="#No-Runtime-——-无运行时代码" class="headerlink" title="No Runtime —— 无运行时代码"></a>No Runtime —— 无运行时代码</h3><p><code>React</code> 和 <code>Vue</code> 都是基于运行时的框架，当用户在你的页面进行各种操作改变组件的状态时，框架的运行时会根据新的组件状态（state）计算（diff）出哪些DOM节点需要被更新，从而更新视图。</p>
+<p>这就意味着，框架本身所依赖的代码也会被打包到最终的构建产物中。这就不可避免增加了打包后的体积，有一部分的体积增加是不可避免的，那么这部分体积大约是多少呢？请看下面的数据：</p>
+<p>常用的框架中，最小的<code>Vue</code>都有<code>58k</code>，<code>React</code>更有<code>97.5k</code>。我们使用<code>React</code>开发一个小型组件，即使里面的逻辑代码很少，但是打包出来的<code>bundle size</code>轻轻松松都要<code>100k</code>起步。对于大型后台管理系统来说，<code>100k</code> 不算什么，但是对于特别注重用户端加载性能的场景来说，一个组件<code>100k</code> 多，还是太大了。</p>
+<p>如果你特别在意打包出来的体积，Svelte 就是一个特别好的选择。下面是Jacek Schae大神的统计，使用市面上主流的框架，来编写同样的<code>Realword</code> 应用的体积：</p>
+<p>从上图的统计，Svelte简直是神奇！竟然只有 9.7 KB ! 果然魔法消失 UI 框架，无愧其名。</p>
+<p>可以看出，Svelte的bundle size大小是Vue的1/4，是React的1/20，体积上的优势还是相当明显的。</p>
+<h3 id="Less-Code-——写更少的代码"><a href="#Less-Code-——写更少的代码" class="headerlink" title="Less-Code ——写更少的代码"></a>Less-Code ——写更少的代码</h3><p>在写svelte组件时，你就会发现，和 Vue 或 React 相比只需要更少的代码。开发者的梦想之一，就是敲更少的代码。因为更少的代码量，往往意味着有更好的语义性，也有更少的几率写出bug。</p>
+<p>下面的例子，可以看出Svelte和React的不同：</p>
+<ol>
+<li><code>React</code>的代码</li>
+</ol>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> [count, setCount] = useState(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">increment</span>(<span class="params"></span>) </span>{</span><br><span class="line">  setCount(count + <span class="number">1</span>);</span><br><span class="line">}</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<ol start="2">
+<li><code>Svelte</code>的代码</li>
+</ol>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">increment</span>(<span class="params"></span>) </span>{</span><br><span class="line">  count += <span class="number">1</span>;</span><br><span class="line">}</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>虽然用上了<code>16</code>版本最新的 <code>hooks</code>，但是和<code>svelte</code>相比，代码还是很冗余。</p>
+<p>在React中，我们要么使用<code>useState</code>钩子，要么使用<code>setState</code>设置状态。而在<code>Svelte</code>中，可以直接使用赋值操作符更新状态。</p>
+<p>如果说上面的例子太简单了，可以看下面的统计，分别使用<code>React</code>和 <code>Svelte</code> 实现下面的组件所需要的代码行数.</p>
+<p>下面还是 Jacek Schae 老哥的统计，编写同样的Realword 应用，各个框架所需要的行数.</p>
+<h3 id="Hight-Performance-——高性能"><a href="#Hight-Performance-——高性能" class="headerlink" title="Hight-Performance ——高性能"></a>Hight-Performance ——高性能</h3><p>在Virtual Dom已经是前端框架标配的今天， Svelte 声称自己是没有Virtual Dom加持的， 怎么还能保证高性能呢？</p>
+<p>不急，慢慢看。</p>
+<h4 id="性能测评"><a href="#性能测评" class="headerlink" title="性能测评"></a>性能测评</h4><p>Jacek Schae 在《A RealWorld Comparison of Front-End Frameworks with Benchmarks》中用主流的前端框架来编写 RealWorld 应用，使用 Chrome 的Lighthouse Audit测试性能，得出数据是Svelte 略逊于Vue, 但好于 React。</p>
+<p>是不是很惊奇？另外一个前端框架性能对比的项目也给出了同样的答案：<a target="_blank" rel="noopener" href="https://github.com/krausest/js-framework-benchmark%E3%80%82">https://github.com/krausest/js-framework-benchmark。</a></p>
+<p>为什么 Svelte 性能还不错，至少没有我们预期的那么糟糕？我们接下来会在原理那一小结来介绍。</p>
+<h2 id="Svelte-劣势"><a href="#Svelte-劣势" class="headerlink" title="Svelte 劣势"></a>Svelte 劣势</h2><p>说完了<code>Svelte</code>的优势，我们也要考虑到<code>Svelte</code>的劣势。</p>
+<h3 id="和Vue，-React框架的对比"><a href="#和Vue，-React框架的对比" class="headerlink" title="和Vue， React框架的对比"></a>和Vue， React框架的对比</h3><p>在构建大型前端项目时，我们在选择框架的时候就需要考虑更多的事情。<code>Svelte</code>目前尚处在起步阶段，对于大型项目必要的单元测试并没有完整的方案。目前在大型应用中使用<code>Svelte</code>, 需要谨慎评。</p>
+<table>
+<thead>
+<tr>
+<th>类目</th>
+<th>Svelte</th>
+<th>Vue</th>
+<th>React</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>UI组件库</td>
+<td><code>Material design ( 坦率的说，不好用 )</code></td>
+<td><code>Element UI / AntD</code></td>
+<td><code>AntD / Material design</code>｜</td>
+</tr>
+<tr>
+<td>状态管理</td>
+<td>官网自带</td>
+<td>Vuex</td>
+<td>Redux/MobX</td>
+</tr>
+<tr>
+<td>路由</td>
+<td>Svelte-router</td>
+<td>Vue-router</td>
+<td>React-router</td>
+</tr>
+<tr>
+<td>服务端渲染</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>测试工具</td>
+<td>官方网站没有相关内容</td>
+<td>@vue/test-utils</td>
+<td>Jest</td>
+</tr>
+</tbody></table>
+<p>我们在用 Svelte 开发公司级别中大型项目时，也发现了其他的一些主要注意的点</p>
+<p>没有像AntD那样成熟的UI库。比如说需求方想加一个toast提示，或者弹窗，pm：”很简单的，不用出UI稿，就直接用之前的样式好啦~“<br>但是 Svelte 需要从0开始 ”抄“ 出来一个toast或者弹窗组件出来，可能会带来额外的开发量和做好加班的准备。</p>
+<ul>
+<li><p>Svelte 原生不支持预处理器，比如说less/scss，需要自己单独的配置 webpack loader。</p>
+</li>
+<li><p>Svelte 原生脚手架没有目录划分</p>
+</li>
+<li><p>暂时不支持typescript，虽然官方说了会支持, 但是不知道什么时候.</p>
+</li>
+</ul>
+<p>还需要注意的一点是，React / Vue等框架自带的runtime虽然会增加首屏加载的bundle.js，可是当项目变得越来越大的时候，框架的runtime在bundle.js里面占据的比例也会越来越小，这个时候我们就得考虑一下是不是存在一个Svelte生成的代码大于React和Vue生成的代码的阈值了。</p>
+<h2 id="原理篇"><a href="#原理篇" class="headerlink" title="原理篇"></a>原理篇</h2><p><code>Svelte</code>原理相对于<code>React</code> 和 <code>Vue</code> 来说，相对比较简单，大家可以放心的往下看。</p>
+<p>首先，我们从一个问题出发：</p>
+<h3 id="Virtual-Dom-真的高效吗"><a href="#Virtual-Dom-真的高效吗" class="headerlink" title="Virtual Dom 真的高效吗"></a>Virtual Dom 真的高效吗</h3><p>Rich Harris 在设计 Svelte 的时候没有采用 Virtual DOM 是因为觉得Virtual DOM Diff 的过程是非常低效的。</p>
+<p>在他的一文《Virtual DOM is pure overhead》原文连接：<a target="_blank" rel="noopener" href="https://www.sveltejs.cn/blog/virtual-dom-is-pure-overhead%EF%BC%8C%E6%84%9F%E5%85%B4%E8%B6%A3%E7%9A%84%E5%90%8C%E5%AD%A6%E5%8F%AF%E4%BB%A5%E7%BF%BB%E4%B8%80%E4%B8%8B%E3%80%82">https://www.sveltejs.cn/blog/virtual-dom-is-pure-overhead，感兴趣的同学可以翻一下。</a></p>
+<p>人们觉得 Virtual DOM高效的一个理由，就是它不会直接操作原生的DOM节点。在浏览器当中，JavaScript的运算在现代的引擎中非常快，但DOM本身是非常缓慢的东西。当你调用原生DOM API的时候，浏览器需要在JavaScript引擎的语境下去接触原生的DOM的实现，这个过程有相当的性能损耗。</p>
+<p>但其实 Virtual DOM 有时候会做很多无用功，这体现在很多组件会被“无缘无故”进行重渲染（re-render）。</p>
+<p>比如说，下面的例子中，React 为了更新掉message 对应的DOM 节点，需要做n多次遍历，才能找到具体要更新哪些节点。</p>
+<p>为了解决这个问题，React 提供pureComponent,shouldComponentUpdate，useMemo,useCallback让开发者来操心哪些subtree是需要重新渲染的，哪些是不需要重新渲染的。究其本质，是因为 React 采用 jsx 语法过于灵活，不理解开发者写出代码所代表的意义，没有办法做出优化。</p>
+<p>所以，React 为了解决这个问题，在 v16.0 带来了全新的 Fiber 架构，Fiber 思路是不减少渲染工作量，把渲染工作拆分成小任务思路是不减少渲染工作量。渲染过程中，留出时间来处理用户响应，让用户感觉起来变快了。这样会带来额外的问题，不得不加载额外的代码，用于处理复杂的运行时调度工作</p>
+<h4 id="那么-Svelte-是如何解决这个问题的？"><a href="#那么-Svelte-是如何解决这个问题的？" class="headerlink" title="那么 Svelte 是如何解决这个问题的？"></a>那么 Svelte 是如何解决这个问题的？</h4><p>React 采用 jsx 语法本质不理解数据代表的意义，没有办法做出优化。Svelte 采用了Templates语法（类似于 Vue 的写法），更加严格和具有语义性，可以在编译的过程中就进行优化操作。</p>
+<p>那么，为什么Templates语法可以解决这个问题呢？</p>
+<h4 id="Template-带来的优势"><a href="#Template-带来的优势" class="headerlink" title="Template 带来的优势"></a>Template 带来的优势</h4><p>关于 <code>JSX</code> 与 <code>Templates</code> ，可以看成是两种不同的前端框架渲染机制，有兴趣的同学可以翻一下尤雨溪的演讲《在框架设计中寻求平衡》：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/av80042358/%E3%80%82">https://www.bilibili.com/video/av80042358/。</a></p>
+<p>一方面， <code>JSX</code> 的代表框架有 <code>React</code> 以及所有 <code>react-like</code> 库，比如 <code>preact</code>、 <code>stencil</code>, <code>infernal</code> 等；另一方面， <code>Templates</code> 代表性的解决方案有 <code>Vue</code>、<code>Svelte</code>、 <code>ember</code>，各有优缺点。</p>
+<h3 id="JSX-优缺点"><a href="#JSX-优缺点" class="headerlink" title="JSX 优缺点"></a>JSX 优缺点</h3><p><code>jsx</code> 具有 <code>JavaScript</code> 的完整表现力，非常具有表现力，可以构建非常复杂的组件。</p>
+<p>但是灵活的语法，也意味着引擎难以理解，无法预判开发者的用户意图，从而难以优化性能。你很可能会写出下面的代码：</p>
+<p>在使用 <code>JavaScript</code> 的时候，编译器不可能<code>hold</code>住所有可能发生的事情，因为 <code>JavaScript</code> 太过于动态化。也有人对这块做了很多尝试，但从本质上来说很难提供安全的优化。</p>
+<h4 id="Template优缺点"><a href="#Template优缺点" class="headerlink" title="Template优缺点"></a>Template优缺点</h4><p><code>Template</code>模板是一种非常有约束的语言，你只能以某种方式去编写模板。</p>
+<p>例如，当你写出这样的代码的时候，编译器可以立刻明白：”哦！这些 <code>p</code> 标签的顺序是不会变的，这个 <code>id</code> 是不会变的，这些 class 也不会变的，唯一会变的就是这个“。</p>
+<p>在编译时，编译器对你的意图可以做更多的预判，从而给它更多的空间去做执行优化。</p>
+<p>左侧 <code>template</code> 中，其他所有内容都是静态的，只有 <code>name</code> 可能会发生改变。</p>
+<p>右侧 <code>p</code> 函数是编译生成的最终的产物，是原生的<code>js</code>可以直接运行在浏览器里，会在有脏数据时被调用。<code>p</code> 函数唯一做的事情就是，当 <code>name</code> 发生变更的时候，调用原生方法把 <code>t1</code> 这个原生<code>DOM</code>节点更新。这里的 <code>set_data</code> 可不是 <code>React</code> 的 <code>setState</code> 或者小程序的 <code>setData</code> ，这里的<code>set_data</code> 就是封装的原生的 <code>javascript</code> 操作<code>DOM</code> 节点的方法。</p>
+<p>如果我们仔细观察上面的代码，发现问题的关键在于 <code>if</code>语句的判断条件——<code>changed.name</code>， 表示有哪些变量被更新了，这些被更新的变量被称为脏数据。</p>
+<p>任何一个现代前端框架，都需要记住哪些数据更新了，根据更新后的数据渲染出最新的<code>DOM</code>.</p>
+<h4 id="Svelte-记录脏数据的方式：位掩码（bitMask）"><a href="#Svelte-记录脏数据的方式：位掩码（bitMask）" class="headerlink" title="Svelte 记录脏数据的方式：位掩码（bitMask）"></a>Svelte 记录脏数据的方式：位掩码（bitMask）</h4><p>Svelte使用位掩码（bitMask） 的技术来跟踪哪些值是脏的，即自组件最后一次更新以来，哪些数据发生了哪些更改。</p>
+<p>位掩码是一种将多个布尔值存储在单个整数中的技术，一个比特位存放一个数据是否变化，一般<code>1</code>表示脏数据，<code>0</code>表示是干净数据。</p>
+<p>用大白话来讲，你有<code>A</code>、<code>B</code>、<code>C</code>、<code>D</code> 四个值，那么二进制<code>0000 0001</code>表示第一个值A发生了改变，<code>0000 0010</code>表示第二个值<code>B</code>发生了改变，<code>0000 0100</code>表示第三个值<code>C</code>发生了改变，<code>0000 1000</code>表示第四个<code>D</code>发生了改变。</p>
+<p>这种表示法，可以最大程度的利用空间。为啥这么说呢？</p>
+<p>比如说，十进制数字<code>3</code>就可以表示 <code>A</code>、<code>B</code>是脏数据。先把十进制数字<code>3</code>， 转变为二进制<code>0000 0011</code>。从左边数第一位、第二位是<code>1</code>，意味着第一个值<code>A</code> 和第二个值<code>B</code>是脏数据；其余位都是<code>0</code>，意味着其余数据都是干净的。</p>
+<h4 id="JS-的限制"><a href="#JS-的限制" class="headerlink" title="JS 的限制"></a>JS 的限制</h4><p>那么，是不是用二进制比特位就可以记录各种无穷无尽的变化了呢？</p>
+<p><code>JS</code> 的二进制有<code>31</code>位限制，<code>number</code> 类型最长是<code>32</code>位，减去<code>1</code>位用来存放符号。也就是说，如果 <code>Svelte</code> 采用二进制位存储的方法，那么只能存 <code>31</code>个数据。</p>
+<p>但肯定不能这样，对吧？</p>
+<p><code>Svelte</code> 采用数组来存放，数组中一项是二进制<code>31</code>位的比特位。假如超出<code>31</code>个数据了，超出的部分放到数组中的下一项。</p>
+<p>这个数组就是<code>component.$.dirty</code>数组，二进制的<code>1</code>位表示该对应的数据发生了变化，是脏数据，需要更新；二进制的<code>0</code>位表示该对应的数据没有发生变化，是干净的。</p>
+<h4 id="一探究竟component-dirty"><a href="#一探究竟component-dirty" class="headerlink" title="一探究竟component.$.dirty"></a>一探究竟component.$.dirty</h4><p>上文中，我们说到<code>component.$.dirty</code>是数组，具体这个数组长什么样呢？</p>
+<p>我们模拟一个 <code>Svelte</code> 组件，这个 <code>Svelte</code> 组件会修改33个数据。</p>
+<p>我们打印出每一次<code>make_dirty</code>之后的<code>component.$.dirty</code>， 为了方便演示，转化为二进制打印出来，如下面所示：</p>
+<p>上面数组中的每一项中的每一个比特位，如果是1，则代表着该数据是否是脏数据。如果是脏数据，则意味着更新。</p>
+<p>第一行<code>["0000000000000000000000000000001", "0000000000000000000000000000000"]</code>, 表示第一个数据脏了，需要更新第一个数据对应的<code>dom</code>节点</p>
+<p>第二行<code>["0000000000000000000000000000011", "0000000000000000000000000000000"]</code>, 表示第一个、第二个数据都脏了，需要更新第一个，第二个数据对应的<code>dom</code>节点。</p>
+<p>……</p>
+<p>当一个组件内，数据的个数，超出了<code>31</code>的数量限制，就数组新增一项来表示。</p>
+<p>这样，我们就可以通过<code>component.$.dirty</code>这个数组，清楚的知道有哪些数据发生了变化。那么具体应该更新哪些DOM 节点呢？</p>
+<h4 id="数据和DOM节点之间的对应关系"><a href="#数据和DOM节点之间的对应关系" class="headerlink" title="数据和DOM节点之间的对应关系"></a>数据和DOM节点之间的对应关系</h4><p>我们都知道， React 和 Vue 是通过 Virtual Dom 进行 diff 来算出来更新哪些 DOM 节点效率最高。Svelte 是在编译时候，就记录了数据 和 DOM 节点之间的对应关系，并且保存在 p 函数中。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/lP9iauFI73z8zVrOwuwOCBxjsf0osDx8Nbmvp9xd7GszgEaaLrlRecCYD0WqicibAQR9jSJVucZfJgybB3hxQXWzw/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1&amp;wx_co=1"></p>
+<p>这里说的<code>p</code>函数，就是 <code>Svelte</code> 的更新方法，本质上就是一大堆<code>if</code>判断，逻辑非常简单.</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( A 数据变了 ) {</span><br><span class="line">  更新A对应的DOM节点</span><br><span class="line">}</span><br><span class="line"><span class="keyword">if</span> ( B 数据变了 ) {</span><br><span class="line">  更新B对应的DOM节点</span><br><span class="line">}</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+
+<p>为了更加直观的理解，我们模拟更新一下<code>33</code>个数据的组件，编译得到的<code>p 函数</code>打印出来，如：</p>
+<p>我们会发现，里面就是一大堆if判断，但是if判断条件比较有意思，我们从上面摘取一行仔细观察一下：</p>
+<p>首先要注意，<code>&amp;</code>不是逻辑与，而是按位与，会把两边数值转为二进制后进行比较，只有相同的二进制位都为<code>1</code> 才会为真。</p>
+<p>这里的<code>if</code>判断条件是：拿<code>compoenent.$.dirty[0]</code>(<code>00000000000000000000000000000100</code>)和<code>4</code>（<code>4</code> 转变为二进制是<code>0000 0100</code>）做按位并操作。那么我们可以思考一下了，这个按位并操作什么时候会返回1呢？</p>
+<p><code>4</code>是一个常量，转变为二进制是<code>0000 0100</code>， 第三位是<code>1</code>。那么也就是，只有<code>dirty[0]</code>的二进制的第三位也是<code>1</code>时, 表达式才会返回真。换句话来说，只有第三个数据是脏数据，才会走入到这个if判断中，执行<code>set_data(t5, ctx[2])</code>， 更新<code>t5</code>这个 <code>DOM</code> 节点。</p>
+<p>当我们分析到这里，已经看出了一些眉目，让我们站在更高的一个层次去看待这 <code>30</code>多行代码：它们其实是保存了这<code>33</code>个变量 和 真实<code>DOM</code> 节点之间的对应关系，哪些变量脏了，<code>Svelte </code>会走入不同的if体内直接更新对应的<code>DOM</code>节点，而不需要复杂 <code>Virtual DOM DIFF</code> 算出更新哪些<code>DOM</code>节点；</p>
+<p>这 <code>30</code>多行代码，是<code>Svelte </code>编译了我们写的<code>Svelte </code>组件之后的产物，在<code>Svelte</code> 编译时，就已经分析好了，数据 和 <code>DOM </code>节点之间的对应关系，在数据发生变化时，可以非常高效的来更新DOM节点。</p>
+<p><code>Vue</code> 曾经也是想采取这样的思路，但是<code>Vue</code>觉得保存每一个脏数据太消耗内存了，于是没有采用那么细颗粒度，而是以组件级别的中等颗粒度，只监听到组件的数据更新，组件内部再通过 <code>DIFF </code>算法计算出更新哪些 <code>DOM</code> 节点。<code>Svelte</code> 采用了比特位的存储方式，解决了保存脏数据会消耗内存的问题。</p>
+<h4 id="整体流程"><a href="#整体流程" class="headerlink" title="整体流程"></a>整体流程</h4><p>上面就是Svelte 最核心更新DOM机制，下面我们串起来整个的流程。</p>
+<p>下面是非常简单的一个 Svelte 组件，点击<code>&lt;button&gt;</code>会触发onClick事件，从而改变name 变量。</p>
+<p>上面代码背后的整体流程如下图所示，我们一步一步来看：</p>
+<p>第一步，<code>Svelte</code> 会编译我们的代码，下图中左边是我们的源码，右边是 <code>Svelte</code> 编译生成的。<code>Svelte</code> 在编译过程中发现，『咦，这里有一行代码 <code>name</code> 被重新赋值了，我要插入一条<code>make_dirty</code>的调用』，于是当我们改写 <code>name </code>变量的时候，就会调用<code>make_dirty</code>方法把 <code>name</code> 记为脏数据。</p>
+<p>第二步，我们来看make_diry方法究竟做了什么事情：</p>
+<ol>
+<li><p>把对应数据的二进制改为1</p>
+</li>
+<li><p>把对应组件记为脏组件，推入到 dirty_components 数组中</p>
+</li>
+<li><p>调用<code>schedule_update()</code>方法把<code>flush</code>方法推入到一帧中的微任务阶段执行。因为这样既可以做频繁更新 的截流，又避免了阻塞一帧中的 <code>layout</code>， <code>repaint</code> 阶段的渲染。</p>
+</li>
+</ol>
+<p><code>schedule_update</code> 方法其实就是一个<code>promise.then()</code>，</p>
+<p>一帧大概有 <code>16ms</code>, 大概会经历 <code>layout</code>, <code>repaint</code>的阶段后，就可以开始执行微任务的回调了。</p>
+<p><code>flush</code> 方法做的事情也比较简单，就是遍历脏组件，依次调用<code>update</code>方法去更新对应的组件。</p>
+<p><code>update</code>方法除了执行一些生命周期的方法外，最核心的一行代码是调用<code>p</code>方法，<code>p</code>方法我们已经在上文中介绍过很熟悉了。</p>
+<p><code>p</code> 方法的本质就是走入到不同的<code>if</code> 判断里面，调用<code>set_data</code>原生的 <code>javascript</code> 方法更新对应的 <code>DOM</code>节点。</p>
+<p>至此，我们的页面的DOM节点就已经更新好了。</p>
+<blockquote>
+<p>上面的代码均是剔除了分支逻辑的伪代码。<br>Svelte 在处理子节点列表的时候，还是有优化的算法在的。比如说[a,b,c,d] 变成 [d, a, b, c] ，但是只是非常简单的优化，简单来说，是比较节点移动距离的绝对值，绝对值最小的节点被移动。<br>所以，严格意义上来说，Svelte 并不是100%无运行时，还是会引入额外的算法逻辑，只是量很少罢了。</p>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>一个前端框架，不管是<code>vue</code>还是<code>react</code>更新了数据之后，需要考虑更新哪个<code>dom</code>节点，也就是，需要知道，脏数据和待更新的真实<code>dom</code>之间的映射。<code>vue</code>, <code>react</code> 是通过 <code>virtualDom</code> 来 <code>diff</code> 计算出更新哪些<code>dom</code>节点更划算，而<code>sveltedom </code>是把数据和真实<code>dom</code>之间的映射关系，在编译的时候就通过<code>AST</code>等算出来，保存在<code>p</code>函数中。</p>
+<p><code>Svelte</code> 作为新兴的前端框架，采用了和 <code>React</code>， <code>Vue</code> 不同的设计思路，其独特的特性在某些场景下还是很值得尝试的。</p>
+<blockquote>
+<p>免责声明：本文章来自转载，不会有任何盈利部分，如有侵权，请联系<code>jadeface.scholar@gmail.com</code>删除，遵循<code>开放知识共享协议--GNU</code>。</p>
+</blockquote>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+<script src="/bundle.js"></script></body></html>

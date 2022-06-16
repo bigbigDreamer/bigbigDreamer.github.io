@@ -1,0 +1,402 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>组件库打包---答疑篇 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,作为九月的收尾文章，分享一下我已经应用于若干生产项目的组件库打包方案以及难题解决～
+以下的每个问题点，都以Topic的形式展开讲述。
+组件库的样式怎么解决？其实在之前的文章中有分享过组件库的样式解决,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">组件库打包---答疑篇</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">组件库打包---答疑篇</h1>
+        <div class="stuff">
+            <span>九月 27, 2021</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             1.2k 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               4分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E6%89%93%E5%8C%85/" rel="tag">打包</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E6%9E%84%E5%BB%BA/" rel="tag">构建</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p>作为九月的收尾文章，分享一下我已经应用于若干生产项目的组件库打包方案以及难题解决～</p>
+<p>以下的每个问题点，都以<code>Topic</code>的形式展开讲述。</p>
+<h2 id="组件库的样式怎么解决？"><a href="#组件库的样式怎么解决？" class="headerlink" title="组件库的样式怎么解决？"></a>组件库的样式怎么解决？</h2><p>其实在之前的文章中有分享过组件库的样式解决方案，但是还是有一些问题的，不过经历了一个多星期的钻研尝试，总算是找到了样式解决方案的最优解～</p>
+<p><strong>怎么处理第三方样式？</strong></p>
+<p>拿目前的<code>antd</code>样式来看，为了避免打包过程中产生额外的<code>三方库</code>样式赘余，所以我们使用<strong>按需</strong>&amp;<strong>peer依赖方案</strong></p>
+<p>具体对应到<code>rollup</code>配置里，我们可能会这么做：</p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js"><span class="token keyword">const</span> external <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token string">'react'</span><span class="token punctuation">,</span>
+    <span class="token string">'react/jsx-runtime'</span><span class="token punctuation">,</span>
+    <span class="token string">'antd'</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 省略若干配置</span>
+    external<span class="token punctuation">,</span>
+    <span class="token comment">// 省略若干配置</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>其次，对应到<code>babel.config</code>中，我们可能会这么做：</p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
+    presets<span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">[</span><span class="token string">'@babel/preset-env'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> loose<span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">[</span>
+            <span class="token string">'@babel/preset-react'</span><span class="token punctuation">,</span>
+            <span class="token punctuation">{</span>
+                runtime<span class="token operator">:</span> <span class="token string">'automatic'</span><span class="token punctuation">,</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    plugins<span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token string">'@babel/plugin-transform-runtime'</span><span class="token punctuation">,</span>
+        <span class="token comment">// 下面的配置是要点！</span>
+        <span class="token punctuation">[</span>
+            <span class="token string">'import'</span><span class="token punctuation">,</span>
+            <span class="token punctuation">{</span>
+                libraryName<span class="token operator">:</span> <span class="token string">'antd'</span><span class="token punctuation">,</span>
+                libraryDirectory<span class="token operator">:</span> <span class="token string">'es'</span><span class="token punctuation">,</span>
+                style<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>告诉工具，我们的打包配置是按需的，其次，我们的样式走的是<code>less</code>文件。为了保证<strong>不和项目中的<code>antd css</code>产生冲突，那么我们同样需要在项目中做相同的处理</strong></p>
+<p><strong>项目中的配置</strong></p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"babel"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"plugins"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">[</span>
+        <span class="token string">"@babel/plugin-proposal-decorators"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+          <span class="token property">"legacy"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token punctuation">[</span>
+        <span class="token string">"import"</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+          <span class="token property">"libraryName"</span><span class="token operator">:</span> <span class="token string">"antd"</span><span class="token punctuation">,</span>
+          <span class="token property">"libraryDirectory"</span><span class="token operator">:</span> <span class="token string">"es"</span><span class="token punctuation">,</span>
+          <span class="token property">"style"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">]</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"presets"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token string">"react-app"</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>当然这里是需要借助<code>webpack</code>的<code>less loader</code>做一些事情的：</p>
+<p>需要在 <code>less</code> <code>options</code>中添加如下配置：</p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js"><span class="token punctuation">{</span>
+    lessOptions<span class="token operator">:</span> <span class="token punctuation">{</span>
+        javascriptEnabled<span class="token operator">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>保证和组件库的配置依赖保持一致，让组件库的按需<code>es</code>能够找得到项目中的按需样式，这样就可以做到<strong>样式不丢失</strong>。</p>
+<h2 id="多个组件包的管理怎么处理"><a href="#多个组件包的管理怎么处理" class="headerlink" title="多个组件包的管理怎么处理"></a>多个组件包的管理怎么处理</h2><p><strong>工具</strong></p>
+<p>最常见的使用工具，当然是<code>lerna</code>了，我们可以配置<code>lerna</code>。</p>
+<p><code>lerna</code>的配置详细规则，这里不再做过多的阐述，重点我们去解决下面的问题：</p>
+<p><strong><code>lerna</code>管理多个包，怎么处理包的碰撞<code>log</code>，也就是不相关的包会触发版本升级</strong></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># **Note:** Version bump only for package xxx</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>上面的内容就是包版本发生碰撞之后的<code>changelog</code>内容，怎么解决呢？</p>
+<p>我个人想了一个比较好的方案：</p>
+<p><strong>解决痛点：lerna只能一次性控制所有的包打包构建，那么单独精确控制呢？</strong></p>
+<p><strong>思路：提供可视化的打包选择<code>shell</code>，提供更加语意化的<code>commit</code>信息</strong></p>
+<h6 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h6><p>解析命令行：</p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js"><span class="token keyword">const</span> <span class="token punctuation">{</span> Command <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'commander'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+program<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>process<span class="token punctuation">.</span>argv<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h6 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h6><p>获取<code>lerna</code>管理项目的所有包信息：</p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js"><span class="token keyword">const</span> shell <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'shelljs'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> res <span class="token operator">=</span> shell<span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string"> lerna ls --json</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span> silent<span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>上面的<code>silent</code>的意思是，控制命令行执行不输出语句，因为我们更希望我们的<code>shell</code>是干净的。</p>
+<h6 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h6><p>命令行答询</p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js"><span class="token keyword">const</span> inquirer <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'inquirer'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+inquirer
+    <span class="token punctuation">.</span><span class="token function">prompt</span><span class="token punctuation">(</span><span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+            type<span class="token operator">:</span> <span class="token string">'checkbox'</span><span class="token punctuation">,</span>
+            message<span class="token operator">:</span> <span class="token string">'Please select your want publish packages'</span><span class="token punctuation">,</span>
+            name<span class="token operator">:</span> <span class="token string">'packages'</span><span class="token punctuation">,</span>
+            choices<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token keyword">new</span> <span class="token class-name">inquirer<span class="token punctuation">.</span>Separator</span><span class="token punctuation">(</span><span class="token string">' = Lerna All Packages = '</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">...</span><span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>stdout<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">catch</span><span class="token punctuation">(</span><span class="token parameter">error</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>error<span class="token punctuation">.</span>isTtyError<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment">// Prompt couldn't be rendered in the current environment</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment">// Something else went wrong</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>上面的文档，其实在人家<code>github</code>仓库中已经给了案例了，这里做一个传送门：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/SBoudrias/Inquirer.js/tree/master/packages/inquirer/examples">传送门</a> : <a target="_blank" rel="noopener" href="https://github.com/SBoudrias/Inquirer.js/tree/master/packages/inquirer/examples">https://github.com/SBoudrias/Inquirer.js/tree/master/packages/inquirer/examples</a></p>
+<p>选择自己适合的方案去做。</p>
+<h6 id="第四步"><a href="#第四步" class="headerlink" title="第四步"></a>第四步</h6><p>借助<code>lerna</code>命令去遍历精确打包；</p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js"><span class="token keyword">const</span> inquirer <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'inquirer'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+inquirer
+    <span class="token punctuation">.</span><span class="token function">prompt</span><span class="token punctuation">(</span><span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+            type<span class="token operator">:</span> <span class="token string">'checkbox'</span><span class="token punctuation">,</span>
+            message<span class="token operator">:</span> <span class="token string">'Please select your want publish packages'</span><span class="token punctuation">,</span>
+            name<span class="token operator">:</span> <span class="token string">'packages'</span><span class="token punctuation">,</span>
+            choices<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token keyword">new</span> <span class="token class-name">inquirer<span class="token punctuation">.</span>Separator</span><span class="token punctuation">(</span><span class="token string">' = Lerna All Packages = '</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">...</span><span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span>stdout<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token parameter">answers</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        answers<span class="token punctuation">.</span>packages<span class="token operator">?.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">item</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+            shell<span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">lerna run --scope </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>item<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string"> build</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>其实<code>lerna</code>的官方文档里有说明<code>lerna run --scope [包名] [script 命令]</code> 可以做到精确控制某个包的命令执行，那我们遍历就可以做一个<code>宏观并行处理</code>。</p>
+<h6 id="第五步"><a href="#第五步" class="headerlink" title="第五步"></a>第五步</h6><p>借助<code>commitizen</code>控制<strong>发布信息的规范化</strong></p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">starderedCommmit</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    shell<span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">git add .</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> bootstrap <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'commitizen/dist/cli/git-cz'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>bootstrap<span class="token punctuation">;</span>
+    <span class="token function">bootstrap</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        cliPath<span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'../node_modules/commitizen'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        config<span class="token operator">:</span> <span class="token punctuation">{</span>
+            path<span class="token operator">:</span> <span class="token string">'cz-conventional-changelog'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>这个东西呢，在<code>库</code>的官方文档里也有写：</p>
+<p><a target="_blank" rel="noopener" href="https://www.npmjs.com/package/@marionebl/git-cz">传送门</a> : <a target="_blank" rel="noopener" href="https://www.npmjs.com/package/@marionebl/git-cz">https://www.npmjs.com/package/@marionebl/git-cz</a></p>
+<p><strong>解释一下，为什么这么做呢？</strong></p>
+<p>因为，这么做的原因是，在<code>shell</code>中如果执行<code>git cz</code>是无法触发交互的，是因为<code>shell</code>开启了子进程做的命令执行。</p>
+<p>最后，我们想实现的效果可能就是这样：</p>
+<p><img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/img/2109/Snipaste_2021-09-28_01-28-01.png"></p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>最后，小结一下吧，其实每一个问题都是可以解决的，我们欠缺的并不是实现技术的细节，而是一个思路。</p>
+<p>有思路就代表可行，或者可以尝试下，这样我们有路才会选择去走还是坐飞机，还是坐火车，骑车……</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+</body></html>

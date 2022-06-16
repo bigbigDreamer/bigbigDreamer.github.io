@@ -1,0 +1,413 @@
+<!DOCTYPE html><html lang="zh" class="loading"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rollup 高效打包组件库 - Eric's Blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate">
+    <meta name="baidu-site-verification" content="code-q7tHyuvy79">
+    <meta name="google-site-verification" content="F97PSHSngeZ-l-I-eHvlFXwqjxNoCrtvvWP8SU9fwco">
+    <meta name="keywords" content="Eric jadeface scholar,"> 
+    <meta name="description" content="jadeface scholar's blog,RollupRollup是什么，这里就不再过多的赘述了，具体详情见官网 : https://rollupjs.org/guide/zh/
+Rollup是自带scope hoisting 和 tree,"> 
+    <meta name="author" content="Scholar"> 
+    <link rel="alternative" href="atom.xml" title="Eric's Blog" type="application/atom+xml"> 
+    <link rel="icon" href="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/favicon.png"> 
+    
+
+
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"><script>function loadCss(l){var d=document,h=d.head,s=d.createElement('link');s.rel='stylesheet';s.href=l;!function e(f){if (d.body)return f();setTimeout(function(){e(f)})}(function(){h.appendChild(s);});}loadCss('/style.css');loadCss('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css');</script><noscript><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css"></noscript></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">Eric's Blog</span>
+    <div id="loader"></div>
+    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="https://www.bigdreamer.cc"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">Rollup 高效打包组件库</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <style>
+    .article .hexo-footer {
+        margin-top: 25px;
+        border-top: 1px solid #E3E3E3;
+    }
+
+    .article .hexo-footer .license {
+        margin-top: 12px;
+        padding-left: 12px;
+        color: #4c4b4b;
+        font-size: 16px;
+        border-left: 5px solid #EF6D57;
+    }
+    .article .hexo-footer .footer-desc {
+        background: url("https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/blog/Snipaste_2021-05-12_21-58-46.png?x-oss-process=image/quality,q_80") no-repeat;
+        background-size: contain;
+        width: 100%;
+        position: relative;
+    }
+
+    .article .hexo-footer p span {
+        font-weight: 600;
+    }
+</style>
+
+<div class="article">
+    <div class="main">
+        <h1 class="title">Rollup 高效打包组件库</h1>
+        <div class="stuff">
+            <span>九月 13, 2021</span>
+            本文共计：<span title="{{ __('post.wordcount') }}">
+             730 字
+              </span>
+            预计阅读时长：<span title="{{ __('post.min2read') }}">
+               3分钟
+             </span>
+            <span id="busuanzi_container_page_pv" style="display:none">
+                本文总阅读量：<span id="busuanzi_value_page_pv" style="margin-right: 0"></span>次
+            </span>
+            <span id="busuanzi_container_site_pv" style="display:none">
+                本站总访问量<span id="busuanzi_value_site_pv" style="margin-right: 0"></span>次
+            </span>
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/rollup/" rel="tag">rollup</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/ts/" rel="tag">ts</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E7%BB%84%E4%BB%B6%E5%BA%93/" rel="tag">组件库</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h2 id="Rollup"><a href="#Rollup" class="headerlink" title="Rollup"></a>Rollup</h2><p><code>Rollup</code>是什么，这里就不再过多的赘述了，具体详情见<a target="_blank" rel="noopener" href="https://rollupjs.org/guide/zh/">官网</a> : <a target="_blank" rel="noopener" href="https://rollupjs.org/guide/zh/">https://rollupjs.org/guide/zh/</a></p>
+<p><code>Rollup</code>是自带<code>scope hoisting</code> 和 <code>tree-shaking</code>的。</p>
+<p><strong>强烈建议：在使用之前认真阅读一遍官方文档</strong></p>
+<h2 id="package-json-配置解读"><a href="#package-json-配置解读" class="headerlink" title="package.json 配置解读"></a>package.json 配置解读</h2><p>参考：<a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/v7/configuring-npm/package-json#main">package.json官方 Docs</a> : <a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/v7/configuring-npm/package-json#main">https://docs.npmjs.com/cli/v7/configuring-npm/package-json#main</a></p>
+<p><strong>核心解读1：<code>module</code>、<code>main</code>、<code>types</code>、<code>typing</code></strong></p>
+<ul>
+<li><p><code>main</code></p>
+<blockquote>
+<p>程序主入口，如果没有设置，默认会在根目录查找<code>index.js</code>，通常给予<code>CommonJS</code>去使用，例如<code>require('xxxxx')</code>。</p>
+</blockquote>
+</li>
+<li><p><code>module</code></p>
+<blockquote>
+<p>程序主入口，虽然不成官方标准，但是正在趋向于主流，主要用于<code>es6</code>。</p>
+</blockquote>
+</li>
+<li><p><code>types</code> &amp; <code>typings</code></p>
+<blockquote>
+<p>如果打包的是<code>ts</code>代码，需要为你的包显式的指定<code>type</code>的声明文件；<br>这两个字段没任何区别，是同义的，<a target="_blank" rel="noopener" href="https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html">参考</a> : <a target="_blank" rel="noopener" href="https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html">https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html</a></p>
+</blockquote>
+</li>
+</ul>
+<h2 id="基础的配置文件"><a href="#基础的配置文件" class="headerlink" title="基础的配置文件"></a>基础的配置文件</h2><p><strong>所需要用到的包</strong></p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js"><span class="token comment">// babel</span>
+<span class="token keyword">import</span> babel <span class="token keyword">from</span> <span class="token string">'@rollup/plugin-babel'</span><span class="token punctuation">;</span>
+<span class="token comment">// typescript</span>
+<span class="token keyword">import</span> tsc <span class="token keyword">from</span> <span class="token string">'rollup-plugin-typescript2'</span><span class="token punctuation">;</span>
+<span class="token comment">// resolve</span>
+<span class="token keyword">import</span> resolve <span class="token keyword">from</span> <span class="token string">'@rollup/plugin-node-resolve'</span><span class="token punctuation">;</span>
+<span class="token comment">// 处理 commonjs</span>
+<span class="token keyword">import</span> commonjs <span class="token keyword">from</span> <span class="token string">'@rollup/plugin-commonjs'</span><span class="token punctuation">;</span>
+<span class="token comment">// 处理图片</span>
+<span class="token keyword">import</span> image <span class="token keyword">from</span> <span class="token string">'@rollup/plugin-image'</span><span class="token punctuation">;</span>
+<span class="token comment">// 压缩代码</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> terser <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'rollup-plugin-terser'</span><span class="token punctuation">;</span>
+<span class="token comment">// 处理 json 文件</span>
+<span class="token keyword">import</span> json <span class="token keyword">from</span> <span class="token string">'@rollup/plugin-json'</span><span class="token punctuation">;</span>
+<span class="token comment">// 使rollup可以使用postCss处理样式文件less、css等，需要同时安装 postcss</span>
+<span class="token keyword">import</span> postcss <span class="token keyword">from</span> <span class="token string">'rollup-plugin-postcss'</span><span class="token punctuation">;</span>
+<span class="token comment">// 处理 less 定义的变量</span>
+<span class="token keyword">import</span> simplevars <span class="token keyword">from</span> <span class="token string">'postcss-simple-vars'</span><span class="token punctuation">;</span>
+<span class="token comment">// 处理less嵌套样式写法</span>
+<span class="token keyword">import</span> nested <span class="token keyword">from</span> <span class="token string">'postcss-nested'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>rollup.config.js</strong></p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js">
+<span class="token keyword">const</span> extensions <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'.ts'</span><span class="token punctuation">,</span> <span class="token string">'.tsx'</span><span class="token punctuation">,</span> <span class="token string">'.js'</span><span class="token punctuation">,</span> <span class="token string">'.jsx'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> external <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'react'</span><span class="token punctuation">,</span> <span class="token string">'antd'</span><span class="token punctuation">,</span> <span class="token string">'react/jsx-runtime'</span><span class="token punctuation">]</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">{</span>
+    input<span class="token operator">:</span> <span class="token string">'./src/index.ts'</span><span class="token punctuation">,</span>
+    output<span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+            file<span class="token operator">:</span> <span class="token string">'./lib/index.js'</span><span class="token punctuation">,</span>
+            sourcemap<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+            format<span class="token operator">:</span> <span class="token string">'cjs'</span><span class="token punctuation">,</span>
+            esModule<span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span>
+            file<span class="token operator">:</span> <span class="token string">'./es/index.js'</span><span class="token punctuation">,</span>
+            sourcemap<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+            format<span class="token operator">:</span> <span class="token string">'esm'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    external<span class="token punctuation">,</span>
+    plugins<span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token function">image</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token function">postcss</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+            plugins<span class="token operator">:</span> <span class="token punctuation">[</span>
+                <span class="token function">simplevars</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                <span class="token function">nested</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token comment">// 内部使用 cssnano 去做压缩的，外部不需要再次安装 </span>
+            minimize<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+            <span class="token comment">// 处理.css和.less文件</span>
+            extensions<span class="token operator">:</span> <span class="token punctuation">[</span> <span class="token string">'.css'</span><span class="token punctuation">,</span> <span class="token string">'.less'</span> <span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token comment">// 帮助 rollup 查找 node_modules 里的三方模块</span>
+        <span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">{</span> extensions <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token comment">// 帮助 rollup 查找 commonjs 规范的模块, 常配合 rollup-plugin-node-resolve 一起使用</span>
+        <span class="token function">commonjs</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token function">tsc</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+            tsconfig<span class="token operator">:</span> <span class="token string">'./tsconfig.json'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token function">babel</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+            extensions<span class="token punctuation">,</span>
+            babelHelpers<span class="token operator">:</span> <span class="token string">'runtime'</span><span class="token punctuation">,</span>
+            exclude<span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">node_modules</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token function">terser</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">]</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>tsconfig.json</strong></p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"compilerOptions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"target"</span><span class="token operator">:</span> <span class="token string">"esnext"</span><span class="token punctuation">,</span>
+    <span class="token property">"module"</span><span class="token operator">:</span> <span class="token string">"esnext"</span><span class="token punctuation">,</span>
+    <span class="token property">"moduleResolution"</span><span class="token operator">:</span> <span class="token string">"node"</span><span class="token punctuation">,</span>
+    <span class="token property">"importHelpers"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"jsx"</span><span class="token operator">:</span> <span class="token string">"react-jsx"</span><span class="token punctuation">,</span>
+    <span class="token property">"esModuleInterop"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"sourceMap"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"declaration"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"baseUrl"</span><span class="token operator">:</span> <span class="token string">"."</span><span class="token punctuation">,</span>
+    <span class="token property">"outDir"</span><span class="token operator">:</span> <span class="token string">"."</span><span class="token punctuation">,</span>
+    <span class="token property">"strict"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"allowSyntheticDefaultImports"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"exclude"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"node_modules"</span><span class="token punctuation">,</span>
+    <span class="token string">"lib"</span><span class="token punctuation">,</span>
+    <span class="token string">"es"</span><span class="token punctuation">,</span>
+    <span class="token string">"dist"</span><span class="token punctuation">,</span>
+    <span class="token string">"typings"</span><span class="token punctuation">,</span>
+    <span class="token string">"**/__test__"</span><span class="token punctuation">,</span>
+    <span class="token string">"test"</span><span class="token punctuation">,</span>
+    <span class="token string">"docs"</span><span class="token punctuation">,</span>
+    <span class="token string">"tests"</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>babel.config.js</strong></p>
+<pre class="line-numbers language-js" data-language="js"><code class="language-js">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
+    presets<span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">[</span><span class="token string">'@babel/preset-env'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> loose<span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">[</span>
+            <span class="token string">'@babel/preset-react'</span><span class="token punctuation">,</span>
+            <span class="token punctuation">{</span>
+                runtime<span class="token operator">:</span> <span class="token string">'automatic'</span><span class="token punctuation">,</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    plugins<span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token string">'@babel/plugin-transform-runtime'</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>以上的配置基本就可以打造一个组件库了，麻雀虽小，五脏俱全。</p>
+<h2 id="FAQ"><a href="#FAQ" class="headerlink" title="FAQ"></a>FAQ</h2><ul>
+<li>打包完，发现<code>antd</code>或者自生样式丢失？</li>
+</ul>
+<pre class="line-numbers language-diff" data-language="diff"><code class="language-diff">
+module.exports = {
+<span class="token unchanged"><span class="token prefix unchanged"> </span><span class="token line">   presets: [
+</span><span class="token prefix unchanged"> </span><span class="token line">       ['@babel/preset-env', { loose: true }],
+</span><span class="token prefix unchanged"> </span><span class="token line">       [
+</span><span class="token prefix unchanged"> </span><span class="token line">           '@babel/preset-react',
+</span><span class="token prefix unchanged"> </span><span class="token line">           {
+</span><span class="token prefix unchanged"> </span><span class="token line">               runtime: 'automatic',
+</span><span class="token prefix unchanged"> </span><span class="token line">           },
+</span><span class="token prefix unchanged"> </span><span class="token line">       ],
+</span><span class="token prefix unchanged"> </span><span class="token line">   ],
+</span><span class="token prefix unchanged"> </span><span class="token line">   plugins: [
+</span><span class="token prefix unchanged"> </span><span class="token line">     '@babel/plugin-transform-runtime',
+</span></span><span class="token inserted-sign inserted"><span class="token prefix inserted">+</span><span class="token line">     [
+</span><span class="token prefix inserted">+</span><span class="token line">       'import', {
+</span><span class="token prefix inserted">+</span><span class="token line">       "libraryName": "antd",
+</span><span class="token prefix inserted">+</span><span class="token line">       "libraryDirectory": "es",
+</span><span class="token prefix inserted">+</span><span class="token line">       "style": "css"
+</span><span class="token prefix inserted">+</span><span class="token line">     }
+</span><span class="token prefix inserted">+</span><span class="token line">     ]
+</span></span><span class="token unchanged"><span class="token prefix unchanged"> </span><span class="token line">   ],
+</span></span>};
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<blockquote>
+<p>这里需要使用<code>babel</code>中的 <code>import</code>实现<code>lazy</code>加载。</p>
+</blockquote>
+<ul>
+<li>如果我打包完后，想实现类似于<code>antd</code>的懒加载样式，可以做到吗？</li>
+</ul>
+<blockquote>
+<p>可以的，需要在<code>rollup.config.js</code>的<code>postcss</code>配置中加入：<code>extract</code>，单独输出样式文件，然后在项目中像加载<code>antd</code>一样，配置<code>babel</code>就可以了。</p>
+</blockquote>
+<hr>
+<p>最后，我叫<strong>小王</strong>，花名<strong>书生</strong>，今日份知识分享到此<code>over</code>，下一期再见～</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="false">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title="0" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                        
+                            <li title="1" data-url="http://link.hhtjim.com/163/425570952.mp3"></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        <div class="hexo-footer">
+            <div class="footer-desc"></div>
+            <img src="https://bigdreamerblog.oss-cn-beijing.aliyuncs.com/wechat/wechat-put.png?x-oss-process=image/quality,q_80" alt="alt">
+            <p class="license"><span>许可协议:</span><a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+        </div>
+        
+    <div id="gitalk-container" class="comment link" data-enable="true" data-ae="false" data-ci="400eb29d3e9a8200ebce" data-cs="3752a31c14ca2baf0f2f24cd1c47905b1b01697d" data-r="bigbigDreamer.github.io" data-o="bigbigDreamer" data-a="bigbigDreamer" data-d="false">查看评论</div>
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script async="" custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?196b0e1c350c1276f42806183a2d3951";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+
+<!--
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/jquery.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/diaspora.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/typed.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/plugin.js"></script>
+
+
+
+
+
+<!--
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+-->
+
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe.min.js"></script>
+<script src="//bigdreamerblog.oss-accelerate.aliyuncs.com/blog/js/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-179593702-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+
+</body></html>
